@@ -3,21 +3,21 @@
 
 #include <tuple>
 
-namespace mcurses
-{
+namespace mcurses {
 
 template <typename Function>
-class function_type_splitter;
+class Function_type_splitter;
 
-template <typename Ret, typename ... Args>
-class function_type_splitter<Ret(Args...)> {
-public:
-	static const int arity = sizeof...(Args);
+// Useful for extracting the return and argument types from a function.
+template <typename Ret, typename... Args>
+class Function_type_splitter<Ret(Args...)> {
+   public:
+    static const int arity = sizeof...(Args);
 
-	typedef Ret return_type;
-	typedef std::tuple<Args...> argument_tuple_type;
+    typedef Ret return_type;
+    typedef std::tuple<Args...> argument_tuple_type;
 };
 
-} // namespace mcurses
+}  // namespace mcurses
 
-#endif // FUNCTION_TYPE_SPLITTER_HPP
+#endif  // FUNCTION_TYPE_SPLITTER_HPP

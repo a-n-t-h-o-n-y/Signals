@@ -87,22 +87,22 @@ public:
 		return *this;
 	}
 
-	connection connect(const slot_type& s, position pos = position::at_back)
+	connection connect(const slot_type& s, Position pos = Position::at_back)
 	{
 		return pimpl_->connect(s, pos);
 	}
 
-	connection connect(const group_type& g, const slot_type& s, position pos = position::at_back)
+	connection connect(const group_type& g, const slot_type& s, Position pos = Position::at_back)
 	{
 		return pimpl_->connect(g, s, pos);
 	}
 
-	connection connect_extended(const extended_slot_type& es, position pos = position::at_back)
+	connection connect_extended(const extended_slot_type& es, Position pos = Position::at_back)
 	{
 		return pimpl_->connect_extended(es, pos);
 	}
 
-	connection connect_extended(const group_type& g, const extended_slot_type& es, position pos = position::at_back)
+	connection connect_extended(const group_type& g, const extended_slot_type& es, Position pos = Position::at_back)
 	{
 		return pimpl_->connect_extended(g, es, pos);
 	}

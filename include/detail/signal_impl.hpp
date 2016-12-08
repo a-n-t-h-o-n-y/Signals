@@ -59,17 +59,17 @@ public:
 	signal_impl& operator=(const signal_impl&) = default;
 	signal_impl& operator=(signal_impl&& x) = default;
 
-	connection connect(const slot_type& s, position pos)
+	connection connect(const slot_type& s, Position pos)
 	{
 		auto c = std::make_shared<connection_impl<signature_type>>(s);
-		if(pos == position::at_front)
+		if(pos == Position::at_front)
 		{
 			at_front_connections_.insert(std::begin(at_front_connections_), c);
 			// at_front_connections_.push_back(c);
 			return connection(c);
 		}
 
-		if(pos == position::at_back)
+		if(pos == Position::at_back)
 		{
 			at_back_connections_.push_back(c);
 			return connection(c);
@@ -77,15 +77,15 @@ public:
 		return connection();
 	}
 
-	connection connect(const group_type& g, const slot_type& s, position pos)
+	connection connect(const group_type& g, const slot_type& s, Position pos)
 	{
 		auto c = std::make_shared<connection_impl<signature_type>>(s);
-		if(pos == position::at_front)
+		if(pos == Position::at_front)
 		{
 			grouped_connections_[g].insert(std::begin(grouped_connections_[g]), c);
 			return connection(c);
 		}
-		if(pos == position::at_back)
+		if(pos == Position::at_back)
 		{
 			grouped_connections_[g].push_back(c);
 			return connection(c);
@@ -93,19 +93,19 @@ public:
 		return connection();
 	}
 
-	connection connect_extended(const extended_slot_type& es, position pos)
+	connection connect_extended(const extended_slot_type& es, Position pos)
 	{
 		auto conn_impl = std::make_shared<connection_impl<signature_type>>();
 		connection conn = connection(conn_impl);
 		conn_impl->emplace_extended(es, conn);	// this only takes the slot function, not the tracked items..!
 
-		if(pos == position::at_front)
+		if(pos == Position::at_front)
 		{
 			at_front_connections_.insert(std::begin(at_front_connections_), conn_impl);
 			return conn;
 		}
 
-		if(pos == position::at_back)
+		if(pos == Position::at_back)
 		{
 			at_back_connections_.push_back(conn_impl);
 			return conn;
@@ -113,18 +113,18 @@ public:
 		return connection();
 	}
 
-	connection connect_extended(const group_type& g, const extended_slot_type& es, position pos)
+	connection connect_extended(const group_type& g, const extended_slot_type& es, Position pos)
 	{
 		auto conn_impl = std::make_shared<connection_impl<signature_type>>();
 		connection conn = connection(conn_impl);
 		conn_impl->emplace_extended(es, conn);
 
-		if(pos == position::at_front)
+		if(pos == Position::at_front)
 		{
 			grouped_connections_[g].insert(std::begin(grouped_connections_[g]), conn_impl);
 			return conn;
 		}
-		if(pos == position::at_back)
+		if(pos == Position::at_back)
 		{
 			grouped_connections_[g].push_back(conn_impl);
 			return conn;
