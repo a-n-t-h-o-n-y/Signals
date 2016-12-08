@@ -2,7 +2,7 @@
 #define SHARED_CONNECTION_BLOCK_HPP
 
 #include "connection.hpp"
-class connection_impl_base;
+class Connection_impl_base;
 
 #include <memory>
 
@@ -25,7 +25,7 @@ public:
 private:
 	void reset(const shared_connection_block& x);
 
-	std::weak_ptr<connection_impl_base> weak_conn_impl_base_;
+	std::weak_ptr<Connection_impl_base> weak_conn_impl_base_;
 	bool blocking_;
 };
 

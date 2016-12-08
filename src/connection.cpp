@@ -6,7 +6,7 @@
 namespace mcurses
 {
 
-connection::connection(std::weak_ptr<connection_impl_base> wp_cib)
+connection::connection(std::weak_ptr<Connection_impl_base> wp_cib)
 :pimpl_{wp_cib}
 {}
 

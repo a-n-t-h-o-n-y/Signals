@@ -17,7 +17,7 @@ template <typename Signature>
 class connection_impl;
 
 template <typename Ret, typename ... Args>
-class connection_impl<Ret(Args...)> : public connection_impl_base {
+class connection_impl<Ret(Args...)> : public Connection_impl_base {
 public:
 	typedef slot<Ret(const connection&, Args...)> extended_slot_type;
 

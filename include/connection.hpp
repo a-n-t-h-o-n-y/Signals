@@ -10,7 +10,7 @@ namespace mcurses
 class connection {
 public:
 	connection() = default;
-	connection(std::weak_ptr<connection_impl_base> wp_cib);	// for signal constructor, undocumented
+	connection(std::weak_ptr<Connection_impl_base> wp_cib);	// for signal constructor, undocumented
 	
 	connection(const connection& x);
 	connection(connection&& x);
@@ -32,7 +32,7 @@ public:
 	friend class shared_connection_block;
 
 private:
-	std::weak_ptr<connection_impl_base> pimpl_;
+	std::weak_ptr<Connection_impl_base> pimpl_;
 };
 
 void swap(connection& x, connection& y);

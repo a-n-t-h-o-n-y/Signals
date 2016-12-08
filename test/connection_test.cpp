@@ -267,7 +267,7 @@ TEST(ConnectionTest, OperatorLessThan)
 
 	EXPECT_FALSE(conn < conn);
 
-	typedef mcurses::connection_impl_base base;
+	typedef mcurses::Connection_impl_base base;
 
 	if(std::dynamic_pointer_cast<base>(c_impl) < std::dynamic_pointer_cast<base>(c_impl2))
 	{
