@@ -31,8 +31,9 @@ class Connection_impl<Ret(Args...)> : public Connection_impl_base {
     explicit Connection_impl(const slot<Ret(Args...)>& s)
         : Connection_impl_base{}, slot_{s}, connected_{true} {}
 
-    // add a test
-    // Constructs a Connection_impl with extended_slot and connection.
+    // Constructs a Connection_impl with extended_slot and connection. This
+    // binds the connection to the first parameter of the extended_slot_t
+    // function so that the signature of the function fits with the signal type.
     Connection_impl& emplace_extended(const extended_slot_t& es,
                                       const connection& c) {
         connected_ = true;

@@ -1,8 +1,12 @@
+#include <connection.hpp>
 #include <detail/connection_impl.hpp>
 #include <slot.hpp>
 
 #include <gtest/gtest.h>
 
+#include <memory>
+
+using mcurses::connection;
 using mcurses::Connection_impl;
 using mcurses::slot;
 
@@ -37,8 +41,6 @@ TEST(ConnectionImplTest, BlockedMethod) {
     slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl2(s);
     EXPECT_FALSE(impl2.blocked());
-
-    // Fill in once you have shared_connection_block
 }
 
 TEST(ConnectionImplTest, ConnectedMethod) {
@@ -67,4 +69,15 @@ TEST(ConnectionImplTest, ConstGetSlotMethod) {
     const Connection_impl<int(int)> impl(s1);
 
     EXPECT_EQ(5, (impl.get_slot())(1));
+}
+
+TEST(ConnectionImplTest, EmplaceExtended) {
+    auto ci = std::make_shared<Connection_impl<int(double)>>();
+    slot<int(const connection&, double)> es = [](const connection&, double) {
+        return 3;
+    };
+    connection conn{ci};
+    ci->emplace_extended(es, conn);
+    EXPECT_TRUE(conn.connected());
+    EXPECT_EQ(3, ci->get_slot()(5.4));
 }
