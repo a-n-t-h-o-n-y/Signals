@@ -1,9 +1,9 @@
 #include <signal.hpp>
 #include <slot.hpp>
 #include <position.hpp>
+#include <optional_last_value.hpp>
 
 #include <aml/optional/optional.hpp>
-#include <aml/optional/optional_last_value.hpp>
 #include <gtest/gtest.h>
 
 #include <functional>
@@ -28,7 +28,7 @@ TEST(SignalTest, Constructor)
 {
 	mcurses::signal<double(int, char)> sig1;
 	EXPECT_TRUE(sig1.empty());
-	EXPECT_FALSE(bool(sig1(5, 'h')));	// returns an empty optional<double>
+	EXPECT_FALSE(bool(sig1(5, 'h')));	// returns an empty Optional<double>
 
 	mcurses::signal<void(int)> sig2;
 	EXPECT_TRUE(sig2.empty());
@@ -46,7 +46,7 @@ TEST(SignalTest, Constructor)
 
 	const mcurses::signal<char(int, double, float), mcurses::optional_last_value<char>, std::less<char>> sig5;
 	EXPECT_TRUE(sig5.empty());
-	EXPECT_FALSE(bool(sig5(4, 8.4, 6.5))); // returns optional<char>
+	EXPECT_FALSE(bool(sig5(4, 8.4, 6.5))); // returns Optional<char>
 	auto comb_char = mcurses::optional_last_value<char>();
 	EXPECT_EQ(typeid(comb_char), typeid(sig5.combiner()));
 }
@@ -61,9 +61,9 @@ TEST(SignalTest, SignalInSlotConnectedToSignal)
 	mcurses::slot<int(double, char)> slot_3 = [](double, char){return 3;};
 	sig_child.connect(slot_3);
 
-	mcurses::slot<mcurses::optional<int>(double, char)> slot_holding_signal = sig_child;
+	mcurses::slot<mcurses::Optional<int>(double, char)> slot_holding_signal = sig_child;
 
-	mcurses::signal<mcurses::optional<int>(double, char)> sig_parent;
+	mcurses::signal<mcurses::Optional<int>(double, char)> sig_parent;
 	sig_parent.connect(slot_holding_signal);
 
 	// This slot will not be called by the signal containing sig_child
@@ -115,7 +115,7 @@ TEST(SignalTest, MoveConstructor)
 	EXPECT_EQ(nullptr, sig.lock_impl());
 
 	to_track1.reset();
-	EXPECT_THROW(sig_move_to(4, 2.1), mcurses::expired_slot);
+	EXPECT_THROW(sig_move_to(4, 2.1), mcurses::Expired_slot);
 }
 
 TEST(SignalTest, MoveAssignmentOperator)
@@ -145,7 +145,7 @@ TEST(SignalTest, MoveAssignmentOperator)
 	EXPECT_EQ(nullptr, sig.lock_impl());
 
 	to_track1.reset();
-	EXPECT_THROW(sig_move_to(4, 2.1), mcurses::expired_slot);
+	EXPECT_THROW(sig_move_to(4, 2.1), mcurses::Expired_slot);
 }
 
 TEST(SignalTest, ConnectWithPosition)
@@ -346,7 +346,7 @@ TEST(SignalTest, ConnectWithTrackedObject)
 	EXPECT_EQ(3, *result);
 
 	track_me.reset();
-	EXPECT_THROW(sig('l', 'k'), mcurses::expired_slot); // slot has expired
+	EXPECT_THROW(sig('l', 'k'), mcurses::Expired_slot); // slot has expired
 }
 
 TEST(SignalTest, ConnectExtendedWithPosition)
@@ -568,8 +568,8 @@ TEST(SignalTest, ConnectExtendedSlotWithTrackedObject)
 	track_me.reset();
 	EXPECT_EQ(0, track_me.use_count());
 
-	EXPECT_THROW(ext_slot(conn, 'j', 'o'), mcurses::expired_slot);
-	EXPECT_THROW(sig('l', 'k'), mcurses::expired_slot);
+	EXPECT_THROW(ext_slot(conn, 'j', 'o'), mcurses::Expired_slot);
+	EXPECT_THROW(sig('l', 'k'), mcurses::Expired_slot);
 }
 
 TEST(SignalTest, DisconnectByGroup)

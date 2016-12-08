@@ -2,10 +2,10 @@
 #include <signal.hpp>
 #include <connection.hpp>
 #include <position.hpp>
+#include <optional_last_value.hpp>
 
 #include <gtest/gtest.h>
 
-#include <aml/optional/optional_last_value.hpp>
 #include <boost/function.hpp>
 
 #include <functional>
@@ -39,8 +39,8 @@ protected:
 
 		signal_boost.connect(boost_slot_empty2);
 		signal_boost.connect(std_slot_empty2);
-		boost_slot_holds_signal = mcurses::slot<mcurses::optional<unsigned>(long long),
-					boost::function<mcurses::optional<unsigned>(long long)>>{signal_boost};
+		boost_slot_holds_signal = mcurses::slot<mcurses::Optional<unsigned>(long long),
+					boost::function<mcurses::Optional<unsigned>(long long)>>{signal_boost};
 
 		si_type1_2.connect([](int){return;}, mcurses::position::at_back);
 
@@ -95,13 +95,13 @@ protected:
 	// Slot holds empty Signal - boost::function
 	mcurses::signal<unsigned(long long), mcurses::optional_last_value<unsigned>,
 					int, std::less<int>, boost::function<unsigned(long long)>> empty_signal_boost{};
-	mcurses::slot<mcurses::optional<unsigned>(long long), boost::function<mcurses::optional<unsigned>(long long)>>
+	mcurses::slot<mcurses::Optional<unsigned>(long long), boost::function<mcurses::Optional<unsigned>(long long)>>
 					boost_slot_holds_empty_signal{empty_signal_boost};
 
 	// Slot holds non-empty Signal - boost::function
 	mcurses::signal<unsigned(long long), mcurses::optional_last_value<unsigned>,
 					int, std::less<int>, boost::function<unsigned(long long)>> signal_boost{};
-	mcurses::slot<mcurses::optional<unsigned>(long long), boost::function<mcurses::optional<unsigned>(long long)>>
+	mcurses::slot<mcurses::Optional<unsigned>(long long), boost::function<mcurses::Optional<unsigned>(long long)>>
 					boost_slot_holds_signal{};
 
 	// Empty Slot - std::function

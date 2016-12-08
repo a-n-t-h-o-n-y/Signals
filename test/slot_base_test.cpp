@@ -1,4 +1,4 @@
-#include <slot_base.hpp>
+#include <detail/slot_base.hpp>
 #include <slot.hpp>
 
 #include <gtest/gtest.h>

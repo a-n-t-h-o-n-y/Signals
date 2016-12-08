@@ -4,7 +4,7 @@
 #include <mutex>
 #include <functional>
 
-#include <aml/optional/optional_last_value.hpp>
+#include "optional_last_value.hpp"
 
 #include "detail/function_type_splitter.hpp"
 

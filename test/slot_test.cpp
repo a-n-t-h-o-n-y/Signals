@@ -159,7 +159,7 @@ TEST(SlotTest, ConstSlotFunction)
 TEST(SlotTest, ConstructWithSignal)
 {
 	mcurses::signal<int(int)> sig;
-	mcurses::slot<mcurses::optional<int>(int)> a_slot{sig};
+	mcurses::slot<mcurses::Optional<int>(int)> a_slot{sig};
 }
 
 TEST(SlotTest, CopyConstructor)
@@ -204,7 +204,7 @@ TEST(SlotTest, ParenthesisOperator)
 
 	// exception thrown
 	obj.reset();
-	EXPECT_THROW(s(4,5), mcurses::expired_slot);
+	EXPECT_THROW(s(4,5), mcurses::Expired_slot);
 
 	// void return type
 	mcurses::slot<void(char, double)> s_v{[](char, double){return 5;}};
@@ -227,5 +227,5 @@ TEST(SlotTest, ConstParenthesisOperator)
 
 	// exception thrown
 	// obj.reset();
-	// EXPECT_THROW(s(4,5), mcurses::expired_slot);
+	// EXPECT_THROW(s(4,5), mcurses::Expired_slot);
 }

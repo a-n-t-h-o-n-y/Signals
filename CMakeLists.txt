@@ -37,6 +37,7 @@ list(APPEND TEST_SOURCES "test/slot_test.cpp"
 						 "test/signal_test.cpp"
 						 "test/signal_impl_test.cpp"
 						 "test/shared_connection_block_test.cpp"
+                         "test/optional_last_value_test.cpp"
 						 )
 
 # Create Static Library
@@ -48,7 +49,7 @@ add_executable(tests ${TEST_SOURCES})
 # Link libraries to executables
 target_link_libraries(tests signals gtest gtest_main)
 
-# Install Library
+# Install Static Library
 install(TARGETS signals ARCHIVE DESTINATION lib)
 
 # Install Headers

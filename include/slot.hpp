@@ -1,7 +1,7 @@
 #ifndef SLOT_HPP
 #define SLOT_HPP
 
-#include "slot_base.hpp"
+#include "detail/slot_base.hpp"
 #include "expired_slot.hpp"
 // #include "signal.hpp" // delete this
 #include "signal_fwd.hpp"
@@ -83,7 +83,7 @@ typename slot<Ret (Args...), FunctionType>::result_type
 slot<Ret (Args...), FunctionType>::operator()(Args&&... args)
 {
 	// make sure to first check if expired, then lock all object tracked
-	auto l = expired() ? throw expired_slot() : lock();	// might be able to not assign to l if it will last until the brackets close
+	auto l = expired() ? throw Expired_slot() : lock();	// might be able to not assign to l if it will last until the brackets close
 	return function_(std::forward<Args>(args)...);
 }
 
@@ -92,7 +92,7 @@ typename slot<Ret (Args...), FunctionType>::result_type
 slot<Ret (Args...), FunctionType>::operator()(Args&&... args) const
 {
 	// make sure to first check if expired, then lock all object tracked
-	auto l = expired() ? throw expired_slot() : lock();	// might be able to not assign to l if it will last until the brackets close
+	auto l = expired() ? throw Expired_slot() : lock();	// might be able to not assign to l if it will last until the brackets close
 	return function_(std::forward<Args>(args)...);
 }
 
