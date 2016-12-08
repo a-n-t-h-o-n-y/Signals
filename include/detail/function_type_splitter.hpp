@@ -14,8 +14,8 @@ class Function_type_splitter<Ret(Args...)> {
    public:
     static const int arity = sizeof...(Args);
 
-    typedef Ret return_type;
-    typedef std::tuple<Args...> argument_tuple_type;
+    using return_type = Ret;
+    using argument_tuple_type = std::tuple<Args...>;
 };
 
 }  // namespace mcurses

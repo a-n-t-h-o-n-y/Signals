@@ -839,7 +839,7 @@ EXCLUDE_PATTERNS       =
 # exclude all test directories use the pattern */test/*
 
 EXCLUDE_SYMBOLS        = Function_type_splitter Placeholder_template \
-                            Connection_impl_base
+                            Connection_impl_base Connection_impl
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include

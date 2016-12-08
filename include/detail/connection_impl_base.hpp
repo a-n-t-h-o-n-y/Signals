@@ -6,7 +6,7 @@
 // Forward Declarations
 namespace mcurses {
 class connection;
-}
+} // namespace mcurses
 
 namespace mcurses {
 
@@ -15,7 +15,7 @@ namespace mcurses {
 // a pointer with a concrete Connection_impl instantiation.
 class Connection_impl_base {
    public:
-    virtual ~Connection_impl_base() {}
+    virtual ~Connection_impl_base() = default;
 
     virtual void disconnect() = 0;
 
@@ -27,11 +27,9 @@ class Connection_impl_base {
 
     inline void add_block() {
         ++blocking_object_count_;
-        return;
     }
     inline void remove_block() {
         --blocking_object_count_;
-        return;
     }
 
    protected:

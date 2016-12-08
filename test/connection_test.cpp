@@ -22,7 +22,7 @@ TEST(ConnectionTest, DefaultConstructor)
 TEST(ConnectionTest, CopyConstructor)
 {
 	mcurses::slot<int(double)> s {[](double){return 3;}};
-	auto c_impl = std::make_shared<mcurses::connection_impl<int(double)>>(s);
+	auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
 	mcurses::connection conn{c_impl};
 
 	mcurses::connection conn_2{conn};
@@ -39,7 +39,7 @@ TEST(ConnectionTest, CopyConstructor)
 TEST(ConnectionTest, MoveConstructor)
 {
 	mcurses::slot<int(double)> s {[](double){return 3;}};
-	auto c_impl = std::make_shared<mcurses::connection_impl<int(double)>>(s);
+	auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
 	mcurses::connection conn{c_impl};
 
 	mcurses::connection conn_2{std::move(conn)};
@@ -56,11 +56,11 @@ TEST(ConnectionTest, MoveConstructor)
 TEST(ConnectionTest, CopyAssignmentOperator)
 {
 	mcurses::slot<int(double)> s {[](double){return 3;}};
-	auto c_impl = std::make_shared<mcurses::connection_impl<int(double)>>(s);
+	auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
 	mcurses::connection conn{c_impl};
 
 	mcurses::slot<int(int,int)> s2 {[](int,int){return 3;}};
-	auto c_impl2 = std::make_shared<mcurses::connection_impl<int(int,int)>>(s2);
+	auto c_impl2 = std::make_shared<mcurses::Connection_impl<int(int,int)>>(s2);
 	mcurses::connection conn2{c_impl2};
 
 	EXPECT_TRUE(conn.connected());
@@ -85,11 +85,11 @@ TEST(ConnectionTest, CopyAssignmentOperator)
 TEST(ConnectionTest, MoveAssignmentOperator)
 {
 	mcurses::slot<int(double)> s {[](double){return 3;}};
-	auto c_impl = std::make_shared<mcurses::connection_impl<int(double)>>(s);
+	auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
 	mcurses::connection conn{c_impl};
 
 	mcurses::slot<int(int,int)> s2 {[](int,int){return 3;}};
-	auto c_impl2 = std::make_shared<mcurses::connection_impl<int(int,int)>>(s2);
+	auto c_impl2 = std::make_shared<mcurses::Connection_impl<int(int,int)>>(s2);
 	mcurses::connection conn2{c_impl2};
 
 	EXPECT_TRUE(conn.connected());
@@ -114,7 +114,7 @@ TEST(ConnectionTest, MoveAssignmentOperator)
 TEST(ConnectionTest, DisconnectMethod)
 {
 	mcurses::slot<int(double)> s {[](double){return 3;}};
-	auto c_impl = std::make_shared<mcurses::connection_impl<int(double)>>(s);
+	auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
 	mcurses::connection my_conn{c_impl};
 
 	EXPECT_TRUE(my_conn.connected());
@@ -124,7 +124,7 @@ TEST(ConnectionTest, DisconnectMethod)
 	EXPECT_FALSE(my_conn.connected());
 
 	mcurses::slot<int(double)> s2 {[](double){return 3;}};
-	auto c_impl2 = std::make_shared<mcurses::connection_impl<int(double)>>(s2);
+	auto c_impl2 = std::make_shared<mcurses::Connection_impl<int(double)>>(s2);
 	mcurses::connection my_conn2{c_impl2};
 
 	EXPECT_TRUE(my_conn2.connected());
@@ -147,7 +147,7 @@ TEST(ConnectionTest, ConnectedMethod)
 
 	// test properly built connection
 	mcurses::slot<int(double)> s {[](double){return 4;}};
-	auto c_impl = std::make_shared<mcurses::connection_impl<int(double)>>(s); // this was expiring and making connection not connected anymore
+	auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s); // this was expiring and making connection not connected anymore
 	mcurses::connection c2 {c_impl};
 
 	EXPECT_TRUE(c2.connected());
@@ -166,7 +166,7 @@ TEST(ConnectionTest, BlockedMethod)
 
 	// test properly build connection
 	mcurses::slot<int(double)> s {[](double){return 4;}};
-	mcurses::connection c2 {std::make_shared<mcurses::connection_impl<int(double)>>(s)};
+	mcurses::connection c2 {std::make_shared<mcurses::Connection_impl<int(double)>>(s)};
 
 	EXPECT_FALSE(c2.blocked());
 
@@ -176,11 +176,11 @@ TEST(ConnectionTest, BlockedMethod)
 TEST(ConnectionTest, SwapMemberFunction)
 {
 	mcurses::slot<int(double)> s {[](double){return 3;}};
-	auto c_impl = std::make_shared<mcurses::connection_impl<int(double)>>(s);
+	auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
 	mcurses::connection conn{c_impl};
 
 	mcurses::slot<int(int,int)> s2 {[](int,int){return 3;}};
-	auto c_impl2 = std::make_shared<mcurses::connection_impl<int(int,int)>>(s2);
+	auto c_impl2 = std::make_shared<mcurses::Connection_impl<int(int,int)>>(s2);
 	mcurses::connection conn2{c_impl2};
 
 	EXPECT_TRUE(conn.connected());
@@ -200,15 +200,15 @@ TEST(ConnectionTest, SwapMemberFunction)
 TEST(ConnectionTest, OperatorEquals)
 {
 	mcurses::slot<int(double)> s {[](double){return 3;}};
-	auto c_impl = std::make_shared<mcurses::connection_impl<int(double)>>(s);
+	auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
 	mcurses::connection conn{c_impl};
 
 	mcurses::slot<int(int,int)> s2 {[](int,int){return 3;}};
-	auto c_impl2 = std::make_shared<mcurses::connection_impl<int(int,int)>>(s2);
+	auto c_impl2 = std::make_shared<mcurses::Connection_impl<int(int,int)>>(s2);
 	mcurses::connection conn2{c_impl2};
 
 	mcurses::slot<int(int,int)> s3 {[](int,int){return 3;}};
-	auto c_impl3 = std::make_shared<mcurses::connection_impl<int(int,int)>>(s3);
+	auto c_impl3 = std::make_shared<mcurses::Connection_impl<int(int,int)>>(s3);
 	mcurses::connection conn3{c_impl3};
 
 	mcurses::connection c_null_1;
@@ -227,15 +227,15 @@ TEST(ConnectionTest, OperatorEquals)
 TEST(ConnectionTest, OperatorNotEquals)
 {
 	mcurses::slot<int(double)> s {[](double){return 3;}};
-	auto c_impl = std::make_shared<mcurses::connection_impl<int(double)>>(s);
+	auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
 	mcurses::connection conn{c_impl};
 
 	mcurses::slot<int(int,int)> s2 {[](int,int){return 3;}};
-	auto c_impl2 = std::make_shared<mcurses::connection_impl<int(int,int)>>(s2);
+	auto c_impl2 = std::make_shared<mcurses::Connection_impl<int(int,int)>>(s2);
 	mcurses::connection conn2{c_impl2};
 
 	mcurses::slot<int(int,int)> s3 {[](int,int){return 3;}};
-	auto c_impl3 = std::make_shared<mcurses::connection_impl<int(int,int)>>(s3);
+	auto c_impl3 = std::make_shared<mcurses::Connection_impl<int(int,int)>>(s3);
 	mcurses::connection conn3{c_impl3};
 
 	mcurses::connection c_null_1;
@@ -254,15 +254,15 @@ TEST(ConnectionTest, OperatorNotEquals)
 TEST(ConnectionTest, OperatorLessThan)
 {
 	mcurses::slot<int(double)> s {[](double){return 3;}};
-	auto c_impl = std::make_shared<mcurses::connection_impl<int(double)>>(s);
+	auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
 	mcurses::connection conn{c_impl};
 
 	mcurses::slot<int(int,int)> s2 {[](int,int){return 3;}};
-	auto c_impl2 = std::make_shared<mcurses::connection_impl<int(int,int)>>(s2);
+	auto c_impl2 = std::make_shared<mcurses::Connection_impl<int(int,int)>>(s2);
 	mcurses::connection conn2{c_impl2};
 
 	mcurses::slot<int(int,int)> s3 {[](int,int){return 3;}};
-	auto c_impl3 = std::make_shared<mcurses::connection_impl<int(int,int)>>(s3);
+	auto c_impl3 = std::make_shared<mcurses::Connection_impl<int(int,int)>>(s3);
 	mcurses::connection conn3{c_impl3};
 
 	EXPECT_FALSE(conn < conn);
@@ -309,11 +309,11 @@ TEST(ConnectionTest, OperatorLessThan)
 TEST(ConnectionTest, SwapFreeFunction)
 {
 	mcurses::slot<int(double)> s {[](double){return 3;}};
-	auto c_impl = std::make_shared<mcurses::connection_impl<int(double)>>(s);
+	auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
 	mcurses::connection conn{c_impl};
 
 	mcurses::slot<int(int,int)> s2 {[](int,int){return 3;}};
-	auto c_impl2 = std::make_shared<mcurses::connection_impl<int(int,int)>>(s2);
+	auto c_impl2 = std::make_shared<mcurses::Connection_impl<int(int,int)>>(s2);
 	mcurses::connection conn2{c_impl2};
 
 	EXPECT_TRUE(conn.connected());

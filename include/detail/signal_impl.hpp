@@ -17,7 +17,7 @@
 namespace mcurses
 {
 	template <typename Signature>
-	class connection_impl;
+	class Connection_impl;
 }
 
 namespace mcurses
@@ -42,7 +42,7 @@ public:
 	typedef Ret(signature_type)(Args...) ;
 	typedef Group group_type;
 	typedef GroupCompare group_compare_type;
-	typedef std::vector<std::shared_ptr<connection_impl<signature_type>>> positioned_connection_container_type;
+	typedef std::vector<std::shared_ptr<Connection_impl<signature_type>>> positioned_connection_container_type;
 	typedef std::map<group_type, positioned_connection_container_type, group_compare_type> grouped_connection_container_type;
 	typedef Combiner combiner_type;
 	typedef SlotFunction slot_function_type;
@@ -61,7 +61,7 @@ public:
 
 	connection connect(const slot_type& s, Position pos)
 	{
-		auto c = std::make_shared<connection_impl<signature_type>>(s);
+		auto c = std::make_shared<Connection_impl<signature_type>>(s);
 		if(pos == Position::at_front)
 		{
 			at_front_connections_.insert(std::begin(at_front_connections_), c);
@@ -79,7 +79,7 @@ public:
 
 	connection connect(const group_type& g, const slot_type& s, Position pos)
 	{
-		auto c = std::make_shared<connection_impl<signature_type>>(s);
+		auto c = std::make_shared<Connection_impl<signature_type>>(s);
 		if(pos == Position::at_front)
 		{
 			grouped_connections_[g].insert(std::begin(grouped_connections_[g]), c);
@@ -95,7 +95,7 @@ public:
 
 	connection connect_extended(const extended_slot_type& es, Position pos)
 	{
-		auto conn_impl = std::make_shared<connection_impl<signature_type>>();
+		auto conn_impl = std::make_shared<Connection_impl<signature_type>>();
 		connection conn = connection(conn_impl);
 		conn_impl->emplace_extended(es, conn);	// this only takes the slot function, not the tracked items..!
 
@@ -115,7 +115,7 @@ public:
 
 	connection connect_extended(const group_type& g, const extended_slot_type& es, Position pos)
 	{
-		auto conn_impl = std::make_shared<connection_impl<signature_type>>();
+		auto conn_impl = std::make_shared<Connection_impl<signature_type>>();
 		connection conn = connection(conn_impl);
 		conn_impl->emplace_extended(es, conn);
 
