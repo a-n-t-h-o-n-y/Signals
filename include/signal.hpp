@@ -45,8 +45,8 @@ public:
 	typedef GroupCompare					group_compare_type;
 	typedef SlotFunction					slot_function_type;
 	typedef typename mcurses::slot<signature_type, SlotFunction> slot_type;
-	typedef std::function<Ret(const connection&, Args...)>	extended_slot_function_type;
-	typedef typename mcurses::slot<Ret(const mcurses::connection&, Args...), extended_slot_function_type> extended_slot_type;
+	typedef std::function<Ret(const Connection&, Args...)>	extended_slot_function_type;
+	typedef typename mcurses::slot<Ret(const mcurses::Connection&, Args...), extended_slot_function_type> extended_slot_type;
 	typedef typename SlotFunction::result_type slot_result_type;
 	// typedef slot_iterator					slot_call_iterator;
 	typedef std::tuple<Args...> 			argument_types;
@@ -87,22 +87,22 @@ public:
 		return *this;
 	}
 
-	connection connect(const slot_type& s, Position pos = Position::at_back)
+	Connection connect(const slot_type& s, Position pos = Position::at_back)
 	{
 		return pimpl_->connect(s, pos);
 	}
 
-	connection connect(const group_type& g, const slot_type& s, Position pos = Position::at_back)
+	Connection connect(const group_type& g, const slot_type& s, Position pos = Position::at_back)
 	{
 		return pimpl_->connect(g, s, pos);
 	}
 
-	connection connect_extended(const extended_slot_type& es, Position pos = Position::at_back)
+	Connection connect_extended(const extended_slot_type& es, Position pos = Position::at_back)
 	{
 		return pimpl_->connect_extended(es, pos);
 	}
 
-	connection connect_extended(const group_type& g, const extended_slot_type& es, Position pos = Position::at_back)
+	Connection connect_extended(const group_type& g, const extended_slot_type& es, Position pos = Position::at_back)
 	{
 		return pimpl_->connect_extended(g, es, pos);
 	}

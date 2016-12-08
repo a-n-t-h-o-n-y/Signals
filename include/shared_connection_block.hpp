@@ -11,7 +11,7 @@ namespace mcurses
 
 class shared_connection_block {
 public:
-	shared_connection_block(const connection& conn = mcurses::connection{}, bool initially_blocking = true);
+	shared_connection_block(const Connection& conn = Connection{}, bool initially_blocking = true);
 	shared_connection_block(const shared_connection_block& x);
 	shared_connection_block& operator=(const shared_connection_block& x);
 	~shared_connection_block();
@@ -20,7 +20,7 @@ public:
 	void block();
 	bool blocking() const;
 
-	connection connection() const;
+	Connection connection() const;
 
 private:
 	void reset(const shared_connection_block& x);

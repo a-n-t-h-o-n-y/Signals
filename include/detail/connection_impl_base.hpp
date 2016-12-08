@@ -5,7 +5,7 @@
 
 // Forward Declarations
 namespace mcurses {
-class connection;
+class Connection;
 } // namespace mcurses
 
 namespace mcurses {

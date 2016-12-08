@@ -1,42 +1,60 @@
+/// \file
+/// \brief Contains the definition of the Connection class.
 #ifndef CONNECTION_HPP
 #define CONNECTION_HPP
 
-#include <memory>
 #include "detail/connection_impl_base.hpp"
 
-namespace mcurses
-{
+#include <memory>
 
-class connection {
-public:
-	connection() = default;
-	connection(std::weak_ptr<Connection_impl_base> wp_cib);	// for signal constructor, undocumented
-	
-	connection(const connection& x);
-	connection(connection&& x);
+namespace mcurses {
 
-	connection& operator=(const connection& x);
-	connection& operator=(connection&& x);
+class Connection {
+   public:
+    Connection() = default;
 
-	void disconnect() const;
+    // Signal uses this constructor to build Connection objects.
+    // Each Signal owns the Connection_impl, and each Connection_impl owns the
+    // connecte Slot.
+    explicit Connection(std::weak_ptr<Connection_impl_base> wp_cib)
+        : pimpl_{std::move(wp_cib)} {}
 
-	bool connected() const;
-	bool blocked() const;
+    void disconnect() const {
+        if (!this->pimpl_.expired()) {
+            pimpl_.lock()->disconnect();
+        }
+    }
 
-	void swap(connection& x);
+    bool connected() const {
+        if (!this->pimpl_.expired()) {
+            return pimpl_.lock()->connected();
+        }
+        return false;
+    }
 
-	bool operator==(const connection& x);
-	bool operator!=(const connection& x);
-	bool operator<(const connection& x);
+    bool blocked() const {
+        if (!this->pimpl_.expired()) {
+            return pimpl_.lock()->blocked();
+        }
+        return false;
+    }
 
-	friend class shared_connection_block;
+    bool operator==(const Connection& x) {
+        return pimpl_.lock() == x.pimpl_.lock();
+    }
 
-private:
-	std::weak_ptr<Connection_impl_base> pimpl_;
+    bool operator!=(const Connection& x) { return !(*this == x); }
+
+    bool operator<(const Connection& x) {
+        return pimpl_.lock() < x.pimpl_.lock();
+    }
+
+    friend class shared_connection_block;
+
+   private:
+    std::weak_ptr<Connection_impl_base> pimpl_;
 };
 
-void swap(connection& x, connection& y);
+}  // namespace mcurses
 
-} // namespace mcurses
-
-#endif // CONNECTION_HPP
+#endif  // CONNECTION_HPP

@@ -9,7 +9,7 @@
 #include <utility>
 
 namespace mcurses {
-class connection;
+class Connection;
 
 template <typename Signature>
 class Connection_impl;
@@ -24,7 +24,7 @@ class Connection_impl;
 template <typename Ret, typename... Args>
 class Connection_impl<Ret(Args...)> : public Connection_impl_base {
    public:
-    using extended_slot_t = slot<Ret(const connection&, Args...)>;
+    using extended_slot_t = slot<Ret(const Connection&, Args...)>;
 
     Connection_impl() : Connection_impl_base{}, slot_{}, connected_{false} {}
 
@@ -35,7 +35,7 @@ class Connection_impl<Ret(Args...)> : public Connection_impl_base {
     // binds the connection to the first parameter of the extended_slot_t
     // function so that the signature of the function fits with the signal type.
     Connection_impl& emplace_extended(const extended_slot_t& es,
-                                      const connection& c) {
+                                      const Connection& c) {
         connected_ = true;
         slot_.slot_function() = bind_connection(es.slot_function(), c);
         for (const std::weak_ptr<void>& wp : es.get_tracked_container()) {
@@ -54,22 +54,22 @@ class Connection_impl<Ret(Args...)> : public Connection_impl_base {
 
    private:
     std::function<Ret(Args...)> bind_connection(
-        std::function<Ret(const connection&, Args...)> f,
-        const connection& c) {
+        std::function<Ret(const Connection&, Args...)> f,
+        const Connection& c) {
         return bind_connection(
-            std::forward<std::function<Ret(const connection&, Args...)>>(f),
-            std::forward<const connection&>(c),
+            std::forward<std::function<Ret(const Connection&, Args...)>>(f),
+            std::forward<const Connection&>(c),
             std::index_sequence_for<Args...>{});
     }
 
     template <typename IntType, IntType... Is>
     std::function<Ret(Args...)> bind_connection(
-        std::function<Ret(const connection&, Args...)> f,
-        const connection& c,
+        std::function<Ret(const Connection&, Args...)> f,
+        const Connection& c,
         std::integer_sequence<IntType, Is...>) {
         return std::bind(
-            std::forward<std::function<Ret(const connection&, Args...)>>(f),
-            std::forward<const connection&>(c), Placeholder_template<Is>{}...);
+            std::forward<std::function<Ret(const Connection&, Args...)>>(f),
+            std::forward<const Connection&>(c), Placeholder_template<Is>{}...);
     }
 
     slot<Ret(Args...)> slot_;

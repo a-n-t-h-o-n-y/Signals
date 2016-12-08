@@ -4,7 +4,7 @@
 namespace mcurses
 {
 
-shared_connection_block::shared_connection_block(const mcurses::connection& conn, bool initially_blocking)
+shared_connection_block::shared_connection_block(const mcurses::Connection& conn, bool initially_blocking)
 :weak_conn_impl_base_{conn.pimpl_}, blocking_{initially_blocking}
 {
 	if(!weak_conn_impl_base_.expired() && blocking_)
@@ -86,10 +86,10 @@ shared_connection_block::blocking() const
 }
 
 
-connection
+Connection
 shared_connection_block::connection() const
 {
-	return mcurses::connection(weak_conn_impl_base_);
+	return Connection(weak_conn_impl_base_);
 }
 
 } // namespace mcurses

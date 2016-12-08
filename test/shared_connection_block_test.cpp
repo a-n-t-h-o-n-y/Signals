@@ -99,7 +99,7 @@ TEST(SharedConnectionBlockTest, CopyAssignmentOperator)
 	mcurses::signal<int(double)> sig2;
 	mcurses::slot<int(double)> slot_2 = [](double){return 4;};
 	auto conn2 = sig2.connect(slot_2);
-	mcurses::slot<int(const mcurses::connection&, double)> slot_ext = [](const mcurses::connection&, double){return 5;};
+	mcurses::slot<int(const mcurses::Connection&, double)> slot_ext = [](const mcurses::Connection&, double){return 5;};
 	auto conn3 = sig2.connect_extended(1, slot_ext);
 
 	mcurses::shared_connection_block scb4 = conn2;

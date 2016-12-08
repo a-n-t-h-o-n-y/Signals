@@ -47,7 +47,8 @@ public:
 	typedef Combiner combiner_type;
 	typedef SlotFunction slot_function_type;
 	typedef mcurses::slot<signature_type, slot_function_type> slot_type;
-	typedef mcurses::slot<Ret(const mcurses::connection&, Args...)> extended_slot_type;
+	typedef mcurses::slot<Ret(const mcurses::Connection&, Args...)> extended_slot_type;
+    //^^ you are in namespace mcurses, don't need to qualify with it?
 
 
 	signal_impl(const combiner_type& combiner, const group_compare_type& group_compare)
@@ -59,44 +60,44 @@ public:
 	signal_impl& operator=(const signal_impl&) = default;
 	signal_impl& operator=(signal_impl&& x) = default;
 
-	connection connect(const slot_type& s, Position pos)
+	Connection connect(const slot_type& s, Position pos)
 	{
 		auto c = std::make_shared<Connection_impl<signature_type>>(s);
 		if(pos == Position::at_front)
 		{
 			at_front_connections_.insert(std::begin(at_front_connections_), c);
 			// at_front_connections_.push_back(c);
-			return connection(c);
+			return Connection(c);
 		}
 
 		if(pos == Position::at_back)
 		{
 			at_back_connections_.push_back(c);
-			return connection(c);
+			return Connection(c);
 		}
-		return connection();
+		return Connection();
 	}
 
-	connection connect(const group_type& g, const slot_type& s, Position pos)
+	Connection connect(const group_type& g, const slot_type& s, Position pos)
 	{
 		auto c = std::make_shared<Connection_impl<signature_type>>(s);
 		if(pos == Position::at_front)
 		{
 			grouped_connections_[g].insert(std::begin(grouped_connections_[g]), c);
-			return connection(c);
+			return Connection(c);
 		}
 		if(pos == Position::at_back)
 		{
 			grouped_connections_[g].push_back(c);
-			return connection(c);
+			return Connection(c);
 		}
-		return connection();
+		return Connection();
 	}
 
-	connection connect_extended(const extended_slot_type& es, Position pos)
+	Connection connect_extended(const extended_slot_type& es, Position pos)
 	{
 		auto conn_impl = std::make_shared<Connection_impl<signature_type>>();
-		connection conn = connection(conn_impl);
+		Connection conn = Connection(conn_impl);
 		conn_impl->emplace_extended(es, conn);	// this only takes the slot function, not the tracked items..!
 
 		if(pos == Position::at_front)
@@ -110,13 +111,13 @@ public:
 			at_back_connections_.push_back(conn_impl);
 			return conn;
 		}
-		return connection();
+		return Connection();
 	}
 
-	connection connect_extended(const group_type& g, const extended_slot_type& es, Position pos)
+	Connection connect_extended(const group_type& g, const extended_slot_type& es, Position pos)
 	{
 		auto conn_impl = std::make_shared<Connection_impl<signature_type>>();
-		connection conn = connection(conn_impl);
+		Connection conn = Connection(conn_impl);
 		conn_impl->emplace_extended(es, conn);
 
 		if(pos == Position::at_front)
@@ -129,7 +130,7 @@ public:
 			grouped_connections_[g].push_back(conn_impl);
 			return conn;
 		}
-		return connection();
+		return Connection();
 	}
 
 	void disconnect(const group_type& g)

@@ -26,7 +26,6 @@ include_directories(include)
 
 # Collect Source Files into Variable Names
 list(APPEND SIGNAL_MODULE_SOURCES 	"src/slot_base.cpp"
-									"src/connection.cpp"
 									"src/shared_connection_block.cpp"
 									)
 

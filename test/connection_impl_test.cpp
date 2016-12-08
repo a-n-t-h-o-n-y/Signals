@@ -6,7 +6,7 @@
 
 #include <memory>
 
-using mcurses::connection;
+using mcurses::Connection;
 using mcurses::Connection_impl;
 using mcurses::slot;
 
@@ -73,10 +73,10 @@ TEST(ConnectionImplTest, ConstGetSlotMethod) {
 
 TEST(ConnectionImplTest, EmplaceExtended) {
     auto ci = std::make_shared<Connection_impl<int(double)>>();
-    slot<int(const connection&, double)> es = [](const connection&, double) {
+    slot<int(const Connection&, double)> es = [](const Connection&, double) {
         return 3;
     };
-    connection conn{ci};
+    Connection conn{ci};
     ci->emplace_extended(es, conn);
     EXPECT_TRUE(conn.connected());
     EXPECT_EQ(3, ci->get_slot()(5.4));
