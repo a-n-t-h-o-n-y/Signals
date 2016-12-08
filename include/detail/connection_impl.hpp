@@ -109,7 +109,7 @@ template <typename IntType, IntType ... Is>
 std::function<Ret(Args...)>
 connection_impl<Ret(Args...)>::bind_connection(std::function<Ret(const connection&, Args...)> f, const connection& c, std::integer_sequence<IntType, Is...>)
 {
-	return std::bind(std::forward<std::function<Ret(const connection&, Args...)>>(f), std::forward<const connection&>(c), placeholder_template<Is>{}...);
+	return std::bind(std::forward<std::function<Ret(const connection&, Args...)>>(f), std::forward<const connection&>(c), Placeholder_template<Is>{}...);
 }
 
 
