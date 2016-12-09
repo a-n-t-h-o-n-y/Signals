@@ -16,19 +16,19 @@
 class SignalImplTest: public testing::Test{
 protected:
 	// type_1 - void(int), less<int>, std::function
-	typedef mcurses::signal_impl<void(int), mcurses::optional_last_value<void>,
+	typedef mcurses::signal_impl<void(int), mcurses::Optional_last_value<void>,
 				int, std::less<int>, std::function<void(int)>> type_1;
 
 	// type_2 - double(char, int), less<char>, std::function
-	typedef mcurses::signal_impl<double(char, int), mcurses::optional_last_value<double>,
+	typedef mcurses::signal_impl<double(char, int), mcurses::Optional_last_value<double>,
 				char, std::less<char>, std::function<double(char, int)>> type_2;
 
 	// type_3 - unsigned(long long), less<double>, boost::function
-	typedef mcurses::signal_impl<unsigned(long long), mcurses::optional_last_value<unsigned>,
+	typedef mcurses::signal_impl<unsigned(long long), mcurses::Optional_last_value<unsigned>,
 				double, std::greater<double>, boost::function<unsigned(long long)>> type_3;
 
 	// type_4 - char(int, double), less<int>, std::function
-	typedef mcurses::signal_impl<char(int, double), mcurses::optional_last_value<char>,
+	typedef mcurses::signal_impl<char(int, double), mcurses::Optional_last_value<char>,
 				int, std::less<int>, std::function<char(int, double)>> type_4;
 
 	SignalImplTest()
@@ -57,19 +57,19 @@ protected:
 	}
 
 	// type_1 - void(int), less<int>, std::function
-	type_1 si_type1_1{mcurses::optional_last_value<void>(), std::less<int>()};
-	type_1 si_type1_2{mcurses::optional_last_value<void>(), std::less<int>()};
+	type_1 si_type1_1{mcurses::Optional_last_value<void>(), std::less<int>()};
+	type_1 si_type1_2{mcurses::Optional_last_value<void>(), std::less<int>()};
 
 	// type_2 - double(char, int), less<char>, std::function
-	type_2 si_type2_1{mcurses::optional_last_value<double>(), std::less<char>()};
-	type_2 si_type2_2{mcurses::optional_last_value<double>(), std::less<char>()};
+	type_2 si_type2_1{mcurses::Optional_last_value<double>(), std::less<char>()};
+	type_2 si_type2_2{mcurses::Optional_last_value<double>(), std::less<char>()};
 
 	// type_3 - unsigned(long long), greater<double>, boost::function
-	type_3 si_type3_1{mcurses::optional_last_value<unsigned>(), std::greater<double>()};
-	type_3 si_type3_2{mcurses::optional_last_value<unsigned>(), std::greater<double>()};
+	type_3 si_type3_1{mcurses::Optional_last_value<unsigned>(), std::greater<double>()};
+	type_3 si_type3_2{mcurses::Optional_last_value<unsigned>(), std::greater<double>()};
 
 	// type 4 - char(int, double), less<int>, std::function
-	type_4 si_type4{mcurses::optional_last_value<char>(), std::less<int>()};
+	type_4 si_type4{mcurses::Optional_last_value<char>(), std::less<int>()};
 
 	// Slots - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// Empty Slot - boost::function
@@ -93,13 +93,13 @@ protected:
 			boost_extended_slot{[](const mcurses::Connection&, int, double){return 'h';}};
 
 	// Slot holds empty Signal - boost::function
-	mcurses::signal<unsigned(long long), mcurses::optional_last_value<unsigned>,
+	mcurses::signal<unsigned(long long), mcurses::Optional_last_value<unsigned>,
 					int, std::less<int>, boost::function<unsigned(long long)>> empty_signal_boost{};
 	mcurses::slot<mcurses::Optional<unsigned>(long long), boost::function<mcurses::Optional<unsigned>(long long)>>
 					boost_slot_holds_empty_signal{empty_signal_boost};
 
 	// Slot holds non-empty Signal - boost::function
-	mcurses::signal<unsigned(long long), mcurses::optional_last_value<unsigned>,
+	mcurses::signal<unsigned(long long), mcurses::Optional_last_value<unsigned>,
 					int, std::less<int>, boost::function<unsigned(long long)>> signal_boost{};
 	mcurses::slot<mcurses::Optional<unsigned>(long long), boost::function<mcurses::Optional<unsigned>(long long)>>
 					boost_slot_holds_signal{};
@@ -506,7 +506,7 @@ TEST_F(SignalImplTest, ConstOperatorParenthesisCall)
 
 TEST_F(SignalImplTest, Combiner)
 {
-	EXPECT_TRUE(typeid(si_type2_2.combiner()) == typeid(mcurses::optional_last_value<double>{}));
+	EXPECT_TRUE(typeid(si_type2_2.combiner()) == typeid(mcurses::Optional_last_value<double>{}));
 
 	auto comb = si_type3_1.combiner();
 	std::vector<int> vec {1,2,3,4,5};
@@ -517,9 +517,9 @@ TEST_F(SignalImplTest, Combiner)
 
 TEST_F(SignalImplTest, SetCombiner)
 {
-	si_type1_2.set_combiner(mcurses::optional_last_value<void>{});
-	EXPECT_TRUE(typeid(si_type1_2.combiner()) == typeid(mcurses::optional_last_value<void>{}));
+	si_type1_2.set_combiner(mcurses::Optional_last_value<void>{});
+	EXPECT_TRUE(typeid(si_type1_2.combiner()) == typeid(mcurses::Optional_last_value<void>{}));
 
-	si_type2_2.set_combiner(mcurses::optional_last_value<double>{});
-	EXPECT_TRUE(typeid(si_type2_2.combiner()) == typeid(mcurses::optional_last_value<double>{}));
+	si_type2_2.set_combiner(mcurses::Optional_last_value<double>{});
+	EXPECT_TRUE(typeid(si_type2_2.combiner()) == typeid(mcurses::Optional_last_value<double>{}));
 }

@@ -38,16 +38,16 @@ TEST(SignalTest, Constructor)
 	EXPECT_TRUE(sig3.empty());
 	// EXPECT_FALSE(bool(sig3())); // returns void
 
-	mcurses::signal<void(char, double), mcurses::optional_last_value<void>> sig4;
+	mcurses::signal<void(char, double), mcurses::Optional_last_value<void>> sig4;
 	EXPECT_TRUE(sig4.empty());
 	// EXPECT_FALSE(bool(sig4('h', 8.4))); // returns void
-	auto comb_void = mcurses::optional_last_value<void>();
+	auto comb_void = mcurses::Optional_last_value<void>();
 	EXPECT_EQ(typeid(comb_void), typeid(sig4.combiner()));
 
-	const mcurses::signal<char(int, double, float), mcurses::optional_last_value<char>, std::less<char>> sig5;
+	const mcurses::signal<char(int, double, float), mcurses::Optional_last_value<char>, std::less<char>> sig5;
 	EXPECT_TRUE(sig5.empty());
 	EXPECT_FALSE(bool(sig5(4, 8.4, 6.5))); // returns Optional<char>
-	auto comb_char = mcurses::optional_last_value<char>();
+	auto comb_char = mcurses::Optional_last_value<char>();
 	EXPECT_EQ(typeid(comb_char), typeid(sig5.combiner()));
 }
 
@@ -727,10 +727,10 @@ private:
 TEST(SignalTest, Combiner)
 {
 	mcurses::signal<void(int)> sig1;
-	EXPECT_EQ(typeid(mcurses::optional_last_value<void>{}), typeid(sig1.combiner()));
+	EXPECT_EQ(typeid(mcurses::Optional_last_value<void>{}), typeid(sig1.combiner()));
 
-	mcurses::signal<int(double), mcurses::optional_last_value<int>> sig2;
-	EXPECT_EQ(typeid(mcurses::optional_last_value<int>{}), typeid(sig2.combiner()));
+	mcurses::signal<int(double), mcurses::Optional_last_value<int>> sig2;
+	EXPECT_EQ(typeid(mcurses::Optional_last_value<int>{}), typeid(sig2.combiner()));
 	
 	mcurses::signal<int(double), new_combiner<int>> sig3;
 	EXPECT_EQ(typeid(new_combiner<int>{}), typeid(sig3.combiner()));
@@ -739,8 +739,8 @@ TEST(SignalTest, Combiner)
 TEST(SignalTest, SetCombiner)
 {
 	mcurses::signal<int(double, char)> sig1;
-	sig1.set_combiner(mcurses::optional_last_value<int>{});
-	EXPECT_EQ(typeid(mcurses::optional_last_value<int>{}), typeid(sig1.combiner()));
+	sig1.set_combiner(mcurses::Optional_last_value<int>{});
+	EXPECT_EQ(typeid(mcurses::Optional_last_value<int>{}), typeid(sig1.combiner()));
 
 	mcurses::signal<int(double, char), new_combiner<int>> sig2;
 	sig2.set_combiner(new_combiner<int>{});

@@ -11,7 +11,7 @@
 namespace mcurses
 {
 template <typename Signature,
-		  typename Combiner = mcurses::optional_last_value<typename mcurses::Function_type_splitter<Signature>::return_type>,
+		  typename Combiner = mcurses::Optional_last_value<typename mcurses::Function_type_splitter<Signature>::return_type>,
 		  typename Group = int,
 		  typename GroupCompare = std::less<Group>,
 		  typename SlotFunction = std::function<Signature>,

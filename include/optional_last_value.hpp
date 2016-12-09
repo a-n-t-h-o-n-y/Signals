@@ -3,6 +3,7 @@
 /// specialization.
 #ifndef OPTIONAL_LAST_VALUE_HPP
 #define OPTIONAL_LAST_VALUE_HPP
+
 #include <aml/optional/none.hpp>
 #include <aml/optional/optional.hpp>
 
@@ -14,10 +15,10 @@ namespace mcurses {
 /// If the iterator range is empty, an empty Optional object is returned,
 /// otherwise an Optional wrapping the last value is returned.
 template <typename T>
-class optional_last_value {
+class Optional_last_value {
    public:
     ///	Type of object the iterator range points to.
-    typedef Optional<T> result_type;
+    using result_type = Optional<T>;
 
     ///	\param  first  Input iterator to the first element in the range.
     ///	\param 	last   Input iterator to one past the last element in the range.
@@ -41,10 +42,10 @@ class optional_last_value {
 ///
 /// Useful when dereferencing of iterators produces side effects.
 template <>
-class optional_last_value<void> {
+class Optional_last_value<void> {
    public:
     ///	Type of object the iterator range points to.
-    typedef void result_type;
+    using result_type = void;
 
     ///	\param  first  Input iterator to the first element in the range.
     ///	\param 	last   Input iterator to one past the last element in the range.
@@ -54,7 +55,6 @@ class optional_last_value<void> {
             *first;
             ++first;
         }
-        return;
     }
 };
 
