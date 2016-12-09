@@ -63,15 +63,12 @@ class Connection {
 
     /// \returns True if both parameters refer to the same Signal/Slot
     /// connection.
-    bool operator==(const Connection& x) {
+    bool operator==(const Connection& x) const {
         return pimpl_.lock() == x.pimpl_.lock();
     }
 
-    /// \returns !(*this == x)
-    bool operator!=(const Connection& x) { return !(*this == x); }
-
-    /// Does pointer < comparison of underlying implementation.
-    bool operator<(const Connection& x) {
+    /// Does pointer less than comparison of underlying implementation.
+    bool operator<(const Connection& x) const {
         return pimpl_.lock() < x.pimpl_.lock();
     }
 
@@ -80,6 +77,11 @@ class Connection {
    private:
     std::weak_ptr<Connection_impl_base> pimpl_;
 };
+
+/// \returns !(*this == x)
+inline bool operator!=(const Connection& x, const Connection& y) {
+    return !(x == y);
+}
 
 }  // namespace mcurses
 
