@@ -24,19 +24,19 @@ class Shared_connection_block {
     /// *this only holds a reference to the Connection and can block the
     /// Connection at some other time by calling block().
     explicit Shared_connection_block(const Connection& conn = Connection{},
-                            bool initially_block = true)
-        : weak_conn_impl_base_{conn.pimpl_}, blocking_{initially_block} {
+                                     bool initially_block = true)
+        : connection_{conn.pimpl_}, blocking_{initially_block} {
         if (this->active()) {
-            this->weak_conn_impl_base_.lock()->add_block();
+            connection_.lock()->add_block();
         }
     }
 
     /// \brief Creates a copy of \p x, increasing the block count on the
     /// Connection if \p x is blocking.
     Shared_connection_block(const Shared_connection_block& x)
-        : weak_conn_impl_base_{x.weak_conn_impl_base_}, blocking_{x.blocking_} {
+        : connection_{x.connection_}, blocking_{x.blocking_} {
         if (this->active()) {
-            this->weak_conn_impl_base_.lock()->add_block();
+            connection_.lock()->add_block();
         }
     }
 
@@ -62,29 +62,26 @@ class Shared_connection_block {
     /// Releases the Connection block. No-op if not currently blocking.
     void unblock() {
         if (this->active()) {
-            this->weak_conn_impl_base_.lock()->remove_block();
-            this->blocking_ = false;
+            connection_.lock()->remove_block();
+            blocking_ = false;
         }
     }
 
     /// Reasserts a block on a Connection. No-op if currently blocking.
     void block() {
-        if (!weak_conn_impl_base_.expired() && !blocking_) {
-            weak_conn_impl_base_.lock()->add_block();
+        if (!connection_.expired() && !blocking_) {
+            connection_.lock()->add_block();
             blocking_ = true;
         }
     }
 
     /// \returns True if *this is currently blocking a Connection, else false.
     bool blocking() const {
-        if (!weak_conn_impl_base_.expired()) {
-            return blocking_;
-        }
-        return false;
+        return !connection_.expired() && blocking_;
     }
 
     /// \returns The Connection object associated with *this.
-    Connection connection() const { return Connection(weak_conn_impl_base_); }
+    Connection connection() const { return Connection(connection_); }
 
    private:
     // Removes the block to the associated Connection and is reset with the
@@ -92,20 +89,18 @@ class Shared_connection_block {
     // blocking.
     void reset(const Shared_connection_block& x) {
         this->unblock();
-        weak_conn_impl_base_ = x.weak_conn_impl_base_;
+        connection_ = x.connection_;
         blocking_ = x.blocking_;
         if (this->active()) {
-            weak_conn_impl_base_.lock()->add_block();
+            connection_.lock()->add_block();
         }
     }
 
     // Returns true if the connection pointed to is still alive and *this is
     // currently blocking.
-    bool active() {
-        return !this->weak_conn_impl_base_.expired() && this->blocking_;
-    }
+    bool active() { return !connection_.expired() && blocking_; }
 
-    std::weak_ptr<Connection_impl_base> weak_conn_impl_base_;
+    std::weak_ptr<Connection_impl_base> connection_;
     bool blocking_;
 };
 
