@@ -9,6 +9,7 @@
 #include "detail/function_type_splitter.hpp"
 
 namespace mcurses {
+
 template <typename Signature,
           typename Combiner = mcurses::Optional_last_value<
               typename mcurses::Function_type_splitter<Signature>::return_type>,
@@ -16,7 +17,8 @@ template <typename Signature,
           typename GroupCompare = std::less<Group>,
           typename SlotFunction = std::function<Signature>,
           typename Mutex = std::mutex>
-class signal;
+class Signal;
+
 } // namespace mcurses
 
 #endif  // SIGNAL_FWD_HPP

@@ -93,13 +93,13 @@ protected:
 			boost_extended_slot{[](const mcurses::Connection&, int, double){return 'h';}};
 
 	// Slot holds empty Signal - boost::function
-	mcurses::signal<unsigned(long long), mcurses::Optional_last_value<unsigned>,
+	mcurses::Signal<unsigned(long long), mcurses::Optional_last_value<unsigned>,
 					int, std::less<int>, boost::function<unsigned(long long)>> empty_signal_boost{};
 	mcurses::slot<mcurses::Optional<unsigned>(long long), boost::function<mcurses::Optional<unsigned>(long long)>>
 					boost_slot_holds_empty_signal{empty_signal_boost};
 
 	// Slot holds non-empty Signal - boost::function
-	mcurses::signal<unsigned(long long), mcurses::Optional_last_value<unsigned>,
+	mcurses::Signal<unsigned(long long), mcurses::Optional_last_value<unsigned>,
 					int, std::less<int>, boost::function<unsigned(long long)>> signal_boost{};
 	mcurses::slot<mcurses::Optional<unsigned>(long long), boost::function<mcurses::Optional<unsigned>(long long)>>
 					boost_slot_holds_signal{};
@@ -124,11 +124,11 @@ protected:
 	mcurses::slot<char(const mcurses::Connection&, int, double)> std_extended_slot{[](const mcurses::Connection&, int, double){return 'k';}};
 
 	// Slot holds empty Signal - std::function
-	mcurses::signal<void(int)> empty_signal_std{};
+	mcurses::Signal<void(int)> empty_signal_std{};
 	mcurses::slot<void(int)> std_slot_holds_empty_signal{empty_signal_std};
 
 	// Slot holds non-empty Signal - std::function
-	mcurses::signal<void(int)> signal_std{};
+	mcurses::Signal<void(int)> signal_std{};
 	mcurses::slot<void(int)> std_slot_holds_signal{};
 
 	// Functors - - - - - - - - - - - - - - - - - - - - -

@@ -29,7 +29,7 @@ template <typename Ret,
 		  typename SlotFunction,
 		  typename Mutex>
 
-class signal<Ret(Args...),
+class Signal<Ret(Args...),
 			 Combiner,
 			 Group,
 			 GroupCompare,
@@ -61,20 +61,20 @@ public:
 		typedef typename std::tuple_element<n, argument_types>::type type;
 	};
 
-	signal(const combiner_type& combiner = combiner_type(),
+	Signal(const combiner_type& combiner = combiner_type(),
 			const group_compare_type& group_compare = group_compare_type())
 	:pimpl_{std::make_shared<impl_type>(combiner, group_compare)}
 	{}
 
-	signal(const signal&) = delete;
+	Signal(const Signal&) = delete;
 
-	signal(signal&& x)
+	Signal(Signal&& x)
 	:pimpl_{std::move(x.pimpl_)}, enabled_{x.enabled_}
 	{ x.enabled_ = false; }
 
-	signal& operator=(const signal&) = delete;
+	Signal& operator=(const Signal&) = delete;
 
-	signal& operator=(signal&& x)
+	Signal& operator=(Signal&& x)
 	{
 		if(this == &x)
 		{
@@ -168,7 +168,7 @@ public:
 		return pimpl_;
 	}
 
-	friend void swap(signal& x, signal& y)
+	friend void swap(Signal& x, Signal& y)
 	{
 		if(&x == &y)
 		{
@@ -191,10 +191,10 @@ private:
 
 template <typename Ret, typename ... Args, typename Combiner, typename Group,
 		  typename GroupCompare, typename SlotFunction, typename Mutex>
-const int signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex>::arity;
+const int Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex>::arity;
 
 } // namespace mcurses
 
-// #include "detail/signal_void_return_specialization.hpp"
+// #include "detail/Signal_void_return_specialization.hpp"
 
 #endif // SIGNAL_HPP

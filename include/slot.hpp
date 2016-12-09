@@ -44,14 +44,14 @@ public:
 	slot(const Function& func);
 
 	template <typename T, typename U, typename V, typename W, typename X, typename Y>
-	slot(const signal<T, U, V, W, X, Y>& sig);
+	slot(const Signal<T, U, V, W, X, Y>& sig);
 
 	result_type operator()(Args&&... args);	// how is this diff? do you need non-const version?
 	result_type operator()(Args&&... args) const;
 
 	slot& track(const std::weak_ptr<void>& obj_ptr);
 	template <typename T, typename U, typename V, typename W, typename X, typename Y>
-	slot& track(const signal<T, U, V, W, X, Y>& sig);
+	slot& track(const Signal<T, U, V, W, X, Y>& sig);
 	slot& track(const slot_base& slt);
 	
 	slot_function_type& slot_function();
@@ -72,7 +72,7 @@ slot<Ret (Args...), FunctionType>::slot(const Function& func)
 
 template <typename Ret, typename ... Args, typename FunctionType>
 template <typename T, typename U, typename V, typename W, typename X, typename Y>
-slot<Ret (Args...), FunctionType>::slot(const signal<T, U, V, W, X, Y>& sig)
+slot<Ret (Args...), FunctionType>::slot(const Signal<T, U, V, W, X, Y>& sig)
 :function_{*(sig.lock_impl())}
 {
 	track(sig);
@@ -107,7 +107,7 @@ slot<Ret (Args...), FunctionType>::track(const std::weak_ptr<void>& obj_ptr)
 template <typename Ret, typename ... Args, typename FunctionType>
 template <typename T, typename U, typename V, typename W, typename X, typename Y>
 slot<Ret (Args...), FunctionType>&
-slot<Ret (Args...), FunctionType>::track(const signal<T, U, V, W, X, Y>& sig)
+slot<Ret (Args...), FunctionType>::track(const Signal<T, U, V, W, X, Y>& sig)
 {
 	tracked_ptrs_.push_back(sig.lock_impl_as_void());
 	return *this;
