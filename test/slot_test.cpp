@@ -10,6 +10,8 @@
 #include <memory>
 #include <functional>
 
+using mcurses::signal;
+
 TEST(SlotTest, Arity)
 {
 	mcurses::slot<void(int, int, double, float)> a_slot = {[](int,int,double,float){return;}};
@@ -86,7 +88,7 @@ TEST(SlotTest, TrackWeakPointer)
 
 TEST(SlotTest, TrackSignal)
 {
-	auto sig = std::make_shared<mcurses::signal<void(int)>>();
+	auto sig = std::make_shared<signal<void(int)>>();
 	sig->connect([](int){return;});
 
 	mcurses::slot<char(int,double)> slt = [](int,double){return 'k';};
@@ -158,7 +160,7 @@ TEST(SlotTest, ConstSlotFunction)
 // Update
 TEST(SlotTest, ConstructWithSignal)
 {
-	mcurses::signal<int(int)> sig;
+	signal<int(int)> sig;
 	mcurses::slot<mcurses::Optional<int>(int)> a_slot{sig};
 }
 

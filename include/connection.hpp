@@ -72,7 +72,7 @@ class Connection {
         return pimpl_.lock() < x.pimpl_.lock();
     }
 
-    friend class shared_connection_block;
+    friend class Shared_connection_block;
 
    private:
     std::weak_ptr<Connection_impl_base> pimpl_;
