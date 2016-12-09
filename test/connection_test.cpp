@@ -6,11 +6,13 @@
 
 #include <memory>
 
-// just makes sure the pointer to base class works by calling the
-// implementation functons
+using mcurses::Connection;
+using mcurses::slot;
+using mcurses::Connection_impl;
+using mcurses::Connection_impl_base;
 
 TEST(ConnectionTest, DefaultConstructor) {
-    mcurses::Connection c;
+    Connection c;
     EXPECT_FALSE(c.connected());
     EXPECT_FALSE(c.blocked());
 
@@ -19,11 +21,11 @@ TEST(ConnectionTest, DefaultConstructor) {
 }
 
 TEST(ConnectionTest, CopyConstructor) {
-    mcurses::slot<int(double)> s{[](double) { return 3; }};
-    auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
-    mcurses::Connection conn{c_impl};
+    slot<int(double)> s{[](double) { return 3; }};
+    auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
+    Connection conn{c_impl};
 
-    mcurses::Connection conn_2{conn};
+    Connection conn_2{conn};
 
     EXPECT_TRUE(conn.connected());
     EXPECT_TRUE(conn_2.connected());
@@ -35,11 +37,11 @@ TEST(ConnectionTest, CopyConstructor) {
 }
 
 TEST(ConnectionTest, MoveConstructor) {
-    mcurses::slot<int(double)> s{[](double) { return 3; }};
-    auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
-    mcurses::Connection conn{c_impl};
+    slot<int(double)> s{[](double) { return 3; }};
+    auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
+    Connection conn{c_impl};
 
-    mcurses::Connection conn_2{std::move(conn)};
+    Connection conn_2{std::move(conn)};
 
     EXPECT_FALSE(conn.connected());
     EXPECT_TRUE(conn_2.connected());
@@ -51,14 +53,14 @@ TEST(ConnectionTest, MoveConstructor) {
 }
 
 TEST(ConnectionTest, CopyAssignmentOperator) {
-    mcurses::slot<int(double)> s{[](double) { return 3; }};
-    auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
-    mcurses::Connection conn{c_impl};
+    slot<int(double)> s{[](double) { return 3; }};
+    auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
+    Connection conn{c_impl};
 
-    mcurses::slot<int(int, int)> s2{[](int, int) { return 3; }};
+    slot<int(int, int)> s2{[](int, int) { return 3; }};
     auto c_impl2 =
-        std::make_shared<mcurses::Connection_impl<int(int, int)>>(s2);
-    mcurses::Connection conn2{c_impl2};
+        std::make_shared<Connection_impl<int(int, int)>>(s2);
+    Connection conn2{c_impl2};
 
     EXPECT_TRUE(conn.connected());
     EXPECT_TRUE(conn2.connected());
@@ -80,14 +82,14 @@ TEST(ConnectionTest, CopyAssignmentOperator) {
 }
 
 TEST(ConnectionTest, MoveAssignmentOperator) {
-    mcurses::slot<int(double)> s{[](double) { return 3; }};
-    auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
-    mcurses::Connection conn{c_impl};
+    slot<int(double)> s{[](double) { return 3; }};
+    auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
+    Connection conn{c_impl};
 
-    mcurses::slot<int(int, int)> s2{[](int, int) { return 3; }};
+    slot<int(int, int)> s2{[](int, int) { return 3; }};
     auto c_impl2 =
-        std::make_shared<mcurses::Connection_impl<int(int, int)>>(s2);
-    mcurses::Connection conn2{c_impl2};
+        std::make_shared<Connection_impl<int(int, int)>>(s2);
+    Connection conn2{c_impl2};
 
     EXPECT_TRUE(conn.connected());
     EXPECT_TRUE(conn2.connected());
@@ -109,9 +111,9 @@ TEST(ConnectionTest, MoveAssignmentOperator) {
 }
 
 TEST(ConnectionTest, DisconnectMethod) {
-    mcurses::slot<int(double)> s{[](double) { return 3; }};
-    auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
-    mcurses::Connection my_conn{c_impl};
+    slot<int(double)> s{[](double) { return 3; }};
+    auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
+    Connection my_conn{c_impl};
 
     EXPECT_TRUE(my_conn.connected());
 
@@ -119,9 +121,9 @@ TEST(ConnectionTest, DisconnectMethod) {
 
     EXPECT_FALSE(my_conn.connected());
 
-    mcurses::slot<int(double)> s2{[](double) { return 3; }};
-    auto c_impl2 = std::make_shared<mcurses::Connection_impl<int(double)>>(s2);
-    mcurses::Connection my_conn2{c_impl2};
+    slot<int(double)> s2{[](double) { return 3; }};
+    auto c_impl2 = std::make_shared<Connection_impl<int(double)>>(s2);
+    Connection my_conn2{c_impl2};
 
     EXPECT_TRUE(my_conn2.connected());
 
@@ -136,15 +138,15 @@ TEST(ConnectionTest, DisconnectMethod) {
 
 TEST(ConnectionTest, ConnectedMethod) {
     // test null constructed Connection
-    mcurses::Connection c1;
+    Connection c1;
 
     EXPECT_FALSE(c1.connected());
 
     // test properly built Connection
-    mcurses::slot<int(double)> s{[](double) { return 4; }};
-    auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(
+    slot<int(double)> s{[](double) { return 4; }};
+    auto c_impl = std::make_shared<Connection_impl<int(double)>>(
         s);  // this was expiring and making Connection not connected anymore
-    mcurses::Connection c2{c_impl};
+    Connection c2{c_impl};
 
     EXPECT_TRUE(c2.connected());
 
@@ -155,14 +157,14 @@ TEST(ConnectionTest, ConnectedMethod) {
 
 TEST(ConnectionTest, BlockedMethod) {
     // test null constructed Connection
-    mcurses::Connection c1;
+    Connection c1;
 
     EXPECT_FALSE(c1.blocked());
 
     // test properly build Connection
-    mcurses::slot<int(double)> s{[](double) { return 4; }};
-    mcurses::Connection c2{
-        std::make_shared<mcurses::Connection_impl<int(double)>>(s)};
+    slot<int(double)> s{[](double) { return 4; }};
+    Connection c2{
+        std::make_shared<Connection_impl<int(double)>>(s)};
 
     EXPECT_FALSE(c2.blocked());
 
@@ -170,22 +172,22 @@ TEST(ConnectionTest, BlockedMethod) {
 }
 
 TEST(ConnectionTest, OperatorEquals) {
-    mcurses::slot<int(double)> s{[](double) { return 3; }};
-    auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
-    mcurses::Connection conn{c_impl};
+    slot<int(double)> s{[](double) { return 3; }};
+    auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
+    Connection conn{c_impl};
 
-    mcurses::slot<int(int, int)> s2{[](int, int) { return 3; }};
+    slot<int(int, int)> s2{[](int, int) { return 3; }};
     auto c_impl2 =
-        std::make_shared<mcurses::Connection_impl<int(int, int)>>(s2);
-    mcurses::Connection conn2{c_impl2};
+        std::make_shared<Connection_impl<int(int, int)>>(s2);
+    Connection conn2{c_impl2};
 
-    mcurses::slot<int(int, int)> s3{[](int, int) { return 3; }};
+    slot<int(int, int)> s3{[](int, int) { return 3; }};
     auto c_impl3 =
-        std::make_shared<mcurses::Connection_impl<int(int, int)>>(s3);
-    mcurses::Connection conn3{c_impl3};
+        std::make_shared<Connection_impl<int(int, int)>>(s3);
+    Connection conn3{c_impl3};
 
-    mcurses::Connection c_null_1;
-    mcurses::Connection c_null_2;
+    Connection c_null_1;
+    Connection c_null_2;
 
     EXPECT_FALSE(conn == conn2);
     EXPECT_TRUE(conn == conn);
@@ -198,22 +200,22 @@ TEST(ConnectionTest, OperatorEquals) {
 }
 
 TEST(ConnectionTest, OperatorNotEquals) {
-    mcurses::slot<int(double)> s{[](double) { return 3; }};
-    auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
-    mcurses::Connection conn{c_impl};
+    slot<int(double)> s{[](double) { return 3; }};
+    auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
+    Connection conn{c_impl};
 
-    mcurses::slot<int(int, int)> s2{[](int, int) { return 3; }};
+    slot<int(int, int)> s2{[](int, int) { return 3; }};
     auto c_impl2 =
-        std::make_shared<mcurses::Connection_impl<int(int, int)>>(s2);
-    mcurses::Connection conn2{c_impl2};
+        std::make_shared<Connection_impl<int(int, int)>>(s2);
+    Connection conn2{c_impl2};
 
-    mcurses::slot<int(int, int)> s3{[](int, int) { return 3; }};
+    slot<int(int, int)> s3{[](int, int) { return 3; }};
     auto c_impl3 =
-        std::make_shared<mcurses::Connection_impl<int(int, int)>>(s3);
-    mcurses::Connection conn3{c_impl3};
+        std::make_shared<Connection_impl<int(int, int)>>(s3);
+    Connection conn3{c_impl3};
 
-    mcurses::Connection c_null_1;
-    mcurses::Connection c_null_2;
+    Connection c_null_1;
+    Connection c_null_2;
 
     EXPECT_TRUE(conn != conn2);
     EXPECT_FALSE(conn != conn);
@@ -226,23 +228,23 @@ TEST(ConnectionTest, OperatorNotEquals) {
 }
 
 TEST(ConnectionTest, OperatorLessThan) {
-    mcurses::slot<int(double)> s{[](double) { return 3; }};
-    auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
-    mcurses::Connection conn{c_impl};
+    slot<int(double)> s{[](double) { return 3; }};
+    auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
+    Connection conn{c_impl};
 
-    mcurses::slot<int(int, int)> s2{[](int, int) { return 3; }};
+    slot<int(int, int)> s2{[](int, int) { return 3; }};
     auto c_impl2 =
-        std::make_shared<mcurses::Connection_impl<int(int, int)>>(s2);
-    mcurses::Connection conn2{c_impl2};
+        std::make_shared<Connection_impl<int(int, int)>>(s2);
+    Connection conn2{c_impl2};
 
-    mcurses::slot<int(int, int)> s3{[](int, int) { return 3; }};
+    slot<int(int, int)> s3{[](int, int) { return 3; }};
     auto c_impl3 =
-        std::make_shared<mcurses::Connection_impl<int(int, int)>>(s3);
-    mcurses::Connection conn3{c_impl3};
+        std::make_shared<Connection_impl<int(int, int)>>(s3);
+    Connection conn3{c_impl3};
 
     EXPECT_FALSE(conn < conn);
 
-    typedef mcurses::Connection_impl_base base;
+    typedef Connection_impl_base base;
 
     if (std::dynamic_pointer_cast<base>(c_impl) <
         std::dynamic_pointer_cast<base>(c_impl2)) {
@@ -282,14 +284,14 @@ TEST(ConnectionTest, OperatorLessThan) {
 }
 
 TEST(ConnectionTest, Swap) {
-    mcurses::slot<int(double)> s{[](double) { return 3; }};
-    auto c_impl = std::make_shared<mcurses::Connection_impl<int(double)>>(s);
-    mcurses::Connection conn{c_impl};
+    slot<int(double)> s{[](double) { return 3; }};
+    auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
+    Connection conn{c_impl};
 
-    mcurses::slot<int(int, int)> s2{[](int, int) { return 7; }};
+    slot<int(int, int)> s2{[](int, int) { return 7; }};
     auto c_impl2 =
-        std::make_shared<mcurses::Connection_impl<int(int, int)>>(s2);
-    mcurses::Connection conn2{c_impl2};
+        std::make_shared<Connection_impl<int(int, int)>>(s2);
+    Connection conn2{c_impl2};
 
     EXPECT_TRUE(conn.connected());
     EXPECT_TRUE(conn2.connected());
