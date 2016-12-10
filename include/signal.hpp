@@ -2,9 +2,7 @@
 #define SIGNAL_HPP
 
 #include "connection.hpp"
-#include "detail/connection_impl.hpp"
 #include "detail/signal_impl.hpp"
-#include "detail/slot_iterator.hpp"
 #include "position.hpp"
 #include "signal_fwd.hpp"
 #include "slot_fwd.hpp"
@@ -14,7 +12,6 @@
 #include <memory>
 #include <tuple>
 #include <utility>
-#include <vector>
 
 namespace mcurses {
 
@@ -50,12 +47,11 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     using group_type = Group;
     using group_compare_type = GroupCompare;
     using slot_function_type = SlotFunction;
-    using slot_type = typename mcurses::slot<signature_type, SlotFunction>;
+    using slot_type = slot<signature_type, SlotFunction>;
     using extended_slot_function_type =
         std::function<Ret(const Connection&, Args...)>;
     using extended_slot_type =
-        typename mcurses::slot<Ret(const mcurses::Connection&, Args...),
-                               extended_slot_function_type>;
+        slot<Ret(const Connection&, Args...), extended_slot_function_type>;
     using slot_result_type = typename SlotFunction::result_type;
     using argument_types = std::tuple<Args...>;
     using impl_type = signal_impl<signature_type,
@@ -197,7 +193,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     ///
     /// All arguments to this call operator are passed onto the Slots. The Slots
     /// are called by how they were attached to *this. By default this returns
-    /// the return value of the last Slot that was called. const overload is 
+    /// the return value of the last Slot that was called. const overload is
     /// called with a const Combiner.
     /// \param args The arguments you are passing onto the Slots.
     /// \returns An Optional containing a value determined by the Combiner.
@@ -237,7 +233,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     /// Connected Slots will be called when call operator is summoned. Safe when
     /// *this is already enabled.
     void enable() { enabled_ = true; }
-    
+
     /// \brief Disable the Signal.
     ///
     /// Connected Slots will _not_ be called when call operator is summoned.
