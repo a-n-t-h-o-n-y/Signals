@@ -9,7 +9,6 @@ using mcurses::Shared_connection_block;
 using mcurses::Signal;
 using mcurses::slot; 
 using mcurses::Connection;
-// using namespace mcurses;
 
 TEST(SharedConnectionBlockTest, DefaultConstructor) {
     Shared_connection_block scb1{};

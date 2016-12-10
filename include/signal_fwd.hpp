@@ -1,3 +1,6 @@
+/// \file
+/// \brief Contains the foward declaration of Signal. Use this header instead of
+/// trying to forward declare the class yourself.
 #ifndef SIGNAL_FWD_HPP
 #define SIGNAL_FWD_HPP
 
@@ -19,6 +22,6 @@ template <typename Signature,
           typename Mutex = std::mutex>
 class Signal;
 
-} // namespace mcurses
+}  // namespace mcurses
 
 #endif  // SIGNAL_FWD_HPP
