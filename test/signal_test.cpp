@@ -1,16 +1,25 @@
+#include <connection.hpp>
+#include <expired_slot.hpp>
+#include <optional_last_value.hpp>
+#include <position.hpp>
 #include <signal.hpp>
 #include <slot.hpp>
-#include <position.hpp>
-#include <optional_last_value.hpp>
 
 #include <aml/optional/optional.hpp>
 #include <gtest/gtest.h>
 
 #include <functional>
-#include <typeinfo>
 #include <memory>
+#include <typeinfo>
 
 using mcurses::Signal;
+using mcurses::slot;
+using mcurses::Position;
+using mcurses::Optional_last_value;
+using mcurses::Expired_slot;
+using mcurses::Connection;
+
+using mcurses::Optional;
 
 TEST(SignalTest, Arity) {
     Signal<int(double, float, char, bool)> sig;
@@ -38,38 +47,38 @@ TEST(SignalTest, Constructor) {
     EXPECT_TRUE(sig3.empty());
     // EXPECT_FALSE(bool(sig3())); // returns void
 
-    Signal<void(char, double), mcurses::Optional_last_value<void>> sig4;
+    Signal<void(char, double), Optional_last_value<void>> sig4;
     EXPECT_TRUE(sig4.empty());
     // EXPECT_FALSE(bool(sig4('h', 8.4))); // returns void
-    auto comb_void = mcurses::Optional_last_value<void>();
+    auto comb_void = Optional_last_value<void>();
     EXPECT_EQ(typeid(comb_void), typeid(sig4.combiner()));
 
-    const Signal<char(int, double, float), mcurses::Optional_last_value<char>,
+    const Signal<char(int, double, float), Optional_last_value<char>,
                  std::less<char>>
         sig5;
     EXPECT_TRUE(sig5.empty());
     EXPECT_FALSE(bool(sig5(4, 8.4, 6.5)));  // returns Optional<char>
-    auto comb_char = mcurses::Optional_last_value<char>();
+    auto comb_char = Optional_last_value<char>();
     EXPECT_EQ(typeid(comb_char), typeid(sig5.combiner()));
 }
 
 TEST(SignalTest, SignalInSlotConnectedToSignal) {
     Signal<int(double, char)> sig_child;
-    mcurses::slot<int(double, char)> slot_1 = [](double, char) { return 1; };
+    slot<int(double, char)> slot_1 = [](double, char) { return 1; };
     sig_child.connect(slot_1);
-    mcurses::slot<int(double, char)> slot_2 = [](double, char) { return 2; };
-    sig_child.connect(slot_2, mcurses::Position::at_front);
-    mcurses::slot<int(double, char)> slot_3 = [](double, char) { return 3; };
+    slot<int(double, char)> slot_2 = [](double, char) { return 2; };
+    sig_child.connect(slot_2, Position::at_front);
+    slot<int(double, char)> slot_3 = [](double, char) { return 3; };
     sig_child.connect(slot_3);
 
-    mcurses::slot<mcurses::Optional<int>(double, char)> slot_holding_signal =
+    slot<Optional<int>(double, char)> slot_holding_signal =
         sig_child;
 
-    Signal<mcurses::Optional<int>(double, char)> sig_parent;
+    Signal<Optional<int>(double, char)> sig_parent;
     sig_parent.connect(slot_holding_signal);
 
     // This slot will not be called by the signal containing sig_child
-    mcurses::slot<int(double, char)> slot_4 = [](double, char) { return 4; };
+    slot<int(double, char)> slot_4 = [](double, char) { return 4; };
     sig_child.connect(slot_4);
 
     auto result1 = sig_parent(7.3, 'h');
@@ -94,17 +103,17 @@ TEST(SignalTest, SignalInSlotConnectedToSignal) {
 
 TEST(SignalTest, MoveConstructor) {
     Signal<char(int, double)> sig;
-    mcurses::slot<char(int, double)> slot_1 = [](int, double) { return 'h'; };
+    slot<char(int, double)> slot_1 = [](int, double) { return 'h'; };
     auto to_track1 = std::make_shared<int>(7);
     auto to_track2 = std::make_shared<double>(8.3);
     slot_1.track(to_track1);
     slot_1.track(to_track2);
-    mcurses::slot<char(int, double)> slot_2 = [](int, double) { return 'r'; };
-    mcurses::slot<char(int, double)> slot_3 = [](int, double) { return 'g'; };
+    slot<char(int, double)> slot_2 = [](int, double) { return 'r'; };
+    slot<char(int, double)> slot_3 = [](int, double) { return 'g'; };
 
     sig.connect(slot_2);
-    sig.connect(slot_1, mcurses::Position::at_front);
-    sig.connect(5, slot_3, mcurses::Position::at_back);
+    sig.connect(slot_1, Position::at_front);
+    sig.connect(5, slot_3, Position::at_back);
 
     Signal<char(int, double)> sig_move_to = std::move(sig);
 
@@ -116,22 +125,22 @@ TEST(SignalTest, MoveConstructor) {
     EXPECT_EQ(nullptr, sig.lock_impl());
 
     to_track1.reset();
-    EXPECT_THROW(sig_move_to(4, 2.1), mcurses::Expired_slot);
+    EXPECT_THROW(sig_move_to(4, 2.1), Expired_slot);
 }
 
 TEST(SignalTest, MoveAssignmentOperator) {
     Signal<char(int, double)> sig;
-    mcurses::slot<char(int, double)> slot_1 = [](int, double) { return 'h'; };
+    slot<char(int, double)> slot_1 = [](int, double) { return 'h'; };
     auto to_track1 = std::make_shared<int>(7);
     auto to_track2 = std::make_shared<double>(8.3);
     slot_1.track(to_track1);
     slot_1.track(to_track2);
-    mcurses::slot<char(int, double)> slot_2 = [](int, double) { return 'r'; };
-    mcurses::slot<char(int, double)> slot_3 = [](int, double) { return 'g'; };
+    slot<char(int, double)> slot_2 = [](int, double) { return 'r'; };
+    slot<char(int, double)> slot_3 = [](int, double) { return 'g'; };
 
     sig.connect(slot_2);
-    sig.connect(slot_1, mcurses::Position::at_front);
-    sig.connect(5, slot_3, mcurses::Position::at_back);
+    sig.connect(slot_1, Position::at_front);
+    sig.connect(5, slot_3, Position::at_back);
 
     Signal<char(int, double)> sig_move_to;
     sig_move_to.connect([](int, double) { return 'x'; });
@@ -145,19 +154,19 @@ TEST(SignalTest, MoveAssignmentOperator) {
     EXPECT_EQ(nullptr, sig.lock_impl());
 
     to_track1.reset();
-    EXPECT_THROW(sig_move_to(4, 2.1), mcurses::Expired_slot);
+    EXPECT_THROW(sig_move_to(4, 2.1), Expired_slot);
 }
 
 TEST(SignalTest, ConnectWithPosition) {
     Signal<float()> sig;
-    mcurses::slot<float()> slot_1 = []() { return 8.3; };
+    slot<float()> slot_1 = []() { return 8.3; };
     auto conn1 = sig.connect(slot_1);
 
-    mcurses::slot<float()> slot_2 = []() { return 1.2; };
-    auto conn2 = sig.connect(slot_2, mcurses::Position::at_front);
+    slot<float()> slot_2 = []() { return 1.2; };
+    auto conn2 = sig.connect(slot_2, Position::at_front);
 
-    mcurses::slot<float()> slot_3 = []() { return 3.4; };
-    auto conn3 = sig.connect(slot_3, mcurses::Position::at_back);
+    slot<float()> slot_3 = []() { return 3.4; };
+    auto conn3 = sig.connect(slot_3, Position::at_back);
 
     auto result1 = sig();
     ASSERT_TRUE(bool(result1));
@@ -183,23 +192,23 @@ TEST(SignalTest, ConnectWithPosition) {
 
 TEST(SignalTest, ConnectWithGroup) {
     Signal<char(int)> sig;
-    mcurses::slot<char(int)> slot_1 = [](int) { return 'a'; };
+    slot<char(int)> slot_1 = [](int) { return 'a'; };
     auto conn1 = sig.connect(1, slot_1);
 
-    mcurses::slot<char(int)> slot_2 = [](int) { return 'b'; };
-    auto conn2 = sig.connect(1, slot_2, mcurses::Position::at_front);
+    slot<char(int)> slot_2 = [](int) { return 'b'; };
+    auto conn2 = sig.connect(1, slot_2, Position::at_front);
 
-    mcurses::slot<char(int)> slot_3 = [](int) { return 'c'; };
-    auto conn3 = sig.connect(3, slot_3, mcurses::Position::at_back);
+    slot<char(int)> slot_3 = [](int) { return 'c'; };
+    auto conn3 = sig.connect(3, slot_3, Position::at_back);
 
-    mcurses::slot<char(int)> slot_4 = [](int) { return 'd'; };
+    slot<char(int)> slot_4 = [](int) { return 'd'; };
     auto conn4 = sig.connect(3, slot_4);
 
-    mcurses::slot<char(int)> slot_5 = [](int) { return 'e'; };
+    slot<char(int)> slot_5 = [](int) { return 'e'; };
     auto conn5 = sig.connect(100, slot_5);
 
-    mcurses::slot<char(int)> slot_6 = [](int) { return 'f'; };
-    auto conn6 = sig.connect(1, slot_6, mcurses::Position::at_front);
+    slot<char(int)> slot_6 = [](int) { return 'f'; };
+    auto conn6 = sig.connect(1, slot_6, Position::at_front);
 
     auto result1 = sig(1);
     ASSERT_TRUE(bool(result1));
@@ -243,32 +252,32 @@ TEST(SignalTest, ConnectWithGroup) {
 
 TEST(SignalTest, ConnectBothOverloads) {
     Signal<char(int)> sig;
-    mcurses::slot<char(int)> slot_1 = [](int) { return 'a'; };
+    slot<char(int)> slot_1 = [](int) { return 'a'; };
     auto conn1 = sig.connect(1, slot_1);
 
-    mcurses::slot<char(int)> slot_2 = [](int) { return 'b'; };
-    auto conn2 = sig.connect(1, slot_2, mcurses::Position::at_front);
+    slot<char(int)> slot_2 = [](int) { return 'b'; };
+    auto conn2 = sig.connect(1, slot_2, Position::at_front);
 
-    mcurses::slot<char(int)> slot_3 = [](int) { return 'c'; };
-    auto conn3 = sig.connect(3, slot_3, mcurses::Position::at_back);
+    slot<char(int)> slot_3 = [](int) { return 'c'; };
+    auto conn3 = sig.connect(3, slot_3, Position::at_back);
 
-    mcurses::slot<char(int)> slot_4 = [](int) { return 'd'; };
+    slot<char(int)> slot_4 = [](int) { return 'd'; };
     auto conn4 = sig.connect(3, slot_4);
 
-    mcurses::slot<char(int)> slot_5 = [](int) { return 'e'; };
+    slot<char(int)> slot_5 = [](int) { return 'e'; };
     auto conn5 = sig.connect(100, slot_5);
 
-    mcurses::slot<char(int)> slot_6 = [](int) { return 'f'; };
-    auto conn6 = sig.connect(1, slot_6, mcurses::Position::at_front);
+    slot<char(int)> slot_6 = [](int) { return 'f'; };
+    auto conn6 = sig.connect(1, slot_6, Position::at_front);
 
-    mcurses::slot<char(int)> slot_7 = [](int) { return 'g'; };
-    auto conn7 = sig.connect(slot_7, mcurses::Position::at_front);
+    slot<char(int)> slot_7 = [](int) { return 'g'; };
+    auto conn7 = sig.connect(slot_7, Position::at_front);
 
-    mcurses::slot<char(int)> slot_8 = [](int) { return 'h'; };
-    auto conn8 = sig.connect(slot_8, mcurses::Position::at_front);
+    slot<char(int)> slot_8 = [](int) { return 'h'; };
+    auto conn8 = sig.connect(slot_8, Position::at_front);
 
-    mcurses::slot<char(int)> slot_9 = [](int) { return 'i'; };
-    auto conn9 = sig.connect(slot_9, mcurses::Position::at_back);
+    slot<char(int)> slot_9 = [](int) { return 'i'; };
+    auto conn9 = sig.connect(slot_9, Position::at_back);
 
     auto result0 = sig(0);
     ASSERT_TRUE(bool(result0));
@@ -330,7 +339,7 @@ TEST(SignalTest, ConnectBothOverloads) {
 
 TEST(SignalTest, ConnectWithTrackedObject) {
     Signal<int(char, char)> sig;
-    mcurses::slot<int(char, char)> slot = [](char, char) { return 3; };
+    slot<int(char, char)> slot = [](char, char) { return 3; };
     auto track_me = std::make_shared<int>(9);
     slot.track(track_me);
 
@@ -341,30 +350,29 @@ TEST(SignalTest, ConnectWithTrackedObject) {
     EXPECT_EQ(3, *result);
 
     track_me.reset();
-    EXPECT_THROW(sig('l', 'k'), mcurses::Expired_slot);  // slot has expired
+    EXPECT_THROW(sig('l', 'k'), Expired_slot);  // slot has expired
 }
 
 TEST(SignalTest, ConnectExtendedWithPosition) {
-    using mcurses::Connection;
     Signal<char(int, int)> sig;
 
-    mcurses::slot<char(const Connection&, int, int)> slot_1 = [](
+    slot<char(const Connection&, int, int)> slot_1 = [](
         const Connection&, int, int) { return 'a'; };
     auto conn1 = sig.connect_extended(slot_1);
 
-    mcurses::slot<char(const Connection&, int, int)> slot_2 = [](
+    slot<char(const Connection&, int, int)> slot_2 = [](
         const Connection&, int, int) { return 'b'; };
-    auto conn2 = sig.connect_extended(slot_2, mcurses::Position::at_front);
+    auto conn2 = sig.connect_extended(slot_2, Position::at_front);
 
-    mcurses::slot<char(const Connection&, int, int)> slot_3 = [](
+    slot<char(const Connection&, int, int)> slot_3 = [](
         const Connection&, int, int) { return 'c'; };
-    auto conn3 = sig.connect_extended(slot_3, mcurses::Position::at_front);
+    auto conn3 = sig.connect_extended(slot_3, Position::at_front);
 
-    mcurses::slot<char(const Connection&, int, int)> slot_4 = [](
+    slot<char(const Connection&, int, int)> slot_4 = [](
         const Connection&, int, int) { return 'd'; };
-    auto conn4 = sig.connect_extended(slot_4, mcurses::Position::at_back);
+    auto conn4 = sig.connect_extended(slot_4, Position::at_back);
 
-    mcurses::slot<char(const Connection&, int, int)> slot_5 = [](
+    slot<char(const Connection&, int, int)> slot_5 = [](
         const Connection&, int, int) { return 'e'; };
     auto conn5 = sig.connect_extended(slot_5);
 
@@ -398,31 +406,30 @@ TEST(SignalTest, ConnectExtendedWithPosition) {
 }
 
 TEST(SignalTest, ConnectExtendedWithGroup) {
-    using mcurses::Connection;
     Signal<char(int)> sig;
-    mcurses::slot<char(const Connection&, int)> slot_1 = [](
+    slot<char(const Connection&, int)> slot_1 = [](
         const Connection&, int) { return 'a'; };
     auto conn1 = sig.connect_extended(1, slot_1);
 
-    mcurses::slot<char(const Connection&, int)> slot_2 = [](
+    slot<char(const Connection&, int)> slot_2 = [](
         const Connection&, int) { return 'b'; };
-    auto conn2 = sig.connect_extended(1, slot_2, mcurses::Position::at_front);
+    auto conn2 = sig.connect_extended(1, slot_2, Position::at_front);
 
-    mcurses::slot<char(const Connection&, int)> slot_3 = [](
+    slot<char(const Connection&, int)> slot_3 = [](
         const Connection&, int) { return 'c'; };
-    auto conn3 = sig.connect_extended(3, slot_3, mcurses::Position::at_back);
+    auto conn3 = sig.connect_extended(3, slot_3, Position::at_back);
 
-    mcurses::slot<char(const Connection&, int)> slot_4 = [](
+    slot<char(const Connection&, int)> slot_4 = [](
         const Connection&, int) { return 'd'; };
     auto conn4 = sig.connect_extended(3, slot_4);
 
-    mcurses::slot<char(const Connection&, int)> slot_5 = [](
+    slot<char(const Connection&, int)> slot_5 = [](
         const Connection&, int) { return 'e'; };
     auto conn5 = sig.connect_extended(100, slot_5);
 
-    mcurses::slot<char(const Connection&, int)> slot_6 = [](
+    slot<char(const Connection&, int)> slot_6 = [](
         const Connection&, int) { return 'f'; };
-    auto conn6 = sig.connect_extended(1, slot_6, mcurses::Position::at_front);
+    auto conn6 = sig.connect_extended(1, slot_6, Position::at_front);
 
     auto result1 = sig(1);
     ASSERT_TRUE(bool(result1));
@@ -465,43 +472,42 @@ TEST(SignalTest, ConnectExtendedWithGroup) {
 }
 
 TEST(SignalTest, ConnectExtendedWithBothOverloads) {
-    using mcurses::Connection;
     Signal<char(int)> sig;
-    mcurses::slot<char(const Connection&, int)> slot_1 = [](
+    slot<char(const Connection&, int)> slot_1 = [](
         const Connection&, int) { return 'a'; };
     auto conn1 = sig.connect_extended(1, slot_1);
 
-    mcurses::slot<char(const Connection&, int)> slot_2 = [](
+    slot<char(const Connection&, int)> slot_2 = [](
         const Connection&, int) { return 'b'; };
-    auto conn2 = sig.connect_extended(1, slot_2, mcurses::Position::at_front);
+    auto conn2 = sig.connect_extended(1, slot_2, Position::at_front);
 
-    mcurses::slot<char(const Connection&, int)> slot_3 = [](
+    slot<char(const Connection&, int)> slot_3 = [](
         const Connection&, int) { return 'c'; };
-    auto conn3 = sig.connect_extended(3, slot_3, mcurses::Position::at_back);
+    auto conn3 = sig.connect_extended(3, slot_3, Position::at_back);
 
-    mcurses::slot<char(const Connection&, int)> slot_4 = [](
+    slot<char(const Connection&, int)> slot_4 = [](
         const Connection&, int) { return 'd'; };
     auto conn4 = sig.connect_extended(3, slot_4);
 
-    mcurses::slot<char(const Connection&, int)> slot_5 = [](
+    slot<char(const Connection&, int)> slot_5 = [](
         const Connection&, int) { return 'e'; };
     auto conn5 = sig.connect_extended(100, slot_5);
 
-    mcurses::slot<char(const Connection&, int)> slot_6 = [](
+    slot<char(const Connection&, int)> slot_6 = [](
         const Connection&, int) { return 'f'; };
-    auto conn6 = sig.connect_extended(1, slot_6, mcurses::Position::at_front);
+    auto conn6 = sig.connect_extended(1, slot_6, Position::at_front);
 
-    mcurses::slot<char(const Connection&, int)> slot_7 = [](
+    slot<char(const Connection&, int)> slot_7 = [](
         const Connection&, int) { return 'g'; };
-    auto conn7 = sig.connect_extended(slot_7, mcurses::Position::at_front);
+    auto conn7 = sig.connect_extended(slot_7, Position::at_front);
 
-    mcurses::slot<char(const Connection&, int)> slot_8 = [](
+    slot<char(const Connection&, int)> slot_8 = [](
         const Connection&, int) { return 'h'; };
-    auto conn8 = sig.connect_extended(slot_8, mcurses::Position::at_front);
+    auto conn8 = sig.connect_extended(slot_8, Position::at_front);
 
-    mcurses::slot<char(const Connection&, int)> slot_9 = [](
+    slot<char(const Connection&, int)> slot_9 = [](
         const Connection&, int) { return 'i'; };
-    auto conn9 = sig.connect_extended(slot_9, mcurses::Position::at_back);
+    auto conn9 = sig.connect_extended(slot_9, Position::at_back);
 
     auto result0 = sig(0);
     ASSERT_TRUE(bool(result0));
@@ -563,8 +569,8 @@ TEST(SignalTest, ConnectExtendedWithBothOverloads) {
 
 TEST(SignalTest, ConnectExtendedSlotWithTrackedObject) {
     Signal<int(char, char)> sig;
-    mcurses::slot<int(const mcurses::Connection&, char, char)> ext_slot = [](
-        const mcurses::Connection&, char, char) { return 5; };
+    slot<int(const Connection&, char, char)> ext_slot = [](
+        const Connection&, char, char) { return 5; };
     auto track_me = std::make_shared<int>(2);
     ext_slot.track(track_me);
 
@@ -578,23 +584,23 @@ TEST(SignalTest, ConnectExtendedSlotWithTrackedObject) {
     track_me.reset();
     EXPECT_EQ(0, track_me.use_count());
 
-    EXPECT_THROW(ext_slot(conn, 'j', 'o'), mcurses::Expired_slot);
-    EXPECT_THROW(sig('l', 'k'), mcurses::Expired_slot);
+    EXPECT_THROW(ext_slot(conn, 'j', 'o'), Expired_slot);
+    EXPECT_THROW(sig('l', 'k'), Expired_slot);
 }
 
 TEST(SignalTest, DisconnectByGroup) {
     Signal<char(int)> sig;
 
-    mcurses::slot<char(int)> slot_1 = [](int) { return 'a'; };
-    sig.connect(1, slot_1, mcurses::Position::at_front);
+    slot<char(int)> slot_1 = [](int) { return 'a'; };
+    sig.connect(1, slot_1, Position::at_front);
 
-    mcurses::slot<char(int)> slot_2 = [](int) { return 'b'; };
+    slot<char(int)> slot_2 = [](int) { return 'b'; };
     sig.connect(2, slot_2);
 
-    mcurses::slot<char(int)> slot_3 = [](int) { return 'c'; };
-    sig.connect(2, slot_3, mcurses::Position::at_front);
+    slot<char(int)> slot_3 = [](int) { return 'c'; };
+    sig.connect(2, slot_3, Position::at_front);
 
-    mcurses::slot<char(int)> slot_4 = [](int) { return 'd'; };
+    slot<char(int)> slot_4 = [](int) { return 'd'; };
     sig.connect(3, slot_4);
 
     auto result1 = sig(4);
@@ -617,14 +623,14 @@ TEST(SignalTest, DisconnectByGroup) {
 TEST(SignalTest, DisconnectAllSlots) {
     Signal<char(char, int)> sig;
 
-    mcurses::slot<char(char, int)> slot_1 = [](char, int) { return 'a'; };
-    mcurses::slot<char(const mcurses::Connection&, char, int)> slot_2 = [](
-        const mcurses::Connection&, char, int) { return 'b'; };
-    mcurses::slot<char(char, int)> slot_3 = [](char, int) { return 'c'; };
+    slot<char(char, int)> slot_1 = [](char, int) { return 'a'; };
+    slot<char(const Connection&, char, int)> slot_2 = [](
+        const Connection&, char, int) { return 'b'; };
+    slot<char(char, int)> slot_3 = [](char, int) { return 'c'; };
 
     sig.connect(slot_1);
     sig.connect_extended(4, slot_2);
-    sig.connect(slot_3, mcurses::Position::at_front);
+    sig.connect(slot_3, Position::at_front);
 
     auto result1 = sig('g', 6);
     ASSERT_TRUE(bool(result1));
@@ -638,7 +644,7 @@ TEST(SignalTest, DisconnectAllSlots) {
 TEST(SignalTest, Empty) {
     Signal<int(char)> sig;
 
-    mcurses::slot<int(char)> slot_1 = [](char) { return 1; };
+    slot<int(char)> slot_1 = [](char) { return 1; };
     sig.connect(slot_1);
 
     EXPECT_FALSE(sig.empty());
@@ -646,8 +652,8 @@ TEST(SignalTest, Empty) {
     sig.disconnect_all_slots();
     EXPECT_TRUE(sig.empty());
 
-    mcurses::slot<int(const mcurses::Connection&, char)> slot_2 = [](
-        const mcurses::Connection&, char) { return 2; };
+    slot<int(const Connection&, char)> slot_2 = [](
+        const Connection&, char) { return 2; };
     sig.connect_extended(slot_2);
 
     EXPECT_FALSE(sig.empty());
@@ -660,23 +666,23 @@ TEST(SignalTest, Empty) {
 TEST(SignalTest, NumSlots) {
     Signal<int()> sig;
 
-    mcurses::slot<int()> slot_1 = []() { return 1; };
+    slot<int()> slot_1 = []() { return 1; };
     sig.connect(slot_1);
-    mcurses::slot<int()> slot_2 = []() { return 2; };
+    slot<int()> slot_2 = []() { return 2; };
     sig.connect(slot_2);
-    mcurses::slot<int()> slot_3 = []() { return 3; };
+    slot<int()> slot_3 = []() { return 3; };
     sig.connect(2, slot_3);
-    mcurses::slot<int()> slot_4 = []() { return 4; };
+    slot<int()> slot_4 = []() { return 4; };
     sig.connect(2, slot_4);
 
     EXPECT_EQ(4, sig.num_slots());
 
-    mcurses::slot<int()> slot_5 = []() { return 5; };
-    sig.connect(3, slot_5, mcurses::Position::at_back);
-    mcurses::slot<int(const mcurses::Connection&)> slot_6 =
-        [](const mcurses::Connection&) { return 6; };
+    slot<int()> slot_5 = []() { return 5; };
+    sig.connect(3, slot_5, Position::at_back);
+    slot<int(const Connection&)> slot_6 =
+        [](const Connection&) { return 6; };
     sig.connect_extended(slot_6);
-    mcurses::slot<int()> slot_7 = []() { return 7; };
+    slot<int()> slot_7 = []() { return 7; };
     sig.connect(slot_7);
 
     EXPECT_EQ(7, sig.num_slots());
@@ -732,11 +738,11 @@ class new_combiner {
 
 TEST(SignalTest, Combiner) {
     Signal<void(int)> sig1;
-    EXPECT_EQ(typeid(mcurses::Optional_last_value<void>{}),
+    EXPECT_EQ(typeid(Optional_last_value<void>{}),
               typeid(sig1.combiner()));
 
-    Signal<int(double), mcurses::Optional_last_value<int>> sig2;
-    EXPECT_EQ(typeid(mcurses::Optional_last_value<int>{}),
+    Signal<int(double), Optional_last_value<int>> sig2;
+    EXPECT_EQ(typeid(Optional_last_value<int>{}),
               typeid(sig2.combiner()));
 
     Signal<int(double), new_combiner<int>> sig3;
@@ -745,8 +751,8 @@ TEST(SignalTest, Combiner) {
 
 TEST(SignalTest, SetCombiner) {
     Signal<int(double, char)> sig1;
-    sig1.set_combiner(mcurses::Optional_last_value<int>{});
-    EXPECT_EQ(typeid(mcurses::Optional_last_value<int>{}),
+    sig1.set_combiner(Optional_last_value<int>{});
+    EXPECT_EQ(typeid(Optional_last_value<int>{}),
               typeid(sig1.combiner()));
 
     Signal<int(double, char), new_combiner<int>> sig2;
@@ -765,20 +771,20 @@ TEST(SignalTest, Swap) {
     Signal<int(char)> sig1;
     Signal<int(char)> sig2;
 
-    mcurses::slot<int(char)> slot_1 = [](char) { return 1; };
+    slot<int(char)> slot_1 = [](char) { return 1; };
     sig1.connect(slot_1);
     sig2.connect(slot_1);
-    mcurses::slot<int(char)> slot_2 = [](char) { return 2; };
+    slot<int(char)> slot_2 = [](char) { return 2; };
     sig1.connect(slot_2);
     sig2.connect(slot_2);
-    mcurses::slot<int(char)> slot_3 = [](char) { return 3; };
+    slot<int(char)> slot_3 = [](char) { return 3; };
     sig1.connect(slot_3);
     sig2.connect(slot_3);
-    mcurses::slot<int(char)> slot_4 = [](char) { return 4; };
+    slot<int(char)> slot_4 = [](char) { return 4; };
     sig2.connect(slot_4);
-    mcurses::slot<int(char)> slot_5 = [](char) { return 5; };
+    slot<int(char)> slot_5 = [](char) { return 5; };
     sig2.connect(slot_5);
-    mcurses::slot<int(char)> slot_6 = [](char) { return 6; };
+    slot<int(char)> slot_6 = [](char) { return 6; };
     sig2.connect(slot_6);
 
     auto result1 = sig1('d');
@@ -815,7 +821,7 @@ TEST(SignalTest, Swap) {
 
 TEST(SignalTest, LockImplAsVoid) {
     Signal<int(char)> sig;
-    mcurses::slot<int(char)> slot_1 = [](char) { return 6; };
+    slot<int(char)> slot_1 = [](char) { return 6; };
     sig.connect(slot_1);
 
     EXPECT_EQ(2, sig.lock_impl().use_count());
@@ -823,7 +829,7 @@ TEST(SignalTest, LockImplAsVoid) {
 
 TEST(SignalTest, LockImpl) {
     Signal<int(char)> sig;
-    mcurses::slot<int(char)> slot_1 = [](char) { return 6; };
+    slot<int(char)> slot_1 = [](char) { return 6; };
     sig.connect(slot_1);
 
     EXPECT_EQ(1, sig.lock_impl()->num_slots());
