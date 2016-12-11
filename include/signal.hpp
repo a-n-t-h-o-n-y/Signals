@@ -1,3 +1,5 @@
+/// \file
+/// \brief Contains the definiton for the Signal class.
 #ifndef SIGNAL_HPP
 #define SIGNAL_HPP
 
@@ -54,7 +56,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
         slot<Ret(const Connection&, Args...), extended_slot_function_type>;
     using slot_result_type = typename SlotFunction::result_type;
     using argument_types = std::tuple<Args...>;
-    using impl_type = signal_impl<signature_type,
+    using impl_type = Signal_impl<signature_type,
                                   combiner_type,
                                   group_type,
                                   group_compare_type,

@@ -34,6 +34,7 @@ class Connection_impl<Ret(Args...)> : public Connection_impl_base {
     // Constructs a Connection_impl with extended_slot and connection. This
     // binds the connection to the first parameter of the extended_slot_t
     // function so that the signature of the function fits with the signal type.
+    // Also copies over tracked items from the extended slot into the new slot.
     Connection_impl& emplace_extended(const extended_slot_t& es,
                                       const Connection& c) {
         connected_ = true;

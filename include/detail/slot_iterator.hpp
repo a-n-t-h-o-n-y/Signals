@@ -14,7 +14,7 @@ public:
 
 	slot_iterator() = default;	// might never be used?
 
-	slot_iterator(InputIterator iter)
+	explicit slot_iterator(InputIterator iter)
 	:iter_{iter}{}
 
 	result_type operator*()
