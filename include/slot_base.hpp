@@ -1,30 +1,50 @@
+/// \file
+/// \brief Contains definition of Slot_base class.
 #ifndef SLOT_BASE_HPP
 #define SLOT_BASE_HPP
 
 #include <memory>
 #include <vector>
 
-namespace mcurses
-{
+namespace mcurses {
 
-class slot_base {
-public:
-	typedef std::vector<std::shared_ptr<void>> locked_container_type;
+/// \brief Base class for Slot, handles tracked objects.
+class Slot_base {
+   public:
+    using locked_container_type = std::vector<std::shared_ptr<void>>;
+    using tracked_container_type = std::vector<std::weak_ptr<void>>;
 
-	slot_base() = default;
+    /// \returns True if any tracked object has been destroyed.
+    bool expired() const {
+        for (auto& tracked : tracked_ptrs_) {
+            if (tracked.expired()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	slot_base(const slot_base&) = default;
+    /// \brief Locks the tracked objects so they cannot be destroyed.
+    ///
+    /// \returns Container of locked objects, as long as this container is alive
+    /// all of the tracked objects will be alive.
+    locked_container_type lock() const {
+        locked_container_type locked_vec;
+        for (auto& tracked : tracked_ptrs_) {
+            locked_vec.push_back(tracked.lock());
+        }
+        return locked_vec;
+    }
 
-	virtual ~slot_base() = default;
+    /// \returns The internally held container of tracked objects.
+    const tracked_container_type& get_tracked_container() const {
+        return tracked_ptrs_;
+    }
 
-	bool expired() const;
-	locked_container_type lock() const;
-	const std::vector<std::weak_ptr<void>>& get_tracked_container() const;
-	
-protected:
-	std::vector<std::weak_ptr<void>> tracked_ptrs_;
+   protected:
+    tracked_container_type tracked_ptrs_;
 };
 
-} // namespace mcurses
+}  // namespace mcurses
 
-#endif // SLOT_BASE_HPP
+#endif  // SLOT_BASE_HPP

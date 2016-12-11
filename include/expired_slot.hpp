@@ -1,16 +1,21 @@
+/// \file
+/// \brief Includes Expired_slot exception definition.
 #ifndef EXPIRED_SLOT_HPP
 #define EXPIRED_SLOT_HPP
 
-#include <exception>
+#include <stdexcept>
 
-namespace mcurses
-{
+/// \namespace
+/// Signals Library namespace.
+namespace mcurses {
 
-class expired_slot: public std::exception {
-public:
-	
+/// Thrown when a Slot is accessed after it has expired.
+class Expired_slot : public std::logic_error {
+   public:
+    /// \param what Used to identify the exception.
+    explicit Expired_slot(const char* what = "") : logic_error{what} {}
 };
 
-} // namespace mcurses
+}  // namespace mcurses
 
-#endif // EXPIRED_SLOT_HPP
+#endif  // EXPIRED_SLOT_HPP

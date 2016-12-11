@@ -3,47 +3,43 @@
 
 #include <iterator>
 
-namespace mcurses
-{
+namespace mcurses {
 
+// Slot_iterator points to a functor object, when it is dereferenced you get a
+// function type object that is callable with no arguments. The iterator is
+// useful for iterating over a container of functions and calling each function
+// on a dereference operation. InputIterator is any container iterator that
+// holds a callable type and can be incremented, dereferenced and copied.
+// \sa Signal_impl
 template <typename InputIterator>
-class slot_iterator {
-public:
-	typedef typename std::iterator_traits<InputIterator>::value_type 	iter_result_type;
-	typedef typename iter_result_type::result_type 						result_type;
+class Slot_iterator {
+   public:
+    using iter_result_type =
+        typename std::iterator_traits<InputIterator>::value_type;
+    using result_type = typename iter_result_type::result_type;
 
-	slot_iterator() = default;	// might never be used?
+    Slot_iterator() = default;  // might never be used?
 
-	slot_iterator(InputIterator iter)
-	:iter_{iter}{}
+    explicit Slot_iterator(InputIterator iter) : iter_{iter} {}
 
-	result_type operator*()
-	{
-		auto slt = *iter_;
-		return slt();
-	}
+    result_type operator*() {
+        auto slot = *iter_;
+        return slot();
+    }
 
-	slot_iterator& operator++()
-	{
-		++iter_;
-		return *this;
-	}
+    Slot_iterator& operator++() {
+        ++iter_;
+        return *this;
+    }
 
-	bool operator==(const slot_iterator& x)
-	{
-		return iter_ == x.iter_;
-	}
+    bool operator==(const Slot_iterator& x) { return iter_ == x.iter_; }
 
-	bool operator!=(const slot_iterator& x)
-	{
-		return !operator==(x);
-	}
+    bool operator!=(const Slot_iterator& x) { return !operator==(x); }
 
-
-private:
-	InputIterator iter_;
+   private:
+    InputIterator iter_;
 };
 
-} // namespace mcurses
+}  // namespace mcurses
 
-#endif // SLOT_ITERATOR_HPP
+#endif  // SLOT_ITERATOR_HPP

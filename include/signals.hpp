@@ -1,3 +1,5 @@
+/// \file
+/// \brief Contains all headers for the Signals Library.
 #ifndef SIGNALS_HPP
 #define SIGNALS_HPP
 
@@ -10,4 +12,4 @@
 #include "slot.hpp"
 #include "slot_fwd.hpp"
 
-#endif // SIGNALS_HPP
+#endif  // SIGNALS_HPP

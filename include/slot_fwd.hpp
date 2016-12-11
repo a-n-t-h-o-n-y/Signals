@@ -1,14 +1,17 @@
+/// \file
+/// \brief Contains the forward declaration of the Slot class template.
+///
+/// Include this header instead of forward declaring the class yourself.
 #ifndef SLOT_FWD_HPP
 #define SLOT_FWD_HPP
 
 #include <functional>
 
-namespace mcurses
-{
+namespace mcurses {
 
 template <typename Signature, typename FunctionType = std::function<Signature>>
-class slot;
+class Slot;
 
-} // namespace mcurses
+}  // namespace mcurses
 
-#endif // SLOT_FWD_HPP
+#endif  // SLOT_FWD_HPP
