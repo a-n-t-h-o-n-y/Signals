@@ -7,7 +7,7 @@
 #include <memory>
 
 using mcurses::Connection;
-using mcurses::slot;
+using mcurses::Slot;
 using mcurses::Connection_impl;
 using mcurses::Connection_impl_base;
 
@@ -21,7 +21,7 @@ TEST(ConnectionTest, DefaultConstructor) {
 }
 
 TEST(ConnectionTest, CopyConstructor) {
-    slot<int(double)> s{[](double) { return 3; }};
+    Slot<int(double)> s{[](double) { return 3; }};
     auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
     Connection conn{c_impl};
 
@@ -37,7 +37,7 @@ TEST(ConnectionTest, CopyConstructor) {
 }
 
 TEST(ConnectionTest, MoveConstructor) {
-    slot<int(double)> s{[](double) { return 3; }};
+    Slot<int(double)> s{[](double) { return 3; }};
     auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
     Connection conn{c_impl};
 
@@ -53,11 +53,11 @@ TEST(ConnectionTest, MoveConstructor) {
 }
 
 TEST(ConnectionTest, CopyAssignmentOperator) {
-    slot<int(double)> s{[](double) { return 3; }};
+    Slot<int(double)> s{[](double) { return 3; }};
     auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
     Connection conn{c_impl};
 
-    slot<int(int, int)> s2{[](int, int) { return 3; }};
+    Slot<int(int, int)> s2{[](int, int) { return 3; }};
     auto c_impl2 =
         std::make_shared<Connection_impl<int(int, int)>>(s2);
     Connection conn2{c_impl2};
@@ -82,11 +82,11 @@ TEST(ConnectionTest, CopyAssignmentOperator) {
 }
 
 TEST(ConnectionTest, MoveAssignmentOperator) {
-    slot<int(double)> s{[](double) { return 3; }};
+    Slot<int(double)> s{[](double) { return 3; }};
     auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
     Connection conn{c_impl};
 
-    slot<int(int, int)> s2{[](int, int) { return 3; }};
+    Slot<int(int, int)> s2{[](int, int) { return 3; }};
     auto c_impl2 =
         std::make_shared<Connection_impl<int(int, int)>>(s2);
     Connection conn2{c_impl2};
@@ -111,7 +111,7 @@ TEST(ConnectionTest, MoveAssignmentOperator) {
 }
 
 TEST(ConnectionTest, DisconnectMethod) {
-    slot<int(double)> s{[](double) { return 3; }};
+    Slot<int(double)> s{[](double) { return 3; }};
     auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
     Connection my_conn{c_impl};
 
@@ -121,7 +121,7 @@ TEST(ConnectionTest, DisconnectMethod) {
 
     EXPECT_FALSE(my_conn.connected());
 
-    slot<int(double)> s2{[](double) { return 3; }};
+    Slot<int(double)> s2{[](double) { return 3; }};
     auto c_impl2 = std::make_shared<Connection_impl<int(double)>>(s2);
     Connection my_conn2{c_impl2};
 
@@ -143,7 +143,7 @@ TEST(ConnectionTest, ConnectedMethod) {
     EXPECT_FALSE(c1.connected());
 
     // test properly built Connection
-    slot<int(double)> s{[](double) { return 4; }};
+    Slot<int(double)> s{[](double) { return 4; }};
     auto c_impl = std::make_shared<Connection_impl<int(double)>>(
         s);  // this was expiring and making Connection not connected anymore
     Connection c2{c_impl};
@@ -162,7 +162,7 @@ TEST(ConnectionTest, BlockedMethod) {
     EXPECT_FALSE(c1.blocked());
 
     // test properly build Connection
-    slot<int(double)> s{[](double) { return 4; }};
+    Slot<int(double)> s{[](double) { return 4; }};
     Connection c2{
         std::make_shared<Connection_impl<int(double)>>(s)};
 
@@ -172,16 +172,16 @@ TEST(ConnectionTest, BlockedMethod) {
 }
 
 TEST(ConnectionTest, OperatorEquals) {
-    slot<int(double)> s{[](double) { return 3; }};
+    Slot<int(double)> s{[](double) { return 3; }};
     auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
     Connection conn{c_impl};
 
-    slot<int(int, int)> s2{[](int, int) { return 3; }};
+    Slot<int(int, int)> s2{[](int, int) { return 3; }};
     auto c_impl2 =
         std::make_shared<Connection_impl<int(int, int)>>(s2);
     Connection conn2{c_impl2};
 
-    slot<int(int, int)> s3{[](int, int) { return 3; }};
+    Slot<int(int, int)> s3{[](int, int) { return 3; }};
     auto c_impl3 =
         std::make_shared<Connection_impl<int(int, int)>>(s3);
     Connection conn3{c_impl3};
@@ -200,16 +200,16 @@ TEST(ConnectionTest, OperatorEquals) {
 }
 
 TEST(ConnectionTest, OperatorNotEquals) {
-    slot<int(double)> s{[](double) { return 3; }};
+    Slot<int(double)> s{[](double) { return 3; }};
     auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
     Connection conn{c_impl};
 
-    slot<int(int, int)> s2{[](int, int) { return 3; }};
+    Slot<int(int, int)> s2{[](int, int) { return 3; }};
     auto c_impl2 =
         std::make_shared<Connection_impl<int(int, int)>>(s2);
     Connection conn2{c_impl2};
 
-    slot<int(int, int)> s3{[](int, int) { return 3; }};
+    Slot<int(int, int)> s3{[](int, int) { return 3; }};
     auto c_impl3 =
         std::make_shared<Connection_impl<int(int, int)>>(s3);
     Connection conn3{c_impl3};
@@ -228,16 +228,16 @@ TEST(ConnectionTest, OperatorNotEquals) {
 }
 
 TEST(ConnectionTest, OperatorLessThan) {
-    slot<int(double)> s{[](double) { return 3; }};
+    Slot<int(double)> s{[](double) { return 3; }};
     auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
     Connection conn{c_impl};
 
-    slot<int(int, int)> s2{[](int, int) { return 3; }};
+    Slot<int(int, int)> s2{[](int, int) { return 3; }};
     auto c_impl2 =
         std::make_shared<Connection_impl<int(int, int)>>(s2);
     Connection conn2{c_impl2};
 
-    slot<int(int, int)> s3{[](int, int) { return 3; }};
+    Slot<int(int, int)> s3{[](int, int) { return 3; }};
     auto c_impl3 =
         std::make_shared<Connection_impl<int(int, int)>>(s3);
     Connection conn3{c_impl3};
@@ -284,11 +284,11 @@ TEST(ConnectionTest, OperatorLessThan) {
 }
 
 TEST(ConnectionTest, Swap) {
-    slot<int(double)> s{[](double) { return 3; }};
+    Slot<int(double)> s{[](double) { return 3; }};
     auto c_impl = std::make_shared<Connection_impl<int(double)>>(s);
     Connection conn{c_impl};
 
-    slot<int(int, int)> s2{[](int, int) { return 7; }};
+    Slot<int(int, int)> s2{[](int, int) { return 7; }};
     auto c_impl2 =
         std::make_shared<Connection_impl<int(int, int)>>(s2);
     Connection conn2{c_impl2};

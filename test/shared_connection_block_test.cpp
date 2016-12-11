@@ -7,7 +7,7 @@
 
 using mcurses::Shared_connection_block;
 using mcurses::Signal;
-using mcurses::slot; 
+using mcurses::Slot; 
 using mcurses::Connection;
 
 TEST(SharedConnectionBlockTest, DefaultConstructor) {
@@ -15,7 +15,7 @@ TEST(SharedConnectionBlockTest, DefaultConstructor) {
     EXPECT_FALSE(scb1.blocking());
 
     Signal<int(char)> sig1;
-    slot<int(char)> slot_1 = [](char) { return 3; };
+    Slot<int(char)> slot_1 = [](char) { return 3; };
     auto conn = sig1.connect(slot_1);
 
     EXPECT_FALSE(conn.blocked());
@@ -27,7 +27,7 @@ TEST(SharedConnectionBlockTest, DefaultConstructor) {
     EXPECT_FALSE(bool(sig1('g')));
 
     Signal<int(char)> sig2;
-    slot<int(char)> slot_2 = [](char) { return 3; };
+    Slot<int(char)> slot_2 = [](char) { return 3; };
     auto conn2 = sig2.connect(slot_2);
 
     EXPECT_FALSE(conn2.blocked());
@@ -43,7 +43,7 @@ TEST(SharedConnectionBlockTest, DefaultConstructor) {
 
 TEST(SharedConnectionBlockTest, CopyConstructor) {
     Signal<int(char)> sig1;
-    slot<int(char)> slot_1 = [](char) { return 3; };
+    Slot<int(char)> slot_1 = [](char) { return 3; };
     auto conn1 = sig1.connect(slot_1);
     Shared_connection_block scb1(conn1);
 
@@ -71,7 +71,7 @@ TEST(SharedConnectionBlockTest, CopyConstructor) {
 
 TEST(SharedConnectionBlockTest, CopyAssignmentOperator) {
     Signal<int()> sig1;
-    slot<int()> slot_1 = []() { return 4; };
+    Slot<int()> slot_1 = []() { return 4; };
     auto conn1 = sig1.connect(slot_1);
 
     Shared_connection_block scb1{conn1};
@@ -100,9 +100,9 @@ TEST(SharedConnectionBlockTest, CopyAssignmentOperator) {
     EXPECT_TRUE(conn1.blocked());
 
     Signal<int(double)> sig2;
-    slot<int(double)> slot_2 = [](double) { return 4; };
+    Slot<int(double)> slot_2 = [](double) { return 4; };
     auto conn2 = sig2.connect(slot_2);
-    slot<int(const Connection&, double)> slot_ext = [](const Connection&,
+    Slot<int(const Connection&, double)> slot_ext = [](const Connection&,
                                                        double) { return 5; };
     auto conn3 = sig2.connect_extended(1, slot_ext);
 
@@ -141,7 +141,7 @@ TEST(SharedConnectionBlockTest, CopyAssignmentOperator) {
 
 TEST(SharedConnectionBlockTest, Destructor) {
     Signal<int(double)> sig1;
-    slot<int(double)> slot_1;
+    Slot<int(double)> slot_1;
     auto conn1 = sig1.connect(slot_1);
 
     auto scb_ptr = std::make_shared<Shared_connection_block>(conn1);
@@ -156,7 +156,7 @@ TEST(SharedConnectionBlockTest, Destructor) {
 
 TEST(SharedConnectionBlockTest, Block) {
     Signal<int()> sig;
-    slot<int()> slot_1;
+    Slot<int()> slot_1;
     auto conn1 = sig.connect(slot_1);
 
     Shared_connection_block scb{conn1, false};
@@ -203,7 +203,7 @@ TEST(SharedConnectionBlockTest, Block) {
 
 TEST(SharedConnectionBlockTest, UnBlock) {
     Signal<void(int)> sig;
-    slot<void(int)> slot_1 = [](int) { return; };
+    Slot<void(int)> slot_1 = [](int) { return; };
     auto conn1 = sig.connect(slot_1);
 
     Shared_connection_block scb{conn1, true};
@@ -226,7 +226,7 @@ TEST(SharedConnectionBlockTest, Blocking) {
     EXPECT_FALSE(scb1.blocking());
 
     Signal<int()> sig;
-    slot<int()> slot_1 = []() { return 2; };
+    Slot<int()> slot_1 = []() { return 2; };
     auto conn1 = sig.connect(slot_1);
 
     Shared_connection_block scb2{conn1};
@@ -244,7 +244,7 @@ TEST(SharedConnectionBlockTest, Blocking) {
 
 TEST(SharedConnectionBlockTest, Connection) {
     Signal<int()> sig;
-    slot<int()> slot_1 = []() { return 2; };
+    Slot<int()> slot_1 = []() { return 2; };
     auto conn1 = sig.connect(slot_1);
 
     Shared_connection_block scb2{conn1};

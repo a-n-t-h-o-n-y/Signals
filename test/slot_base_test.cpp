@@ -8,7 +8,7 @@
 
 TEST(SlotBaseTest, Expired)
 {
-	mcurses::slot<void(int)> s = {[](int){return;}};
+	mcurses::Slot<void(int)> s = {[](int){return;}};
 	EXPECT_FALSE(s.expired());
 
 	auto s_char = std::make_shared<char>('h');
@@ -18,7 +18,7 @@ TEST(SlotBaseTest, Expired)
 	s.track(std::make_shared<int>(5));
 	EXPECT_TRUE(s.expired());
 
-	mcurses::slot<void(int)> s2 = {[](int){return;}};
+	mcurses::Slot<void(int)> s2 = {[](int){return;}};
 	auto s_int = std::make_shared<int>(7);
 	auto s_char2 = std::make_shared<char>('y');
 	s2.track(s_int);
@@ -35,7 +35,7 @@ TEST(SlotBaseTest, Expired)
 // Add Tracked items and check again
 TEST(SlotBaseTest, Lock)
 {
-	mcurses::slot<void(int)> s = {[](int){return;}};
+	mcurses::Slot<void(int)> s = {[](int){return;}};
 	EXPECT_EQ(std::vector<std::shared_ptr<void>>{}, s.lock());
 
 	auto s_char = std::make_shared<char>('h');

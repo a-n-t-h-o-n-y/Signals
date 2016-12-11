@@ -24,11 +24,11 @@ class Connection_impl;
 template <typename Ret, typename... Args>
 class Connection_impl<Ret(Args...)> : public Connection_impl_base {
    public:
-    using extended_slot_t = slot<Ret(const Connection&, Args...)>;
+    using extended_slot_t = Slot<Ret(const Connection&, Args...)>;
 
     Connection_impl() : Connection_impl_base{}, slot_{}, connected_{false} {}
 
-    explicit Connection_impl(const slot<Ret(Args...)>& s)
+    explicit Connection_impl(const Slot<Ret(Args...)>& s)
         : Connection_impl_base{}, slot_{s}, connected_{true} {}
 
     // Constructs a Connection_impl with extended_slot and connection. This
@@ -49,9 +49,9 @@ class Connection_impl<Ret(Args...)> : public Connection_impl_base {
 
     bool connected() const override { return connected_; }
 
-    slot<Ret(Args...)>& get_slot() { return slot_; }
+    Slot<Ret(Args...)>& get_slot() { return slot_; }
 
-    const slot<Ret(Args...)>& get_slot() const { return slot_; }
+    const Slot<Ret(Args...)>& get_slot() const { return slot_; }
 
    private:
     std::function<Ret(Args...)> bind_connection(
@@ -73,7 +73,7 @@ class Connection_impl<Ret(Args...)> : public Connection_impl_base {
             std::forward<const Connection&>(c), Placeholder_template<Is>{}...);
     }
 
-    slot<Ret(Args...)> slot_;
+    Slot<Ret(Args...)> slot_;
     bool connected_;
 };
 

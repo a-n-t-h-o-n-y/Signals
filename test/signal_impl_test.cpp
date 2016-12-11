@@ -18,7 +18,7 @@ using mcurses::Optional_last_value;
 using mcurses::Position;
 using mcurses::Signal;
 using mcurses::Signal_impl;
-using mcurses::slot;
+using mcurses::Slot;
 
 using mcurses::Optional;
 
@@ -51,12 +51,12 @@ class SignalImplTest : public testing::Test {
     SignalImplTest() {
         signal_std.connect(boost_slot_non_empty1);
         signal_std.connect(std_slot_non_empty1);
-        std_slot_holds_signal = slot<void(int)>{signal_std};
+        std_slot_holds_signal = Slot<void(int)>{signal_std};
 
         signal_boost.connect(boost_slot_empty2);
         signal_boost.connect(std_slot_empty2);
         boost_slot_holds_signal =
-            slot<Optional<unsigned>(long long),
+            Slot<Optional<unsigned>(long long),
                  boost::function<Optional<unsigned>(long long)>>{signal_boost};
 
         si_type1_2.connect([](int) { return; }, Position::at_back);
@@ -90,28 +90,28 @@ class SignalImplTest : public testing::Test {
 
     // Slots - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Empty Slot - boost::function
-    slot<void(int), boost::function<void(int)>> boost_slot_empty1{};
+    Slot<void(int), boost::function<void(int)>> boost_slot_empty1{};
 
-    slot<void(int), boost::function<void(int)>> boost_slot_non_empty1{
+    Slot<void(int), boost::function<void(int)>> boost_slot_non_empty1{
         [](int) { return; }};
 
     // Empty Slot - boost::function
-    slot<unsigned(long long), boost::function<unsigned(long long)>>
+    Slot<unsigned(long long), boost::function<unsigned(long long)>>
         boost_slot_empty2{};
 
-    slot<unsigned(long long), boost::function<unsigned(long long)>>
+    Slot<unsigned(long long), boost::function<unsigned(long long)>>
         boost_slot_non_empty2{[](long long) { return 3; }};
 
     // Function Slot - boost::function
-    slot<void(unsigned), boost::function<void(unsigned)>> boost_slot_function1{
+    Slot<void(unsigned), boost::function<void(unsigned)>> boost_slot_function1{
         [](unsigned) { return; }};
 
     // Function Slot - boost::function
-    slot<double(char), boost::function<double(char)>> boost_slot_function2{
+    Slot<double(char), boost::function<double(char)>> boost_slot_function2{
         [](char) { return 3.4; }};
 
     // Extended Slot - boost::function
-    slot<char(const Connection&, int, double),
+    Slot<char(const Connection&, int, double),
          boost::function<char(const Connection&, int, double)>>
         boost_extended_slot{[](const Connection&, int, double) { return 'h'; }};
 
@@ -122,7 +122,7 @@ class SignalImplTest : public testing::Test {
            std::less<int>,
            boost::function<unsigned(long long)>>
         empty_signal_boost{};
-    slot<Optional<unsigned>(long long),
+    Slot<Optional<unsigned>(long long),
          boost::function<Optional<unsigned>(long long)>>
         boost_slot_holds_empty_signal{empty_signal_boost};
 
@@ -133,37 +133,37 @@ class SignalImplTest : public testing::Test {
            std::less<int>,
            boost::function<unsigned(long long)>>
         signal_boost{};
-    slot<Optional<unsigned>(long long),
+    Slot<Optional<unsigned>(long long),
          boost::function<Optional<unsigned>(long long)>>
         boost_slot_holds_signal{};
 
     // Empty Slot - std::function
-    slot<void(int)> std_slot_empty1{};
+    Slot<void(int)> std_slot_empty1{};
 
-    slot<void(int)> std_slot_non_empty1{[](int) { return; }};
+    Slot<void(int)> std_slot_non_empty1{[](int) { return; }};
 
     // Empty Slot - std::function
-    slot<unsigned(long long)> std_slot_empty2{};
+    Slot<unsigned(long long)> std_slot_empty2{};
 
-    slot<unsigned(long long)> std_slot_non_empty2{[](long long) { return 7; }};
-
-    // Function Slot - std::function
-    slot<void(unsigned)> std_slot_function1{[](unsigned) { return; }};
+    Slot<unsigned(long long)> std_slot_non_empty2{[](long long) { return 7; }};
 
     // Function Slot - std::function
-    slot<double(char)> std_slot_function2{[](char) { return 3.4; }};
+    Slot<void(unsigned)> std_slot_function1{[](unsigned) { return; }};
+
+    // Function Slot - std::function
+    Slot<double(char)> std_slot_function2{[](char) { return 3.4; }};
 
     // Extended Slot - std::function
-    slot<char(const Connection&, int, double)> std_extended_slot{
+    Slot<char(const Connection&, int, double)> std_extended_slot{
         [](const Connection&, int, double) { return 'k'; }};
 
     // Slot holds empty Signal - std::function
     Signal<void(int)> empty_signal_std{};
-    slot<void(int)> std_slot_holds_empty_signal{empty_signal_std};
+    Slot<void(int)> std_slot_holds_empty_signal{empty_signal_std};
 
     // Slot holds non-empty Signal - std::function
     Signal<void(int)> signal_std{};
-    slot<void(int)> std_slot_holds_signal{};
+    Slot<void(int)> std_slot_holds_signal{};
 
     // Functors - - - - - - - - - - - - - - - - - - - - -
     class functor {

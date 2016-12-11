@@ -41,8 +41,8 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
     using group_compare_type = GroupCompare;
     using combiner_type = Combiner;
     using slot_function_type = SlotFunction;
-    using slot_type = slot<signature_type, slot_function_type>;
-    using extended_slot_type = slot<Ret(const Connection&, Args...)>;
+    using slot_type = Slot<signature_type, slot_function_type>;
+    using extended_slot_type = Slot<Ret(const Connection&, Args...)>;
 
     Signal_impl(combiner_type combiner, const group_compare_type& group_compare)
         : combiner_{std::move(combiner)} {}

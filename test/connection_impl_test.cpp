@@ -8,7 +8,7 @@
 
 using mcurses::Connection;
 using mcurses::Connection_impl;
-using mcurses::slot;
+using mcurses::Slot;
 
 TEST(ConnectionImplTest, DefaultConstructor) {
     Connection_impl<void(int)> impl;
@@ -17,14 +17,14 @@ TEST(ConnectionImplTest, DefaultConstructor) {
 }
 
 TEST(ConnectionImplTest, SlotConstructor) {
-    slot<void(int)> s = [](int) { return; };
+    Slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl(s);
     EXPECT_TRUE(impl.connected());
     EXPECT_FALSE(impl.blocked());
 }
 
 TEST(ConnectionImplTest, DisconnectMethod) {
-    slot<void(int)> s = [](int) { return; };
+    Slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl(s);
     EXPECT_TRUE(impl.connected());
     EXPECT_FALSE(impl.blocked());
@@ -38,13 +38,13 @@ TEST(ConnectionImplTest, BlockedMethod) {
     Connection_impl<void(int)> impl1;
     EXPECT_FALSE(impl1.blocked());
 
-    slot<void(int)> s = [](int) { return; };
+    Slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl2(s);
     EXPECT_FALSE(impl2.blocked());
 }
 
 TEST(ConnectionImplTest, ConnectedMethod) {
-    slot<void(int)> s = [](int) { return; };
+    Slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl1(s);
     EXPECT_TRUE(impl1.connected());
 
@@ -53,19 +53,19 @@ TEST(ConnectionImplTest, ConnectedMethod) {
 }
 
 TEST(ConnectionImplTest, GetSlotMethod) {
-    slot<int(int)> s1 = [](int) { return 5; };
+    Slot<int(int)> s1 = [](int) { return 5; };
     Connection_impl<int(int)> impl(s1);
 
     EXPECT_EQ(5, (impl.get_slot())(1));
 
-    slot<int(int)> s2 = [](int) { return 7; };
+    Slot<int(int)> s2 = [](int) { return 7; };
     impl.get_slot() = s2;
 
     EXPECT_EQ(7, (impl.get_slot())(1));
 }
 
 TEST(ConnectionImplTest, ConstGetSlotMethod) {
-    slot<int(int)> s1 = [](int) { return 5; };
+    Slot<int(int)> s1 = [](int) { return 5; };
     const Connection_impl<int(int)> impl(s1);
 
     EXPECT_EQ(5, (impl.get_slot())(1));
@@ -73,7 +73,7 @@ TEST(ConnectionImplTest, ConstGetSlotMethod) {
 
 TEST(ConnectionImplTest, EmplaceExtended) {
     auto ci = std::make_shared<Connection_impl<int(double)>>();
-    slot<int(const Connection&, double)> es = [](const Connection&, double) {
+    Slot<int(const Connection&, double)> es = [](const Connection&, double) {
         return 3;
     };
     Connection conn{ci};

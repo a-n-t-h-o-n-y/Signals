@@ -49,11 +49,11 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     using group_type = Group;
     using group_compare_type = GroupCompare;
     using slot_function_type = SlotFunction;
-    using slot_type = slot<signature_type, SlotFunction>;
+    using slot_type = Slot<signature_type, SlotFunction>;
     using extended_slot_function_type =
         std::function<Ret(const Connection&, Args...)>;
     using extended_slot_type =
-        slot<Ret(const Connection&, Args...), extended_slot_function_type>;
+        Slot<Ret(const Connection&, Args...), extended_slot_function_type>;
     using slot_result_type = typename SlotFunction::result_type;
     using argument_types = std::tuple<Args...>;
     using impl_type = Signal_impl<signature_type,
