@@ -27,7 +27,8 @@ class Slot_base {
     /// \brief Locks the tracked objects so they cannot be destroyed.
     ///
     /// \returns Container of locked objects, as long as this container is alive
-    /// all of the tracked objects will be alive.
+    /// all of the tracked objects will be alive, as long as they have not
+    /// already expired.
     locked_container_type lock() const {
         locked_container_type locked_vec;
         for (auto& tracked : tracked_ptrs_) {
