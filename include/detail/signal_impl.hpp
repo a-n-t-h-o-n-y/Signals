@@ -156,16 +156,16 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
     result_type operator()(Args&&... args) {
         auto slots = bind_args(std::forward<Args>(args)...);
         return combiner_(
-            slot_iterator<typename container_t::iterator>(std::begin(slots)),
-            slot_iterator<typename container_t::iterator>(std::end(slots)));
+            Slot_iterator<typename container_t::iterator>(std::begin(slots)),
+            Slot_iterator<typename container_t::iterator>(std::end(slots)));
     }
 
     result_type operator()(Args&&... args) const {
         auto slots = bind_args(std::forward<Args>(args)...);
         const combiner_type const_comb = combiner_;
         return const_comb(
-            slot_iterator<typename container_t::iterator>(std::begin(slots)),
-            slot_iterator<typename container_t::iterator>(std::end(slots)));
+            Slot_iterator<typename container_t::iterator>(std::begin(slots)),
+            Slot_iterator<typename container_t::iterator>(std::end(slots)));
     }
 
     combiner_type combiner() const { return combiner_; }

@@ -24,10 +24,6 @@ set(CMAKE_CXX_FLAGS "-std=c++14 -g -Wall")
 # Include Directory
 include_directories(include)
 
-# Collect Source Files into Variable Names
-list(APPEND SIGNAL_MODULE_SOURCES 	"src/slot_base.cpp"
-									)
-
 list(APPEND TEST_SOURCES "test/slot_test.cpp"
 						 "test/slot_base_test.cpp"
 						 "test/connection_test.cpp"
@@ -38,17 +34,11 @@ list(APPEND TEST_SOURCES "test/slot_test.cpp"
                          "test/optional_last_value_test.cpp"
 						 )
 
-# Create Static Library
-add_library(signals STATIC ${SIGNAL_MODULE_SOURCES})
-
 # Create Executables with the Sources
 add_executable(tests ${TEST_SOURCES})
 
 # Link libraries to executables
-target_link_libraries(tests signals gtest gtest_main)
-
-# Install Static Library
-install(TARGETS signals ARCHIVE DESTINATION lib)
+target_link_libraries(tests gtest gtest_main)
 
 # Install Headers
 install(DIRECTORY include/ DESTINATION include/aml/signals)

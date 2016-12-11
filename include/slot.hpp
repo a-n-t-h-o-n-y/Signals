@@ -3,7 +3,7 @@
 #ifndef SLOT_HPP
 #define SLOT_HPP
 
-#include "detail/slot_base.hpp"
+#include "slot_base.hpp"
 #include "expired_slot.hpp"
 #include "signal_fwd.hpp"
 
@@ -25,7 +25,7 @@ namespace mcurses {
 /// \param Args... Argument types to the function.
 /// \param FunctionType Internally held type where the function will be stored.
 template <typename Ret, typename... Args, typename FunctionType>
-class Slot<Ret(Args...), FunctionType> : public slot_base {
+class Slot<Ret(Args...), FunctionType> : public Slot_base {
    public:
     using result_type = Ret;
     using argument_types = std::tuple<Args...>;
@@ -105,7 +105,7 @@ class Slot<Ret(Args...), FunctionType> : public slot_base {
     /// Does not track slot itself.
     /// \param slot Slot to copy the tracked objects from.
     /// \returns Reference to *this.
-    Slot& track(const slot_base& slot) {
+    Slot& track(const Slot_base& slot) {
         tracked_ptrs_.insert(std::begin(tracked_ptrs_),
                              std::begin(slot.get_tracked_container()),
                              std::end(slot.get_tracked_container()));
