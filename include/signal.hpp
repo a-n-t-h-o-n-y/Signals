@@ -86,12 +86,12 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     Signal(const Signal&) = delete;
 
     /// Move only type.
-    Signal(Signal&& x) = default;
+    Signal(Signal&& x) noexcept = default;
 
     Signal& operator=(const Signal&) = delete;
 
     /// Move only type.
-    Signal& operator=(Signal&& x) = default;
+    Signal& operator=(Signal&& x) noexcept = default;
 
     /// \brief Connect a Slot to *this either at the front or back of call
     /// queue.
