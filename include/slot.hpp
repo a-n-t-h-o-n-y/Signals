@@ -20,7 +20,8 @@ namespace mcurses {
 ///
 /// Slots can track other objects to mirror their lifetime. If one tracked
 /// object is destroyed, *this will no longer be called by any Signal. Slots
-/// can be called like any other function, with operator().
+/// can be called like any other function, with operator(). Is _not_ nothrow
+/// move constructible/assignable because std::function is not.
 /// \param Ret Return type of the function.
 /// \param Args... Argument types to the function.
 /// \param FunctionType Internally held type where the function will be stored.
