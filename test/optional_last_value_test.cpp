@@ -4,7 +4,7 @@
 
 #include <vector>
 
-using mcurses::Optional_last_value;
+using sig::Optional_last_value;
 
 TEST(OptionalLastValueTest, VectorTest) {
     std::vector<int> vec{1, 2, 3, 4, 5};

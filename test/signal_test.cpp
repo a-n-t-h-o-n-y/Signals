@@ -12,14 +12,14 @@
 #include <memory>
 #include <typeinfo>
 
-using mcurses::Signal;
-using mcurses::Slot;
-using mcurses::Position;
-using mcurses::Optional_last_value;
-using mcurses::Expired_slot;
-using mcurses::Connection;
+using sig::Signal;
+using sig::Slot;
+using sig::Position;
+using sig::Optional_last_value;
+using sig::Expired_slot;
+using sig::Connection;
 
-using mcurses::Optional;
+using opt::Optional;
 
 TEST(SignalTest, Arity) {
     Signal<int(double, float, char, bool)> sig;

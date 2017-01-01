@@ -3,7 +3,7 @@
 
 #include <tuple>
 
-namespace mcurses {
+namespace sig {
 
 template <typename Function>
 class Function_type_splitter;
@@ -18,6 +18,6 @@ class Function_type_splitter<Ret(Args...)> {
     using argument_tuple_type = std::tuple<Args...>;
 };
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // FUNCTION_TYPE_SPLITTER_HPP

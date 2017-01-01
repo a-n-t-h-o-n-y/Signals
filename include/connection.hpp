@@ -7,7 +7,7 @@
 
 #include <memory>
 
-namespace mcurses {
+namespace sig {
 
 /// \brief Represents the connection made when a Slot is connected to a Signal.
 ///
@@ -83,6 +83,6 @@ inline bool operator!=(const Connection& x, const Connection& y) {
     return !(x == y);
 }
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // CONNECTION_HPP

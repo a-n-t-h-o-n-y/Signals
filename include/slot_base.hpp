@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-namespace mcurses {
+namespace sig {
 
 /// \brief Base class for Slot, handles tracked objects.
 class Slot_base {
@@ -46,6 +46,6 @@ class Slot_base {
     tracked_container_type tracked_ptrs_;
 };
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // SLOT_BASE_HPP

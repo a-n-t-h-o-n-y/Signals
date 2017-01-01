@@ -5,10 +5,10 @@
 
 #include <gtest/gtest.h>
 
-using mcurses::Shared_connection_block;
-using mcurses::Signal;
-using mcurses::Slot; 
-using mcurses::Connection;
+using sig::Shared_connection_block;
+using sig::Signal;
+using sig::Slot;
+using sig::Connection;
 
 TEST(SharedConnectionBlockTest, DefaultConstructor) {
     Shared_connection_block scb1{};

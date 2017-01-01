@@ -15,7 +15,7 @@
 #include <tuple>
 #include <utility>
 
-namespace mcurses {
+namespace sig {
 
 /// \brief Represents a signal that can be sent out to notify connected Slots.
 ///
@@ -258,6 +258,6 @@ const int
     Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex>::
         arity;
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // SIGNAL_HPP

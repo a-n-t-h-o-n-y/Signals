@@ -13,14 +13,14 @@
 #include <typeinfo>
 #include <vector>
 
-using mcurses::Connection;
-using mcurses::Optional_last_value;
-using mcurses::Position;
-using mcurses::Signal;
-using mcurses::Signal_impl;
-using mcurses::Slot;
+using sig::Connection;
+using sig::Optional_last_value;
+using sig::Position;
+using sig::Signal;
+using sig::Signal_impl;
+using sig::Slot;
 
-using mcurses::Optional;
+using opt::Optional;
 
 class SignalImplTest : public testing::Test {
    protected:

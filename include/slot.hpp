@@ -14,7 +14,7 @@
 #include <tuple>
 #include <vector>
 
-namespace mcurses {
+namespace sig {
 
 /// \brief Represents a function that can be connected to a Signal.
 ///
@@ -126,6 +126,6 @@ class Slot<Ret(Args...), FunctionType> : public Slot_base {
 template <typename Ret, typename... Args, typename FunctionType>
 const int Slot<Ret(Args...), FunctionType>::arity;
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // SLOT_HPP

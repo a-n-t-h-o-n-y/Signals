@@ -3,7 +3,7 @@
 
 #include <iterator>
 
-namespace mcurses {
+namespace sig {
 
 // Slot_iterator points to a functor object, when it is dereferenced you get a
 // function type object that is callable with no arguments. The iterator is
@@ -40,6 +40,6 @@ class Slot_iterator {
     InputIterator iter_;
 };
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // SLOT_ITERATOR_HPP

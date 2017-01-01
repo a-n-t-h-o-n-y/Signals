@@ -7,7 +7,7 @@
 
 #include <memory>
 
-namespace mcurses {
+namespace sig {
 class Connection_impl_base;
 
 /// \brief Blocks a Signal/Slot Connection.
@@ -76,9 +76,7 @@ class Shared_connection_block {
     }
 
     /// \returns True if *this is currently blocking a Connection, else false.
-    bool blocking() const {
-        return !connection_.expired() && blocking_;
-    }
+    bool blocking() const { return !connection_.expired() && blocking_; }
 
     /// \returns The Connection object associated with *this.
     Connection connection() const { return Connection(connection_); }
@@ -104,6 +102,6 @@ class Shared_connection_block {
     bool blocking_;
 };
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // SHARED_CONNECTION_BLOCK_HPP

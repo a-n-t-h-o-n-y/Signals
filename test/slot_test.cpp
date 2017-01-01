@@ -10,11 +10,11 @@
 #include <memory>
 #include <typeinfo>
 
-using mcurses::Expired_slot;
-using mcurses::Signal;
-using mcurses::Slot;
+using sig::Expired_slot;
+using sig::Signal;
+using sig::Slot;
 
-using mcurses::Optional;
+using opt::Optional;
 
 TEST(SlotTest, Arity) {
     Slot<void(int, int, double, float)> a_slot = {

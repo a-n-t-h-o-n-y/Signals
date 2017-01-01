@@ -7,11 +7,11 @@
 
 #include <functional>
 
-namespace mcurses {
+namespace sig {
 
 template <typename Signature, typename FunctionType = std::function<Signature>>
 class Slot;
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // SLOT_FWD_HPP

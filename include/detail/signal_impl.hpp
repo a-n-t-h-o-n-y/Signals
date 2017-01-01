@@ -13,7 +13,7 @@
 #include <utility>
 #include <deque>
 
-namespace mcurses {
+namespace sig {
 
 // Forward Declaration
 template <typename Signature>
@@ -217,6 +217,6 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
     combiner_type combiner_;
 };
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // SIGNAL_IMPL_HPP

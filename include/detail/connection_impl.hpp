@@ -8,13 +8,13 @@
 #include <functional>
 #include <utility>
 
-namespace mcurses {
+namespace sig {
 class Connection;
 
 template <typename Signature>
 class Connection_impl;
 
-// Implementation class for Connection. This class owns the Slot involved in 
+// Implementation class for Connection. This class owns the Slot involved in
 // the connection. Inherits from Connection_impl_base, which implements shared
 // connection block counts.
 // The base class also provides an interface for the Connection class to hold a
@@ -77,6 +77,6 @@ class Connection_impl<Ret(Args...)> : public Connection_impl_base {
     bool connected_;
 };
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // CONNECTION_IMPL_HPP

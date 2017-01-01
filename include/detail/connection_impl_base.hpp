@@ -4,11 +4,11 @@
 #include <cstddef>
 
 // Forward Declarations
-namespace mcurses {
+namespace sig {
 class Connection;
-} // namespace mcurses
+}  // namespace sig
 
-namespace mcurses {
+namespace sig {
 
 // Access to connections without template parameters. This is the interface for
 // the Connection_impl class template. This is used by the connnecton class as
@@ -25,18 +25,14 @@ class Connection_impl_base {
         return blocking_object_count_ < 1 ? false : true;
     }
 
-    inline void add_block() {
-        ++blocking_object_count_;
-    }
-    inline void remove_block() {
-        --blocking_object_count_;
-    }
+    inline void add_block() { ++blocking_object_count_; }
+    inline void remove_block() { --blocking_object_count_; }
 
    protected:
     // Connections keep track of how many objects are blocking the connection.
     std::size_t blocking_object_count_ = 0;
 };
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // CONNECTION_IMPL_BASE_HPP

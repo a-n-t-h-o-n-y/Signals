@@ -7,34 +7,34 @@
 #include <aml/optional/none.hpp>
 #include <aml/optional/optional.hpp>
 
-namespace mcurses {
+namespace sig {
 
 /// \brief A functor class that returns the last value in an iterator range.
 ///
 /// Attempts to dereference every iterator in the range [first, last).
-/// If the iterator range is empty, an empty Optional object is returned,
-/// otherwise an Optional wrapping the last value is returned.
+/// If the iterator range is empty, an empty opt::Optional object is returned,
+/// otherwise an opt::Optional wrapping the last value is returned.
 template <typename T>
 class Optional_last_value {
    public:
     ///	Type of object the iterator range points to.
-    using result_type = Optional<T>;
+    using result_type = opt::Optional<T>;
 
     ///	\param  first  Input iterator to the first element in the range.
     ///	\param 	last   Input iterator to one past the last element in the range.
     ///	\returns	   The value stored in the last iterator of the range,
-    ///                wrapped in an Optional.
+    ///                wrapped in an opt::Optional.
     template <typename InputIterator>
     result_type operator()(InputIterator first, InputIterator last) const {
         if (first == last) {
-            return Optional<T>{none};
+            return opt::Optional<T>{opt::none};
         }
         T temp;
         while (first != last) {
             temp = *first;
             ++first;
         }
-        return Optional<T>{std::move(temp)};
+        return opt::Optional<T>{std::move(temp)};
     }
 };
 
@@ -58,6 +58,6 @@ class Optional_last_value<void> {
     }
 };
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // OPTIONAL_LAST_VALUE_HPP

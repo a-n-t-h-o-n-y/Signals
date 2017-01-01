@@ -7,7 +7,7 @@
 
 /// \namespace
 /// Signals Library namespace.
-namespace mcurses {
+namespace sig {
 
 /// Thrown when a Slot is accessed after it has expired.
 class Expired_slot : public std::logic_error {
@@ -16,6 +16,6 @@ class Expired_slot : public std::logic_error {
     explicit Expired_slot(const char* what = "") : logic_error{what} {}
 };
 
-}  // namespace mcurses
+}  // namespace sig
 
 #endif  // EXPIRED_SLOT_HPP

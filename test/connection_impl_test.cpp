@@ -6,9 +6,9 @@
 
 #include <memory>
 
-using mcurses::Connection;
-using mcurses::Connection_impl;
-using mcurses::Slot;
+using sig::Connection;
+using sig::Connection_impl;
+using sig::Slot;
 
 TEST(ConnectionImplTest, DefaultConstructor) {
     Connection_impl<void(int)> impl;
