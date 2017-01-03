@@ -43,11 +43,11 @@ target_link_libraries(tests gtest gtest_main)
 # Install Headers
 install(DIRECTORY include/ DESTINATION include/aml/signals)
 
-# Doxygen Target - Doxyfile in project/doc - make doc
+# Doxygen Target - Doxyfile in project/docs - make docs
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-add_custom_target(doc
-${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/doc/Doxyfile
-WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc
+add_custom_target(docs
+${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/Doxyfile
+WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs
 COMMENT "Generating API documentation with Doxygen" VERBATIM)
 endif(DOXYGEN_FOUND)
