@@ -19,7 +19,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/lib")
 
 # Set Compiler Flags
-set(CMAKE_CXX_FLAGS "-std=c++14 -g -Wall")
+# set(CMAKE_CXX_FLAGS "-std=c++14 -g -Wall")
+set(CMAKE_CXX_FLAGS "-std=c++14 -O3 -Wall")
 
 # Include Directory
 include_directories(include)
