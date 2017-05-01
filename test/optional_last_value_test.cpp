@@ -21,5 +21,4 @@ TEST(OptionalLastValueTest, EmptyRange) {
     Optional_last_value<int>::result_type result;
     result = olv(std::begin(vec), std::end(vec));
     EXPECT_FALSE(bool(result));
-    EXPECT_EQ(nullptr, result.get_ptr());
 }
