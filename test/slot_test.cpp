@@ -99,11 +99,20 @@ TEST(SlotTest, TrackSignal) {
 
     slt.track(*sig);
 
+    Signal<char(int, double)> sig2;
+
+    sig2.connect(slt);
+
+    ASSERT_TRUE(sig2(1, 1.0));
+    EXPECT_EQ('k', *sig2(1, 1.0));
+
     EXPECT_FALSE(slt.expired());
 
     sig.reset();
 
     EXPECT_TRUE(slt.expired());
+    // EXPECT_THROW(sig2(1, 1.0), Expired_slot);
+    EXPECT_NO_THROW(sig2(1, 1.0));
 }
 
 TEST(SlotTest, TrackSlot) {
