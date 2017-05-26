@@ -153,15 +153,17 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
         return size;
     }
 
-    result_type operator()(Args&&... args) {
-        auto slots = bind_args(std::forward<Args>(args)...);
+    template <typename... Arguments>
+    result_type operator()(Arguments&&... args) {
+        auto slots = bind_args(std::forward<Arguments>(args)...);
         return combiner_(
             Slot_iterator<typename container_t::iterator>(std::begin(slots)),
             Slot_iterator<typename container_t::iterator>(std::end(slots)));
     }
 
-    result_type operator()(Args&&... args) const {
-        auto slots = bind_args(std::forward<Args>(args)...);
+    template <typename... Arguments>
+    result_type operator()(Arguments&&... args) const {
+        auto slots = bind_args(std::forward<Arguments>(args)...);
         const combiner_type const_comb = combiner_;
         return const_comb(
             Slot_iterator<typename container_t::iterator>(std::begin(slots)),
@@ -181,14 +183,15 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
 
     // Prepares the functions to be processed by the combiner.
     // Returns a container of std::functions with signature Ret().
-    container_t bind_args(Args&&... args) const {
+    template <typename... Arguments>
+    container_t bind_args(Arguments&&... args) const {
         container_t bound_slot_container;
         for (auto& c_impl_ptr : front_connections_) {
             if (c_impl_ptr->connected() && !c_impl_ptr->blocked() &&
                 !c_impl_ptr->get_slot().expired()) {
                 bound_slot_container.push_back(std::bind(
                     std::function<Ret(Args...)>{c_impl_ptr->get_slot()},
-                    std::forward<Args>(args)...));
+                    std::forward<Arguments>(args)...));
             }
         }
         for (auto& gc_pair : grouped_connections_) {
@@ -196,8 +199,9 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
                 if (c_impl_ptr->connected() && !c_impl_ptr->blocked() &&
                     !c_impl_ptr->get_slot().expired()) {
                     bound_slot_container.push_back(std::bind(
-                        std::function<Ret(Args...)>{c_impl_ptr->get_slot()},
-                        std::forward<Args>(args)...));
+                        std::function<Ret(Args...)>{
+                            c_impl_ptr->get_slot()},
+                        std::forward<Arguments>(args)...));
                 }
             }
         }
@@ -206,7 +210,7 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
                 !c_impl_ptr->get_slot().expired()) {
                 bound_slot_container.push_back(std::bind(
                     std::function<Ret(Args...)>{c_impl_ptr->get_slot()},
-                    std::forward<Args>(args)...));
+                    std::forward<Arguments>(args)...));
             }
         }
         return bound_slot_container;

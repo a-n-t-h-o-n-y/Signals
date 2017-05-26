@@ -67,14 +67,24 @@ class Slot<Ret(Args...), FunctionType> : public Slot_base {
 
     /// \brief Calls underlying function if no tracked objects are expired.
     ///
-    /// Passes on args... to the FunctionType object. Throws Expired_slot if
-    /// any tracked objects no longer exist. Throws std::bad_function_call if
-    /// Slot is empty.
+    /// Passes on args... to the FunctionType object. No-op if any tracked
+    /// objects no longer exist. Throws std::bad_function_call if Slot is empty.
     /// \param args... Arguments passed onto the underlying function.
     /// \param result_type The value returned by the function call.
-    result_type operator()(Args&&... args) const {
+    template <typename... Arguments>
+    result_type operator()(Arguments&&... args) const {
+        if (this->expired()) {
+            return result_type();
+        }
+        auto l = this->lock();
+        return function_(std::forward<Arguments>(args)...);
+    }
+
+    /// A throwing version of operator(), if any tracked objects are expired.
+    template <typename... Arguments>
+    result_type call(Arguments&&... args) const {
         auto l = this->expired() ? throw Expired_slot() : this->lock();
-        return function_(std::forward<Args>(args)...);
+        return function_(std::forward<Arguments>(args)...);
     }
 
     /// \brief Adds a shared object to the tracked objects list.

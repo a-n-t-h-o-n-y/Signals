@@ -584,7 +584,7 @@ TEST(SignalTest, ConnectExtendedSlotWithTrackedObject) {
     track_me.reset();
     EXPECT_EQ(0, track_me.use_count());
 
-    EXPECT_THROW(ext_slot(conn, 'j', 'o'), Expired_slot);
+    EXPECT_THROW(ext_slot.call(conn, 'j', 'o'), Expired_slot);
     // EXPECT_THROW(sig('l', 'k'), Expired_slot);
 }
 

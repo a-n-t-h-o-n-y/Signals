@@ -171,7 +171,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
 
     /// \brief Query whether or not *this has any Slots connected to it.
     ///
-    /// \returns True if *this has no Signals attached, false otherwise.
+    /// \returns True if *this has no Slots attached, false otherwise.
     bool empty() const { return pimpl_->empty(); }
 
     /// \brief Access the number of Slots connected to *this.
@@ -186,8 +186,9 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     /// the return value of the last Slot that was called.
     /// \param args The arguments you are passing onto the Slots.
     /// \returns An Optional containing a value determined by the Combiner.
-    result_type operator()(Args&&... args) {
-        return enabled_ ? pimpl_->operator()(std::forward<Args>(args)...)
+    template <typename... Arguments>
+    result_type operator()(Arguments&&... args) {
+        return enabled_ ? pimpl_->operator()(std::forward<Arguments>(args)...)
                         : result_type();  // Empty Optional<T>
     }
 
@@ -199,8 +200,9 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     /// called with a const Combiner.
     /// \param args The arguments you are passing onto the Slots.
     /// \returns An Optional containing a value determined by the Combiner.
-    result_type operator()(Args&&... args) const {
-        return enabled_ ? pimpl_->operator()(std::forward<Args>(args)...)
+    template <typename... Arguments>
+    result_type operator()(Arguments&&... args) const {
+        return enabled_ ? pimpl_->operator()(std::forward<Arguments>(args)...)
                         : result_type();  // Empty Optional<T>
     }
 

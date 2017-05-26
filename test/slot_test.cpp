@@ -210,7 +210,7 @@ TEST(SlotTest, ParenthesisOperator) {
     // objects locked - obj is not deleted in separate thread
     // exception thrown
     obj.reset();
-    EXPECT_THROW(s(4, 5), Expired_slot);
+    EXPECT_THROW(s.call(4, 5), Expired_slot);
 
     // void return type
     Slot<void(char, double)> s_v{[](char, double) { return 5; }};
