@@ -31,16 +31,19 @@ endif()
 add_test(testsignals testsignals)
 
 # Build System Info For Clang-Tidy
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-add_custom_target(compile_commands ALL
-	COMMAND [ -f ${CMAKE_SOURCE_DIR}/build/compile_commands.json ] && mv ${CMAKE_SOURCE_DIR}/build/compile_commands.json
-		${CMAKE_SOURCE_DIR}/compile_commands.json || :)
+if (NOT TARGET compile_commands)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+    add_custom_target(compile_commands ALL
+    	COMMAND [ -f ${CMAKE_SOURCE_DIR}/build/compile_commands.json ] && mv
+            ${CMAKE_SOURCE_DIR}/build/compile_commands.json
+    		${CMAKE_SOURCE_DIR}/compile_commands.json || :)
+endif()
 
 # Doxygen Target
 find_package(Doxygen)
-if(DOXYGEN_FOUND)
-add_custom_target(docs
-${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/Doxyfile
-WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs
-COMMENT "Generating API documentation with Doxygen" VERBATIM)
-endif(DOXYGEN_FOUND)
+if(DOXYGEN_FOUND AND NOT TARGET docs)
+    add_custom_target(docs
+    ${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs
+    COMMENT "Generating API documentation with Doxygen" VERBATIM)
+endif()
