@@ -1,5 +1,5 @@
-#ifndef CONNECTION_IMPL_HPP
-#define CONNECTION_IMPL_HPP
+#ifndef DETAIL_CONNECTION_IMPL_HPP
+#define DETAIL_CONNECTION_IMPL_HPP
 
 #include "connection_impl_base.hpp"
 #include "placeholder_template.hpp"
@@ -79,4 +79,4 @@ class Connection_impl<Ret(Args...)> : public Connection_impl_base {
 
 }  // namespace sig
 
-#endif  // CONNECTION_IMPL_HPP
+#endif  // DETAIL_CONNECTION_IMPL_HPP

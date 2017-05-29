@@ -1,8 +1,6 @@
-#include <slot.hpp>
-#include <slot_base.hpp>
-
+#include "signals/slot.hpp"
+#include "signals/slot_base.hpp"
 #include <gtest/gtest.h>
-
 #include <memory>
 #include <vector>
 

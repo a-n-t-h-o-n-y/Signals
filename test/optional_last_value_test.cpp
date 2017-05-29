@@ -1,7 +1,5 @@
-#include <optional_last_value.hpp>
-
+#include "signals/optional_last_value.hpp"
 #include <gtest/gtest.h>
-
 #include <vector>
 
 using sig::Optional_last_value;

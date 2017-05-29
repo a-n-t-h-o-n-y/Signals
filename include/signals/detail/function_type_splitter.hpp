@@ -1,5 +1,5 @@
-#ifndef FUNCTION_TYPE_SPLITTER_HPP
-#define FUNCTION_TYPE_SPLITTER_HPP
+#ifndef DETAIL_FUNCTION_TYPE_SPLITTER_HPP
+#define DETAIL_FUNCTION_TYPE_SPLITTER_HPP
 
 #include <tuple>
 
@@ -20,4 +20,4 @@ class Function_type_splitter<Ret(Args...)> {
 
 }  // namespace sig
 
-#endif  // FUNCTION_TYPE_SPLITTER_HPP
+#endif  // DETAIL_FUNCTION_TYPE_SPLITTER_HPP

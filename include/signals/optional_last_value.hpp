@@ -4,8 +4,8 @@
 #ifndef OPTIONAL_LAST_VALUE_HPP
 #define OPTIONAL_LAST_VALUE_HPP
 
-#include <aml/optional/none.hpp>
-#include <aml/optional/optional.hpp>
+#include <optional/none.hpp>
+#include <optional/optional.hpp>
 
 namespace sig {
 

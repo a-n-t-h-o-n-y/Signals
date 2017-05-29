@@ -1,8 +1,7 @@
-#include <connection.hpp>
-#include <shared_connection_block.hpp>
-#include <signal.hpp>
-#include <slot.hpp>
-
+#include "signals/connection.hpp"
+#include "signals/shared_connection_block.hpp"
+#include "signals/signal.hpp"
+#include "signals/slot.hpp"
 #include <gtest/gtest.h>
 
 using sig::Shared_connection_block;

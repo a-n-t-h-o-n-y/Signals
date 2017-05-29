@@ -1,5 +1,5 @@
-#ifndef SIGNAL_IMPL_HPP
-#define SIGNAL_IMPL_HPP
+#ifndef DETAIL_SIGNAL_IMPL_HPP
+#define DETAIL_SIGNAL_IMPL_HPP
 
 #include "../connection.hpp"
 #include "../position.hpp"
@@ -226,4 +226,4 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
 
 }  // namespace sig
 
-#endif  // SIGNAL_IMPL_HPP
+#endif  // DETAIL_SIGNAL_IMPL_HPP

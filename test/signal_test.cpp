@@ -1,13 +1,11 @@
-#include <connection.hpp>
-#include <expired_slot.hpp>
-#include <optional_last_value.hpp>
-#include <position.hpp>
-#include <signal.hpp>
-#include <slot.hpp>
-
-#include <aml/optional/optional.hpp>
+#include "signals/connection.hpp"
+#include "signals/expired_slot.hpp"
+#include "signals/optional_last_value.hpp"
+#include "signals/position.hpp"
+#include "signals/signal.hpp"
+#include "signals/slot.hpp"
+#include <optional/optional.hpp>
 #include <gtest/gtest.h>
-
 #include <functional>
 #include <memory>
 #include <typeinfo>

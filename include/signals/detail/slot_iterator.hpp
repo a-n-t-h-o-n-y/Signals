@@ -1,5 +1,5 @@
-#ifndef SLOT_ITERATOR_HPP
-#define SLOT_ITERATOR_HPP
+#ifndef DETAIL_SLOT_ITERATOR_HPP
+#define DETAIL_SLOT_ITERATOR_HPP
 
 #include <iterator>
 
@@ -42,4 +42,4 @@ class Slot_iterator {
 
 }  // namespace sig
 
-#endif  // SLOT_ITERATOR_HPP
+#endif  // DETAIL_SLOT_ITERATOR_HPP

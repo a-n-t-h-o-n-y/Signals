@@ -1,5 +1,5 @@
-#ifndef CONNECTION_IMPL_BASE_HPP
-#define CONNECTION_IMPL_BASE_HPP
+#ifndef DETAIL_CONNECTION_IMPL_BASE_HPP
+#define DETAIL_CONNECTION_IMPL_BASE_HPP
 
 #include <cstddef>
 
@@ -35,4 +35,4 @@ class Connection_impl_base {
 
 }  // namespace sig
 
-#endif  // CONNECTION_IMPL_BASE_HPP
+#endif  // DETAIL_CONNECTION_IMPL_BASE_HPP

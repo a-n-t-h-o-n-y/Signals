@@ -1,5 +1,5 @@
-#ifndef PLACEHOLDER_TEMPLATE_HPP
-#define PLACEHOLDER_TEMPLATE_HPP
+#ifndef DETAIL_PLACEHOLDER_TEMPLATE_HPP
+#define DETAIL_PLACEHOLDER_TEMPLATE_HPP
 
 #include <functional>
 #include <type_traits>
@@ -21,4 +21,4 @@ struct is_placeholder<sig::Placeholder_template<N>>
 
 }  // namespace std
 
-#endif  // PLACEHOLDER_TEMPLATE_HPP
+#endif  // DETAIL_PLACEHOLDER_TEMPLATE_HPP
