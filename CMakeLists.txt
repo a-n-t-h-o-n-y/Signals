@@ -6,6 +6,10 @@ add_compile_options(-std=c++14)
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libs/optional/include
+                    )
+
 set(TEST_SOURCES 
     "test/slot_test.cpp"
     "test/slot_base_test.cpp"
@@ -18,10 +22,6 @@ set(TEST_SOURCES
     )
 
 add_executable(testsignals ${TEST_SOURCES})
-
-target_include_directories(testsignals PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
 
 find_package(GTest REQUIRED)
 if (GTEST_FOUND)
