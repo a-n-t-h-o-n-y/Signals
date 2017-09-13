@@ -7,7 +7,7 @@ add_compile_options(-std=c++14)
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libs/optional/include
+                    ${CMAKE_CURRENT_SOURCE_DIR}/libs/Optional/include
                     )
 
 set(TEST_SOURCES 
