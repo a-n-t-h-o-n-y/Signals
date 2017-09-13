@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(libsignals LANGUAGES CXX)
+
+add_subdirectory(libs/Optional)
 include(GNUInstallDirs)
 enable_testing()
 add_compile_options(-std=c++14)
