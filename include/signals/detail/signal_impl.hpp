@@ -7,11 +7,11 @@
 #include "slot_iterator.hpp"
 
 #include <cstddef>
+#include <deque>
 #include <functional>
 #include <map>
 #include <memory>
 #include <utility>
-#include <deque>
 
 namespace sig {
 
@@ -189,28 +189,30 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
         for (auto& c_impl_ptr : front_connections_) {
             if (c_impl_ptr->connected() && !c_impl_ptr->blocked() &&
                 !c_impl_ptr->get_slot().expired()) {
-                bound_slot_container.push_back(std::bind(
-                    std::function<Ret(Args...)>{c_impl_ptr->get_slot()},
-                    std::forward<Arguments>(args)...));
+                bound_slot_container.push_back([&c_impl_ptr, &args...] {
+                    return c_impl_ptr->get_slot()(
+                        std::forward<Arguments>(args)...);
+                });
             }
         }
         for (auto& gc_pair : grouped_connections_) {
             for (auto& c_impl_ptr : gc_pair.second) {
                 if (c_impl_ptr->connected() && !c_impl_ptr->blocked() &&
                     !c_impl_ptr->get_slot().expired()) {
-                    bound_slot_container.push_back(std::bind(
-                        std::function<Ret(Args...)>{
-                            c_impl_ptr->get_slot()},
-                        std::forward<Arguments>(args)...));
+                    bound_slot_container.push_back([&c_impl_ptr, &args...] {
+                        return c_impl_ptr->get_slot()(
+                            std::forward<Arguments>(args)...);
+                    });
                 }
             }
         }
         for (auto& c_impl_ptr : back_connections_) {
             if (c_impl_ptr->connected() && !c_impl_ptr->blocked() &&
                 !c_impl_ptr->get_slot().expired()) {
-                bound_slot_container.push_back(std::bind(
-                    std::function<Ret(Args...)>{c_impl_ptr->get_slot()},
-                    std::forward<Arguments>(args)...));
+                bound_slot_container.push_back([&c_impl_ptr, &args...] {
+                    return c_impl_ptr->get_slot()(
+                        std::forward<Arguments>(args)...);
+                });
             }
         }
         return bound_slot_container;
