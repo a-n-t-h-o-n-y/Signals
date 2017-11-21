@@ -1,11 +1,13 @@
-#include "signals/connection.hpp"
-#include "signals/detail/signal_impl.hpp"
-#include "signals/optional_last_value.hpp"
-#include "signals/position.hpp"
-#include "signals/signal.hpp"
-#include "signals/slot.hpp"
-#include <boost/function.hpp>
+#include <signals/connection.hpp>
+#include <signals/detail/signal_impl.hpp>
+#include <signals/optional_last_value.hpp>
+#include <signals/position.hpp>
+#include <signals/signal.hpp>
+#include <signals/slot.hpp>
+
 #include <gtest/gtest.h>
+#include <boost/function.hpp>
+
 #include <functional>
 #include <type_traits>
 #include <typeinfo>

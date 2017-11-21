@@ -2,8 +2,7 @@
 /// \brief Contains the definition of the Sharedd_connection_block class.
 #ifndef SHARED_CONNECTION_BLOCK_HPP
 #define SHARED_CONNECTION_BLOCK_HPP
-
-#include "connection.hpp"
+#include <signals/connection.hpp>
 
 #include <memory>
 
@@ -103,5 +102,4 @@ class Shared_connection_block {
 };
 
 }  // namespace sig
-
 #endif  // SHARED_CONNECTION_BLOCK_HPP

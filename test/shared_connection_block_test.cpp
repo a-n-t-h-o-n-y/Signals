@@ -1,13 +1,14 @@
-#include "signals/connection.hpp"
-#include "signals/shared_connection_block.hpp"
-#include "signals/signal.hpp"
-#include "signals/slot.hpp"
+#include <signals/connection.hpp>
+#include <signals/shared_connection_block.hpp>
+#include <signals/signal.hpp>
+#include <signals/slot.hpp>
+
 #include <gtest/gtest.h>
 
+using sig::Connection;
 using sig::Shared_connection_block;
 using sig::Signal;
 using sig::Slot;
-using sig::Connection;
 
 TEST(SharedConnectionBlockTest, DefaultConstructor) {
     Shared_connection_block scb1{};

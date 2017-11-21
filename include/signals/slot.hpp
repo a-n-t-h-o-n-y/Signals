@@ -2,12 +2,10 @@
 /// \brief Contains the definition of the Slot template class.
 #ifndef SLOT_HPP
 #define SLOT_HPP
-
-#include "slot_base.hpp"
-#include "expired_slot.hpp"
-#include "signal_fwd.hpp"
-
-#include "slot_fwd.hpp"
+#include <signals/expired_slot.hpp>
+#include <signals/signal_fwd.hpp>
+#include <signals/slot_base.hpp>
+#include <signals/slot_fwd.hpp>
 
 #include <functional>
 #include <memory>
@@ -28,19 +26,19 @@ namespace sig {
 template <typename Ret, typename... Args, typename FunctionType>
 class Slot<Ret(Args...), FunctionType> : public Slot_base {
    public:
-    using result_type = Ret;
-    using argument_types = std::tuple<Args...>;
-    using signature_type = Ret(Args...);
-    using slot_function_type = FunctionType;
+    using Result_t = Ret;
+    using Argument_t = std::tuple<Args...>;
+    using Signature_t = Ret(Args...);
+    using Slot_function_t = FunctionType;
 
     /// Number of arguments to the function.
-    static const int arity = std::tuple_size<argument_types>::value;
+    static const int arity = std::tuple_size<Argument_t>::value;
 
     /// Access to the type of argument number \p n.
     template <unsigned n>
     class arg {
        public:
-        using type = typename std::tuple_element<n, argument_types>::type;
+        using type = typename std::tuple_element<n, Argument_t>::type;
     };
 
     /// Creates an empty Slot, throws std::bad_function_call if call attempted.
@@ -61,7 +59,8 @@ class Slot<Ret(Args...), FunctionType> : public Slot_base {
               typename W,
               typename X,
               typename Y>
-    Slot(const Signal<T, U, V, W, X, Y>& sig) : function_{*(sig.lock_impl())} {
+    explicit Slot(const Signal<T, U, V, W, X, Y>& sig)
+        : function_{*(sig.lock_impl())} {
         track(sig);
     }
 
@@ -70,11 +69,11 @@ class Slot<Ret(Args...), FunctionType> : public Slot_base {
     /// Passes on args... to the FunctionType object. No-op if any tracked
     /// objects no longer exist. Throws std::bad_function_call if Slot is empty.
     /// \param args... Arguments passed onto the underlying function.
-    /// \param result_type The value returned by the function call.
+    /// \param Result_t The value returned by the function call.
     template <typename... Arguments>
-    result_type operator()(Arguments&&... args) const {
+    Result_t operator()(Arguments&&... args) const {
         if (this->expired()) {
-            return result_type();
+            return Result_t();
         }
         auto l = this->lock();
         return function_(std::forward<Arguments>(args)...);
@@ -82,7 +81,7 @@ class Slot<Ret(Args...), FunctionType> : public Slot_base {
 
     /// A throwing version of operator(), if any tracked objects are expired.
     template <typename... Arguments>
-    result_type call(Arguments&&... args) const {
+    Result_t call(Arguments&&... args) const {
         auto l = this->expired() ? throw Expired_slot() : this->lock();
         return function_(std::forward<Arguments>(args)...);
     }
@@ -124,18 +123,17 @@ class Slot<Ret(Args...), FunctionType> : public Slot_base {
     }
 
     /// \returns Reference to the internally held FunctionType object.
-    slot_function_type& slot_function() { return function_; }
+    Slot_function_t& slot_function() { return function_; }
 
     /// \returns const reference to the internally held FunctionType object.
-    const slot_function_type& slot_function() const { return function_; }
+    const Slot_function_t& slot_function() const { return function_; }
 
    private:
-    slot_function_type function_;
+    Slot_function_t function_;
 };
 
 template <typename Ret, typename... Args, typename FunctionType>
 const int Slot<Ret(Args...), FunctionType>::arity;
 
 }  // namespace sig
-
 #endif  // SLOT_HPP

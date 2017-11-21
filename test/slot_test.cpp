@@ -1,9 +1,11 @@
-#include "signals/expired_slot.hpp"
-#include "signals/signal.hpp"
-#include "signals/slot.hpp"
-#include <optional/optional.hpp>
-#include <boost/function.hpp>
+#include <signals/expired_slot.hpp>
+#include <signals/signal.hpp>
+#include <signals/slot.hpp>
+
 #include <gtest/gtest.h>
+#include <boost/function.hpp>
+#include <optional/optional.hpp>
+
 #include <functional>
 #include <memory>
 #include <typeinfo>

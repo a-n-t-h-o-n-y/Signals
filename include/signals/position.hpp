@@ -2,12 +2,10 @@
 /// \brief Contains the Position enum class definition.
 #ifndef POSITION_HPP
 #define POSITION_HPP
-
 namespace sig {
 
-/// Used to place Slots in a Signal at either the front or the back.
+/// Identifies insertion position of Slots in a Signal.
 enum class Position { at_front, at_back };
 
 }  // namespace sig
-
 #endif  // POSITION_HPP

@@ -2,12 +2,11 @@
 /// \brief Contains the definiton for the Signal class.
 #ifndef SIGNAL_HPP
 #define SIGNAL_HPP
-
-#include "connection.hpp"
-#include "detail/signal_impl.hpp"
-#include "position.hpp"
-#include "signal_fwd.hpp"
-#include "slot_fwd.hpp"
+#include <signals/connection.hpp>
+#include <signals/detail/signal_impl.hpp>
+#include <signals/position.hpp>
+#include <signals/signal_fwd.hpp>
+#include <signals/slot_fwd.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -39,31 +38,30 @@ template <typename Ret,
           typename GroupCompare,
           typename SlotFunction,
           typename Mutex>
-
 class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
    public:
     // Types
-    using signature_type = Ret(Args...);
-    using result_type = typename Combiner::result_type;
-    using combiner_type = Combiner;
-    using group_type = Group;
-    using group_compare_type = GroupCompare;
-    using slot_function_type = SlotFunction;
-    using slot_type = Slot<signature_type, SlotFunction>;
-    using extended_slot_function_type =
+    using Signature_t = Ret(Args...);
+    using Result_t = typename Combiner::Result_t;
+    using Combiner_t = Combiner;
+    using Group_t = Group;
+    using Group_compare_t = GroupCompare;
+    using Slot_function_t = SlotFunction;
+    using Slot_t = Slot<Signature_t, SlotFunction>;
+    using Extended_slot_function_t =
         std::function<Ret(const Connection&, Args...)>;
-    using extended_slot_type =
-        Slot<Ret(const Connection&, Args...), extended_slot_function_type>;
-    using slot_result_type = typename SlotFunction::result_type;
-    using argument_types = std::tuple<Args...>;
-    using impl_type = Signal_impl<signature_type,
-                                  combiner_type,
-                                  group_type,
-                                  group_compare_type,
-                                  slot_function_type>;
+    using Extended_slot_t =
+        Slot<Ret(const Connection&, Args...), Extended_slot_function_t>;
+    using Slot_result_t = typename SlotFunction::result_type;
+    using Argument_t = std::tuple<Args...>;
+    using Impl_t = Signal_impl<Signature_t,
+                               Combiner_t,
+                               Group_t,
+                               Group_compare_t,
+                               Slot_function_t>;
 
     /// Number of arguments the Signal takes.
-    static const int arity = std::tuple_size<argument_types>::value;
+    static const int arity = std::tuple_size<Argument_t>::value;
 
     /// \brief Access to each argument's type.
     ///
@@ -71,27 +69,22 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     template <unsigned n>
     class arg {
        public:
-        using type = typename std::tuple_element<n, argument_types>::type;
+        using type = typename std::tuple_element<n, Argument_t>::type;
     };
 
     /// \brief Constructs an empty Signal with a combiner and a group_compare.
     ///
     /// \param combiner Slot return value combiner object.
     /// \param group_compare Comparison functor for Slot call order.
-    explicit Signal(
-        const combiner_type& combiner = combiner_type(),
-        const group_compare_type& group_compare = group_compare_type())
-        : pimpl_{std::make_shared<impl_type>(combiner, group_compare)} {}
+    explicit Signal(const Combiner_t& combiner = Combiner_t(),
+                    const Group_compare_t& group_compare = Group_compare_t())
+        : pimpl_{std::make_shared<Impl_t>(combiner, group_compare)} {}
 
     Signal(const Signal&) = delete;
-
-    /// Move only type.
     Signal(Signal&& x) noexcept = default;
-
     Signal& operator=(const Signal&) = delete;
-
-    /// Move only type.
     Signal& operator=(Signal&& x) noexcept = default;
+    ~Signal() = default;
 
     /// \brief Connect a Slot to *this either at the front or back of call
     /// queue.
@@ -102,7 +95,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     /// \param position The call position of \p slot
     /// \returns A Connection object referring to the Signal/Slot Connection.
     /// \sa Position Slot
-    Connection connect(const slot_type& slot,
+    Connection connect(const Slot_t& slot,
                        Position position = Position::at_back) {
         return pimpl_->connect(slot, position);
     }
@@ -117,8 +110,8 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     /// \param slot The Slot to be connected.
     /// \param position The position in the group that the Slot is added to.
     /// \returns A Connection object referring to the Signal/Slot Connection.
-    Connection connect(const group_type& group,
-                       const slot_type& slot,
+    Connection connect(const Group_t& group,
+                       const Slot_t& slot,
                        Position position = Position::at_back) {
         return pimpl_->connect(group, slot, position);
     }
@@ -134,7 +127,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     /// Ret ext_slot(const Connection&, Args...)
     /// \param position The call position of \p ext_slot.
     /// \returns A Connection object referring to the Signal/Slot Connection.
-    Connection connect_extended(const extended_slot_type& ext_slot,
+    Connection connect_extended(const Extended_slot_t& ext_slot,
                                 Position position = Position::at_back) {
         return pimpl_->connect_extended(ext_slot, position);
     }
@@ -155,8 +148,8 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     /// Ret ext_slot(const Connection&, Args...)
     /// \param position The position in the group that the Slot is added to.
     /// \returns A Connection object referring to the Signal/Slot Connection.
-    Connection connect_extended(const group_type& g,
-                                const extended_slot_type& es,
+    Connection connect_extended(const Group_t& g,
+                                const Extended_slot_t& es,
                                 Position pos = Position::at_back) {
         return pimpl_->connect_extended(g, es, pos);
     }
@@ -164,7 +157,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     /// \brief Disconnect all Slots in a given group.
     ///
     /// \param group The group to disconnect.
-    void disconnect(const group_type& group) { pimpl_->disconnect(group); }
+    void disconnect(const Group_t& group) { pimpl_->disconnect(group); }
 
     /// Disconnect all Slots attached to *this.
     void disconnect_all_slots() { pimpl_->disconnect_all_slots(); }
@@ -187,9 +180,9 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     /// \param args The arguments you are passing onto the Slots.
     /// \returns An Optional containing a value determined by the Combiner.
     template <typename... Arguments>
-    result_type operator()(Arguments&&... args) {
+    Result_t operator()(Arguments&&... args) {
         return enabled_ ? pimpl_->operator()(std::forward<Arguments>(args)...)
-                        : result_type();  // Empty Optional<T>
+                        : Result_t();  // Empty Optional<T>
     }
 
     /// \brief Call operator to call all connected Slots.
@@ -201,23 +194,23 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     /// \param args The arguments you are passing onto the Slots.
     /// \returns An Optional containing a value determined by the Combiner.
     template <typename... Arguments>
-    result_type operator()(Arguments&&... args) const {
+    Result_t operator()(Arguments&&... args) const {
         return enabled_ ? pimpl_->operator()(std::forward<Arguments>(args)...)
-                        : result_type();  // Empty Optional<T>
+                        : Result_t();  // Empty Optional<T>
     }
 
     /// \brief Access to the Combiner object.
     ///
     /// \returns A copy of the Combiner object used by *this.
-    combiner_type combiner() const { return pimpl_->combiner(); }
+    Combiner_t combiner() const { return pimpl_->combiner(); }
 
     /// \brief Set the Combiner object to a new value.
     ///
     /// A Combiner is a functor that takes a range of input iterators, it
     /// dereferences each iterator in the range and returns some value as a
-    /// result_type.
+    /// Result_t.
     /// \params comb The Combiner object to set for *this.
-    void set_combiner(const combiner_type& comb) { pimpl_->set_combiner(comb); }
+    void set_combiner(const Combiner_t& comb) { pimpl_->set_combiner(comb); }
 
     /// \brief Ensures the Signal implementation will not disapear even if *this
     /// is destroyed.
@@ -225,7 +218,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
 
     /// \brief Ensures the Signal implementation will not disapear even if *this
     /// is destroyed. Also gives access to impl functions.
-    std::shared_ptr<impl_type> lock_impl() const { return pimpl_; }
+    std::shared_ptr<Impl_t> lock_impl() const { return pimpl_; }
 
     /// \brief Query whether or not the Signal is enabled. A disabled Signal
     /// does not call any connected Slots when the call operator is summoned.
@@ -245,7 +238,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     void disable() { enabled_ = false; }
 
    private:
-    std::shared_ptr<impl_type> pimpl_;
+    std::shared_ptr<Impl_t> pimpl_;
     bool enabled_ = true;
 };
 
@@ -261,5 +254,4 @@ const int
         arity;
 
 }  // namespace sig
-
 #endif  // SIGNAL_HPP

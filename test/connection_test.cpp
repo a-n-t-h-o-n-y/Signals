@@ -1,13 +1,15 @@
-#include "signals/connection.hpp"
-#include "signals/detail/connection_impl.hpp"
-#include "signals/slot.hpp"
+#include <signals/connection.hpp>
+#include <signals/detail/connection_impl.hpp>
+#include <signals/slot.hpp>
+
 #include <gtest/gtest.h>
+
 #include <memory>
 
 using sig::Connection;
-using sig::Slot;
 using sig::Connection_impl;
 using sig::Connection_impl_base;
+using sig::Slot;
 
 TEST(ConnectionTest, DefaultConstructor) {
     Connection c;

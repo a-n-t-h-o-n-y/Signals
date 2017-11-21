@@ -3,13 +3,13 @@
 #ifndef SIGNALS_HPP
 #define SIGNALS_HPP
 
-#include "connection.hpp"
-#include "expired_slot.hpp"
-#include "position.hpp"
-#include "shared_connection_block.hpp"
-#include "signal.hpp"
-#include "signal_fwd.hpp"
-#include "slot.hpp"
-#include "slot_fwd.hpp"
+#include <signals/connection.hpp>
+#include <signals/expired_slot.hpp>
+#include <signals/position.hpp>
+#include <signals/shared_connection_block.hpp>
+#include <signals/signal.hpp>
+#include <signals/signal_fwd.hpp>
+#include <signals/slot.hpp>
+#include <signals/slot_fwd.hpp>
 
 #endif  // SIGNALS_HPP

@@ -1,6 +1,5 @@
 #ifndef DETAIL_SLOT_ITERATOR_HPP
 #define DETAIL_SLOT_ITERATOR_HPP
-
 #include <iterator>
 
 namespace sig {
@@ -14,15 +13,15 @@ namespace sig {
 template <typename InputIterator>
 class Slot_iterator {
    public:
-    using iter_result_type =
+    using Iter_value_t =
         typename std::iterator_traits<InputIterator>::value_type;
-    using result_type = typename iter_result_type::result_type;
+    using Result_t = typename Iter_value_t::result_type;
 
-    Slot_iterator() = default;  // might never be used?
+    Slot_iterator() = default;
 
     explicit Slot_iterator(InputIterator iter) : iter_{iter} {}
 
-    result_type operator*() {
+    Result_t operator*() {
         auto slot = *iter_;
         return slot();
     }

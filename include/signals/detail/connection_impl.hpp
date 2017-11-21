@@ -20,10 +20,10 @@ class Connection_impl<Ret(Args...)> : public Connection_impl_base {
    public:
     using Extended_slot_t = Slot<Ret(const Connection&, Args...)>;
 
-    Connection_impl() : Connection_impl_base{}, slot_{}, connected_{false} {}
+    Connection_impl() : slot_{}, connected_{false} {}
 
     explicit Connection_impl(Slot<Ret(Args...)> s)
-        : Connection_impl_base{}, slot_{std::move(s)}, connected_{true} {}
+        : slot_{std::move(s)}, connected_{true} {}
 
     // Constructs a Connection_impl with an extended slot and connection. This
     // binds the connection to the first parameter of the Extended_slot_t

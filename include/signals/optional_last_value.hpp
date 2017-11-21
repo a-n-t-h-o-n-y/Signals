@@ -3,7 +3,6 @@
 /// specialization.
 #ifndef OPTIONAL_LAST_VALUE_HPP
 #define OPTIONAL_LAST_VALUE_HPP
-
 #include <optional/none.hpp>
 #include <optional/optional.hpp>
 
@@ -18,14 +17,14 @@ template <typename T>
 class Optional_last_value {
    public:
     ///	Type of object the iterator range points to.
-    using result_type = opt::Optional<T>;
+    using Result_t = opt::Optional<T>;
 
     ///	\param  first  Input iterator to the first element in the range.
     ///	\param 	last   Input iterator to one past the last element in the range.
     ///	\returns	   The value stored in the last iterator of the range,
     ///                wrapped in an opt::Optional.
     template <typename InputIterator>
-    result_type operator()(InputIterator first, InputIterator last) const {
+    Result_t operator()(InputIterator first, InputIterator last) const {
         if (first == last) {
             return opt::Optional<T>{opt::none};
         }
@@ -45,12 +44,12 @@ template <>
 class Optional_last_value<void> {
    public:
     ///	Type of object the iterator range points to.
-    using result_type = void;
+    using Result_t = void;
 
     ///	\param  first  Input iterator to the first element in the range.
     ///	\param 	last   Input iterator to one past the last element in the range.
     template <typename InputIterator>
-    result_type operator()(InputIterator first, InputIterator last) const {
+    Result_t operator()(InputIterator first, InputIterator last) const {
         while (first != last) {
             *first;
             ++first;
@@ -59,5 +58,4 @@ class Optional_last_value<void> {
 };
 
 }  // namespace sig
-
 #endif  // OPTIONAL_LAST_VALUE_HPP

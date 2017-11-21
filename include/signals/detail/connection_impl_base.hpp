@@ -9,6 +9,11 @@ namespace sig {
 // having an internal implementation vary on the Slot type.
 class Connection_impl_base {
    public:
+    Connection_impl_base() = default;
+    Connection_impl_base(const Connection_impl_base&) = default;
+    Connection_impl_base& operator=(const Connection_impl_base&) = default;
+    Connection_impl_base(Connection_impl_base&&) = default;
+    Connection_impl_base& operator=(Connection_impl_base&&) = default;
     virtual ~Connection_impl_base() = default;
 
     virtual void disconnect() = 0;

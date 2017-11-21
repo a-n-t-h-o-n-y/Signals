@@ -1,21 +1,23 @@
-#include "signals/connection.hpp"
-#include "signals/expired_slot.hpp"
-#include "signals/optional_last_value.hpp"
-#include "signals/position.hpp"
-#include "signals/signal.hpp"
-#include "signals/slot.hpp"
-#include <optional/optional.hpp>
+#include <signals/connection.hpp>
+#include <signals/expired_slot.hpp>
+#include <signals/optional_last_value.hpp>
+#include <signals/position.hpp>
+#include <signals/signal.hpp>
+#include <signals/slot.hpp>
+
 #include <gtest/gtest.h>
+#include <optional/optional.hpp>
+
 #include <functional>
 #include <memory>
 #include <typeinfo>
 
+using sig::Connection;
+using sig::Expired_slot;
+using sig::Optional_last_value;
+using sig::Position;
 using sig::Signal;
 using sig::Slot;
-using sig::Position;
-using sig::Optional_last_value;
-using sig::Expired_slot;
-using sig::Connection;
 
 using opt::Optional;
 
@@ -69,8 +71,7 @@ TEST(SignalTest, SignalInSlotConnectedToSignal) {
     Slot<int(double, char)> slot_3 = [](double, char) { return 3; };
     sig_child.connect(slot_3);
 
-    Slot<Optional<int>(double, char)> slot_holding_signal =
-        sig_child;
+    Slot<Optional<int>(double, char)> slot_holding_signal{sig_child};
 
     Signal<Optional<int>(double, char)> sig_parent;
     sig_parent.connect(slot_holding_signal);
@@ -354,24 +355,24 @@ TEST(SignalTest, ConnectWithTrackedObject) {
 TEST(SignalTest, ConnectExtendedWithPosition) {
     Signal<char(int, int)> sig;
 
-    Slot<char(const Connection&, int, int)> slot_1 = [](
-        const Connection&, int, int) { return 'a'; };
+    Slot<char(const Connection&, int, int)> slot_1 = [](const Connection&, int,
+                                                        int) { return 'a'; };
     auto conn1 = sig.connect_extended(slot_1);
 
-    Slot<char(const Connection&, int, int)> slot_2 = [](
-        const Connection&, int, int) { return 'b'; };
+    Slot<char(const Connection&, int, int)> slot_2 = [](const Connection&, int,
+                                                        int) { return 'b'; };
     auto conn2 = sig.connect_extended(slot_2, Position::at_front);
 
-    Slot<char(const Connection&, int, int)> slot_3 = [](
-        const Connection&, int, int) { return 'c'; };
+    Slot<char(const Connection&, int, int)> slot_3 = [](const Connection&, int,
+                                                        int) { return 'c'; };
     auto conn3 = sig.connect_extended(slot_3, Position::at_front);
 
-    Slot<char(const Connection&, int, int)> slot_4 = [](
-        const Connection&, int, int) { return 'd'; };
+    Slot<char(const Connection&, int, int)> slot_4 = [](const Connection&, int,
+                                                        int) { return 'd'; };
     auto conn4 = sig.connect_extended(slot_4, Position::at_back);
 
-    Slot<char(const Connection&, int, int)> slot_5 = [](
-        const Connection&, int, int) { return 'e'; };
+    Slot<char(const Connection&, int, int)> slot_5 = [](const Connection&, int,
+                                                        int) { return 'e'; };
     auto conn5 = sig.connect_extended(slot_5);
 
     auto result1 = sig(5, 4);
@@ -405,28 +406,34 @@ TEST(SignalTest, ConnectExtendedWithPosition) {
 
 TEST(SignalTest, ConnectExtendedWithGroup) {
     Signal<char(int)> sig;
-    Slot<char(const Connection&, int)> slot_1 = [](
-        const Connection&, int) { return 'a'; };
+    Slot<char(const Connection&, int)> slot_1 = [](const Connection&, int) {
+        return 'a';
+    };
     auto conn1 = sig.connect_extended(1, slot_1);
 
-    Slot<char(const Connection&, int)> slot_2 = [](
-        const Connection&, int) { return 'b'; };
+    Slot<char(const Connection&, int)> slot_2 = [](const Connection&, int) {
+        return 'b';
+    };
     auto conn2 = sig.connect_extended(1, slot_2, Position::at_front);
 
-    Slot<char(const Connection&, int)> slot_3 = [](
-        const Connection&, int) { return 'c'; };
+    Slot<char(const Connection&, int)> slot_3 = [](const Connection&, int) {
+        return 'c';
+    };
     auto conn3 = sig.connect_extended(3, slot_3, Position::at_back);
 
-    Slot<char(const Connection&, int)> slot_4 = [](
-        const Connection&, int) { return 'd'; };
+    Slot<char(const Connection&, int)> slot_4 = [](const Connection&, int) {
+        return 'd';
+    };
     auto conn4 = sig.connect_extended(3, slot_4);
 
-    Slot<char(const Connection&, int)> slot_5 = [](
-        const Connection&, int) { return 'e'; };
+    Slot<char(const Connection&, int)> slot_5 = [](const Connection&, int) {
+        return 'e';
+    };
     auto conn5 = sig.connect_extended(100, slot_5);
 
-    Slot<char(const Connection&, int)> slot_6 = [](
-        const Connection&, int) { return 'f'; };
+    Slot<char(const Connection&, int)> slot_6 = [](const Connection&, int) {
+        return 'f';
+    };
     auto conn6 = sig.connect_extended(1, slot_6, Position::at_front);
 
     auto result1 = sig(1);
@@ -471,40 +478,49 @@ TEST(SignalTest, ConnectExtendedWithGroup) {
 
 TEST(SignalTest, ConnectExtendedWithBothOverloads) {
     Signal<char(int)> sig;
-    Slot<char(const Connection&, int)> slot_1 = [](
-        const Connection&, int) { return 'a'; };
+    Slot<char(const Connection&, int)> slot_1 = [](const Connection&, int) {
+        return 'a';
+    };
     auto conn1 = sig.connect_extended(1, slot_1);
 
-    Slot<char(const Connection&, int)> slot_2 = [](
-        const Connection&, int) { return 'b'; };
+    Slot<char(const Connection&, int)> slot_2 = [](const Connection&, int) {
+        return 'b';
+    };
     auto conn2 = sig.connect_extended(1, slot_2, Position::at_front);
 
-    Slot<char(const Connection&, int)> slot_3 = [](
-        const Connection&, int) { return 'c'; };
+    Slot<char(const Connection&, int)> slot_3 = [](const Connection&, int) {
+        return 'c';
+    };
     auto conn3 = sig.connect_extended(3, slot_3, Position::at_back);
 
-    Slot<char(const Connection&, int)> slot_4 = [](
-        const Connection&, int) { return 'd'; };
+    Slot<char(const Connection&, int)> slot_4 = [](const Connection&, int) {
+        return 'd';
+    };
     auto conn4 = sig.connect_extended(3, slot_4);
 
-    Slot<char(const Connection&, int)> slot_5 = [](
-        const Connection&, int) { return 'e'; };
+    Slot<char(const Connection&, int)> slot_5 = [](const Connection&, int) {
+        return 'e';
+    };
     auto conn5 = sig.connect_extended(100, slot_5);
 
-    Slot<char(const Connection&, int)> slot_6 = [](
-        const Connection&, int) { return 'f'; };
+    Slot<char(const Connection&, int)> slot_6 = [](const Connection&, int) {
+        return 'f';
+    };
     auto conn6 = sig.connect_extended(1, slot_6, Position::at_front);
 
-    Slot<char(const Connection&, int)> slot_7 = [](
-        const Connection&, int) { return 'g'; };
+    Slot<char(const Connection&, int)> slot_7 = [](const Connection&, int) {
+        return 'g';
+    };
     auto conn7 = sig.connect_extended(slot_7, Position::at_front);
 
-    Slot<char(const Connection&, int)> slot_8 = [](
-        const Connection&, int) { return 'h'; };
+    Slot<char(const Connection&, int)> slot_8 = [](const Connection&, int) {
+        return 'h';
+    };
     auto conn8 = sig.connect_extended(slot_8, Position::at_front);
 
-    Slot<char(const Connection&, int)> slot_9 = [](
-        const Connection&, int) { return 'i'; };
+    Slot<char(const Connection&, int)> slot_9 = [](const Connection&, int) {
+        return 'i';
+    };
     auto conn9 = sig.connect_extended(slot_9, Position::at_back);
 
     auto result0 = sig(0);
@@ -567,8 +583,8 @@ TEST(SignalTest, ConnectExtendedWithBothOverloads) {
 
 TEST(SignalTest, ConnectExtendedSlotWithTrackedObject) {
     Signal<int(char, char)> sig;
-    Slot<int(const Connection&, char, char)> ext_slot = [](
-        const Connection&, char, char) { return 5; };
+    Slot<int(const Connection&, char, char)> ext_slot =
+        [](const Connection&, char, char) { return 5; };
     auto track_me = std::make_shared<int>(2);
     ext_slot.track(track_me);
 
@@ -622,8 +638,8 @@ TEST(SignalTest, DisconnectAllSlots) {
     Signal<char(char, int)> sig;
 
     Slot<char(char, int)> slot_1 = [](char, int) { return 'a'; };
-    Slot<char(const Connection&, char, int)> slot_2 = [](
-        const Connection&, char, int) { return 'b'; };
+    Slot<char(const Connection&, char, int)> slot_2 =
+        [](const Connection&, char, int) { return 'b'; };
     Slot<char(char, int)> slot_3 = [](char, int) { return 'c'; };
 
     sig.connect(slot_1);
@@ -650,8 +666,9 @@ TEST(SignalTest, Empty) {
     sig.disconnect_all_slots();
     EXPECT_TRUE(sig.empty());
 
-    Slot<int(const Connection&, char)> slot_2 = [](
-        const Connection&, char) { return 2; };
+    Slot<int(const Connection&, char)> slot_2 = [](const Connection&, char) {
+        return 2;
+    };
     sig.connect_extended(slot_2);
 
     EXPECT_FALSE(sig.empty());
@@ -677,8 +694,7 @@ TEST(SignalTest, NumSlots) {
 
     Slot<int()> slot_5 = []() { return 5; };
     sig.connect(3, slot_5, Position::at_back);
-    Slot<int(const Connection&)> slot_6 =
-        [](const Connection&) { return 6; };
+    Slot<int(const Connection&)> slot_6 = [](const Connection&) { return 6; };
     sig.connect_extended(slot_6);
     Slot<int()> slot_7 = []() { return 7; };
     sig.connect(slot_7);
@@ -723,10 +739,10 @@ class new_combiner {
    public:
     new_combiner() = default;
     explicit new_combiner(int val) : value_{val} {}
-    using result_type = return_type;
+    using Result_t = return_type;
     template <typename InputIterator>
-    return_type operator()(InputIterator first, InputIterator last) {
-        return return_type();
+    Result_t operator()(InputIterator first, InputIterator last) {
+        return Result_t();
     }
     int get_value() { return value_; }
 
@@ -736,12 +752,10 @@ class new_combiner {
 
 TEST(SignalTest, Combiner) {
     Signal<void(int)> sig1;
-    EXPECT_EQ(typeid(Optional_last_value<void>{}),
-              typeid(sig1.combiner()));
+    EXPECT_EQ(typeid(Optional_last_value<void>{}), typeid(sig1.combiner()));
 
     Signal<int(double), Optional_last_value<int>> sig2;
-    EXPECT_EQ(typeid(Optional_last_value<int>{}),
-              typeid(sig2.combiner()));
+    EXPECT_EQ(typeid(Optional_last_value<int>{}), typeid(sig2.combiner()));
 
     Signal<int(double), new_combiner<int>> sig3;
     EXPECT_EQ(typeid(new_combiner<int>{}), typeid(sig3.combiner()));
@@ -750,8 +764,7 @@ TEST(SignalTest, Combiner) {
 TEST(SignalTest, SetCombiner) {
     Signal<int(double, char)> sig1;
     sig1.set_combiner(Optional_last_value<int>{});
-    EXPECT_EQ(typeid(Optional_last_value<int>{}),
-              typeid(sig1.combiner()));
+    EXPECT_EQ(typeid(Optional_last_value<int>{}), typeid(sig1.combiner()));
 
     Signal<int(double, char), new_combiner<int>> sig2;
     sig2.set_combiner(new_combiner<int>{});

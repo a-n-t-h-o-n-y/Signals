@@ -3,19 +3,17 @@
 /// trying to forward declare the class yourself.
 #ifndef SIGNAL_FWD_HPP
 #define SIGNAL_FWD_HPP
+#include <signals/detail/function_type_splitter.hpp>
+#include <signals/optional_last_value.hpp>
 
-#include <mutex>
 #include <functional>
-
-#include "optional_last_value.hpp"
-
-#include "detail/function_type_splitter.hpp"
+#include <mutex>
 
 namespace sig {
 
 template <typename Signature,
           typename Combiner = sig::Optional_last_value<
-              typename sig::Function_type_splitter<Signature>::return_type>,
+              typename sig::Function_type_splitter<Signature>::Return_t>,
           typename Group = int,
           typename GroupCompare = std::less<Group>,
           typename SlotFunction = std::function<Signature>,
@@ -23,5 +21,4 @@ template <typename Signature,
 class Signal;
 
 }  // namespace sig
-
 #endif  // SIGNAL_FWD_HPP

@@ -2,10 +2,10 @@
 /// \brief Contains the definition of the Connection class.
 #ifndef CONNECTION_HPP
 #define CONNECTION_HPP
-
-#include "detail/connection_impl_base.hpp"
+#include <signals/detail/connection_impl_base.hpp>
 
 #include <memory>
+#include <utility>
 
 namespace sig {
 
@@ -84,5 +84,4 @@ inline bool operator!=(const Connection& x, const Connection& y) {
 }
 
 }  // namespace sig
-
 #endif  // CONNECTION_HPP

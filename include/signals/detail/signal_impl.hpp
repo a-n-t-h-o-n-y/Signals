@@ -1,10 +1,9 @@
 #ifndef DETAIL_SIGNAL_IMPL_HPP
 #define DETAIL_SIGNAL_IMPL_HPP
-
-#include "../connection.hpp"
-#include "../position.hpp"
-#include "connection_impl.hpp"
-#include "slot_iterator.hpp"
+#include <signals/connection.hpp>
+#include <signals/detail/connection_impl.hpp>
+#include <signals/detail/slot_iterator.hpp>
+#include <signals/position.hpp>
 
 #include <cstddef>
 #include <deque>
@@ -35,38 +34,38 @@ template <typename Ret,
 class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
    public:
     // Types
-    using result_type = typename Combiner::result_type;
-    using signature_type = Ret(Args...);
-    using group_type = Group;
-    using group_compare_type = GroupCompare;
-    using combiner_type = Combiner;
-    using slot_function_type = SlotFunction;
-    using slot_type = Slot<signature_type, slot_function_type>;
-    using extended_slot_type = Slot<Ret(const Connection&, Args...)>;
+    using Result_t = typename Combiner::Result_t;
+    using Signature_t = Ret(Args...);
+    using Group_t = Group;
+    using Group_compare_t = GroupCompare;
+    using Combiner_t = Combiner;
+    using Slot_function_t = SlotFunction;
+    using Slot_t = Slot<Signature_t, Slot_function_t>;
+    using Extended_slot_t = Slot<Ret(const Connection&, Args...)>;
 
-    Signal_impl(combiner_type combiner, const group_compare_type& group_compare)
-        : combiner_{std::move(combiner)} {}
+    Signal_impl(Combiner_t combiner, const Group_compare_t& group_compare)
+        : grouped_connections_{group_compare}, combiner_{std::move(combiner)} {}
 
-    Connection connect(const slot_type& slot, Position position) {
-        auto c_impl = std::make_shared<Connection_impl<signature_type>>(slot);
+    Connection connect(const Slot_t& slot, Position position) {
+        auto c_impl = std::make_shared<Connection_impl<Signature_t>>(slot);
         position == Position::at_front ? front_connections_.push_front(c_impl)
                                        : back_connections_.push_back(c_impl);
         return Connection(c_impl);
     }
 
-    Connection connect(const group_type& group,
-                       const slot_type& slot,
+    Connection connect(const Group_t& group,
+                       const Slot_t& slot,
                        Position position) {
-        auto c_impl = std::make_shared<Connection_impl<signature_type>>(slot);
+        auto c_impl = std::make_shared<Connection_impl<Signature_t>>(slot);
         position == Position::at_front
             ? grouped_connections_[group].push_front(c_impl)
             : grouped_connections_[group].push_back(c_impl);
         return Connection(c_impl);
     }
 
-    Connection connect_extended(const extended_slot_type& ext_slot,
+    Connection connect_extended(const Extended_slot_t& ext_slot,
                                 Position position) {
-        auto c_impl = std::make_shared<Connection_impl<signature_type>>();
+        auto c_impl = std::make_shared<Connection_impl<Signature_t>>();
         auto c = Connection(c_impl);
         c_impl->emplace_extended(ext_slot, c);
         position == Position::at_front ? front_connections_.push_front(c_impl)
@@ -74,10 +73,10 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
         return c;
     }
 
-    Connection connect_extended(const group_type& group,
-                                const extended_slot_type& ext_slot,
+    Connection connect_extended(const Group_t& group,
+                                const Extended_slot_t& ext_slot,
                                 Position position) {
-        auto c_impl = std::make_shared<Connection_impl<signature_type>>();
+        auto c_impl = std::make_shared<Connection_impl<Signature_t>>();
         auto c = Connection(c_impl);
         c_impl->emplace_extended(ext_slot, c);
         position == Position::at_front
@@ -86,7 +85,7 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
         return c;
     }
 
-    void disconnect(const group_type& group) {
+    void disconnect(const Group_t& group) {
         for (auto& c_impl_ptr : grouped_connections_[group]) {
             c_impl_ptr->disconnect();
         }
@@ -154,38 +153,38 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
     }
 
     template <typename... Arguments>
-    result_type operator()(Arguments&&... args) {
+    Result_t operator()(Arguments&&... args) {
         auto slots = bind_args(std::forward<Arguments>(args)...);
         return combiner_(
-            Slot_iterator<typename container_t::iterator>(std::begin(slots)),
-            Slot_iterator<typename container_t::iterator>(std::end(slots)));
+            Slot_iterator<typename Container_t::iterator>(std::begin(slots)),
+            Slot_iterator<typename Container_t::iterator>(std::end(slots)));
     }
 
     template <typename... Arguments>
-    result_type operator()(Arguments&&... args) const {
+    Result_t operator()(Arguments&&... args) const {
         auto slots = bind_args(std::forward<Arguments>(args)...);
-        const combiner_type const_comb = combiner_;
+        const Combiner_t const_comb = combiner_;
         return const_comb(
-            Slot_iterator<typename container_t::iterator>(std::begin(slots)),
-            Slot_iterator<typename container_t::iterator>(std::end(slots)));
+            Slot_iterator<typename Container_t::iterator>(std::begin(slots)),
+            Slot_iterator<typename Container_t::iterator>(std::end(slots)));
     }
 
-    combiner_type combiner() const { return combiner_; }
+    Combiner_t combiner() const { return combiner_; }
 
-    void set_combiner(const combiner_type& comb) { combiner_ = comb; }
+    void set_combiner(const Combiner_t& comb) { combiner_ = comb; }
 
    private:
-    using container_t = std::vector<std::function<Ret()>>;
-    using position_container_t =
-        std::deque<std::shared_ptr<Connection_impl<signature_type>>>;
-    using group_container_t =
-        std::map<group_type, position_container_t, group_compare_type>;
+    using Container_t = std::vector<std::function<Ret()>>;
+    using Position_container_t =
+        std::deque<std::shared_ptr<Connection_impl<Signature_t>>>;
+    using Group_container_t =
+        std::map<Group_t, Position_container_t, Group_compare_t>;
 
     // Prepares the functions to be processed by the combiner.
     // Returns a container of std::functions with signature Ret().
     template <typename... Arguments>
-    container_t bind_args(Arguments&&... args) const {
-        container_t bound_slot_container;
+    Container_t bind_args(Arguments&&... args) const {
+        Container_t bound_slot_container;
         for (auto& c_impl_ptr : front_connections_) {
             if (c_impl_ptr->connected() && !c_impl_ptr->blocked() &&
                 !c_impl_ptr->get_slot().expired()) {
@@ -219,11 +218,11 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
     }
 
     // Connections are stored here
-    position_container_t front_connections_;
-    group_container_t grouped_connections_;
-    position_container_t back_connections_;
+    Position_container_t front_connections_;
+    Group_container_t grouped_connections_;
+    Position_container_t back_connections_;
 
-    combiner_type combiner_;
+    Combiner_t combiner_;
 };
 
 }  // namespace sig
