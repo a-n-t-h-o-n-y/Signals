@@ -10,7 +10,6 @@ var annotated_dup =
       [ "Function_type_splitter< Ret(Args...)>", "classsig_1_1Function__type__splitter_3_01Ret_07Args_8_8_8_08_4.html", "classsig_1_1Function__type__splitter_3_01Ret_07Args_8_8_8_08_4" ],
       [ "Optional_last_value", "classsig_1_1Optional__last__value.html", "classsig_1_1Optional__last__value" ],
       [ "Optional_last_value< void >", "classsig_1_1Optional__last__value_3_01void_01_4.html", "classsig_1_1Optional__last__value_3_01void_01_4" ],
-      [ "Placeholder_template", "structsig_1_1Placeholder__template.html", null ],
       [ "Shared_connection_block", "classsig_1_1Shared__connection__block.html", "classsig_1_1Shared__connection__block" ],
       [ "Signal", "classsig_1_1Signal.html", null ],
       [ "Signal< Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex >", "classsig_1_1Signal_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01GroupCompare_00_01SlotFunction_00_01Mutex_01_4.html", "classsig_1_1Signal_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01GroupCompare_00_01SlotFunction_00_01Mutex_01_4" ],
@@ -20,8 +19,5 @@ var annotated_dup =
       [ "Slot< Ret(Args...), FunctionType >", "classsig_1_1Slot_3_01Ret_07Args_8_8_8_08_00_01FunctionType_01_4.html", "classsig_1_1Slot_3_01Ret_07Args_8_8_8_08_00_01FunctionType_01_4" ],
       [ "Slot_base", "classsig_1_1Slot__base.html", "classsig_1_1Slot__base" ],
       [ "Slot_iterator", "classsig_1_1Slot__iterator.html", "classsig_1_1Slot__iterator" ]
-    ] ],
-    [ "std", null, [
-      [ "is_placeholder< sig::Placeholder_template< N > >", "structstd_1_1is__placeholder_3_01sig_1_1Placeholder__template_3_01N_01_4_01_4.html", null ]
     ] ]
 ];

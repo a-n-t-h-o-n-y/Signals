@@ -1,5 +1,5 @@
 var classsig_1_1Function__type__splitter_3_01Ret_07Args_8_8_8_08_4 =
 [
-    [ "argument_tuple_type", "classsig_1_1Function__type__splitter_3_01Ret_07Args_8_8_8_08_4.html#a437902200ad5c0bcff486a477a36c6ac", null ],
-    [ "return_type", "classsig_1_1Function__type__splitter_3_01Ret_07Args_8_8_8_08_4.html#a63f59ab93a2c7f1884287fefe62f0798", null ]
+    [ "Argument_tuple_t", "classsig_1_1Function__type__splitter_3_01Ret_07Args_8_8_8_08_4.html#ae3e96e571abe3277b2f422e17eb56f2f", null ],
+    [ "Return_t", "classsig_1_1Function__type__splitter_3_01Ret_07Args_8_8_8_08_4.html#ad65bd5320e9044c130434de8d8ea55e0", null ]
 ];

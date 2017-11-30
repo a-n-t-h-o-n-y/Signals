@@ -11,7 +11,6 @@ var files =
       [ "Optional_last_value", "classsig_1_1Optional__last__value.html", "classsig_1_1Optional__last__value" ],
       [ "Optional_last_value< void >", "classsig_1_1Optional__last__value_3_01void_01_4.html", "classsig_1_1Optional__last__value_3_01void_01_4" ]
     ] ],
-    [ "placeholder_template.hpp", "placeholder__template_8hpp_source.html", null ],
     [ "position.hpp", "position_8hpp.html", "position_8hpp" ],
     [ "shared_connection_block.hpp", "shared__connection__block_8hpp.html", [
       [ "Shared_connection_block", "classsig_1_1Shared__connection__block.html", "classsig_1_1Shared__connection__block" ]

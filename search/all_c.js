@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['placeholder_5ftemplate',['Placeholder_template',['../structsig_1_1Placeholder__template.html',1,'sig']]],
-  ['position',['Position',['../position_8hpp.html#a835562181c1d00888fb882fdbff2b484',1,'sig']]],
-  ['position_2ehpp',['position.hpp',['../position_8hpp.html',1,'']]]
+  ['result_5ft',['Result_t',['../classsig_1_1Optional__last__value.html#ad11fde140e1cca89e26b325cf7b0d719',1,'sig::Optional_last_value::Result_t()'],['../classsig_1_1Optional__last__value_3_01void_01_4.html#a417f42d2f1d79f1c8da4abed53f99eb2',1,'sig::Optional_last_value&lt; void &gt;::Result_t()']]]
 ];
