@@ -29,7 +29,7 @@ class Connection {
     explicit Connection(std::weak_ptr<Connection_impl_base> wp_cib)
         : pimpl_{std::move(wp_cib)} {}
 
-    /// \brief Disconnections the connection.
+    /// \brief Disconnects the connection.
     ///
     /// The Slot associated with this connection will no longer be called by the
     /// associated Signal. If connection is already disconnected, this is a
