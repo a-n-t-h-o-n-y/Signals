@@ -10,6 +10,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <utility>
 
 namespace sig {
@@ -18,11 +19,13 @@ namespace sig {
 template <typename Signature>
 class Connection_impl;
 
+// Forward declaration, so that Signature can be split into Ret and Args...
 template <typename Signature,
           typename Combiner,
           typename Group,
           typename GroupCompare,
-          typename SlotFunction>
+          typename SlotFunction,
+          typename Mutex = std::mutex>
 class Signal_impl;
 
 template <typename Ret,
@@ -30,8 +33,14 @@ template <typename Ret,
           typename Combiner,
           typename Group,
           typename GroupCompare,
-          typename SlotFunction>
-class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
+          typename SlotFunction,
+          typename Mutex>
+class Signal_impl<Ret(Args...),
+                  Combiner,
+                  Group,
+                  GroupCompare,
+                  SlotFunction,
+                  Mutex> {
    public:
     // Types
     using Result_t = typename Combiner::Result_t;
@@ -46,7 +55,42 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
     Signal_impl(Combiner_t combiner, const Group_compare_t& group_compare)
         : grouped_connections_{group_compare}, combiner_{std::move(combiner)} {}
 
+    Signal_impl(const Signal_impl& other)
+        : front_connections_{other.front_connections_},
+          grouped_connections_{other.grouped_connections_},
+          back_connections_{other.back_connections_},
+          combiner_{other.combiner_} {}
+
+    Signal_impl(Signal_impl&& other) {
+        front_connections_ = std::move(other.front_connections_);
+        grouped_connections_ = std::move(other.grouped_connections_);
+        back_connections_ = std::move(other.back_connections_);
+        combiner_ = std::move(other.combiner_);
+    }
+
+    Signal_impl& operator=(const Signal_impl& other) {
+        // lock other first for all constructors/assignment
+        if (this != &other) {
+            front_connections_ = other.front_connections_;
+            grouped_connections_ = other.grouped_connections_;
+            back_connections_ = other.back_connections_;
+            combiner_ = other.combiner_;
+        }
+        return *this;
+    }
+
+    Signal_impl& operator=(Signal_impl&& other) {
+        if (this != &other) {
+            front_connections_ = std::move(other.front_connections_);
+            grouped_connections_ = std::move(other.grouped_connections_);
+            back_connections_ = std::move(other.back_connections_);
+            combiner_ = std::move(other.combiner_);
+        }
+        return *this;
+    }
+
     Connection connect(const Slot_t& slot, Position position) {
+        std::lock_guard<Mutex> guard(mtx_);
         auto c_impl = std::make_shared<Connection_impl<Signature_t>>(slot);
         position == Position::at_front ? front_connections_.push_front(c_impl)
                                        : back_connections_.push_back(c_impl);
@@ -223,6 +267,7 @@ class Signal_impl<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction> {
     Position_container_t back_connections_;
 
     Combiner_t combiner_;
+    mutable Mutex mtx_;
 };
 
 }  // namespace sig
