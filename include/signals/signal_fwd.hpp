@@ -7,7 +7,7 @@
 #include <signals/optional_last_value.hpp>
 
 #include <functional>
-#include <mutex>
+#include <shared_mutex>
 
 namespace sig {
 
@@ -17,7 +17,7 @@ template <typename Signature,
           typename Group = int,
           typename GroupCompare = std::less<Group>,
           typename SlotFunction = std::function<Signature>,
-          typename Mutex = std::mutex>
+          typename SharedMutex = std::shared_timed_mutex>
 class Signal;
 
 }  // namespace sig

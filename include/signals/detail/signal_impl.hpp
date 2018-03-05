@@ -11,6 +11,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <utility>
 
 namespace sig {
@@ -25,7 +26,7 @@ template <typename Signature,
           typename Group,
           typename GroupCompare,
           typename SlotFunction,
-          typename Mutex = std::mutex>
+          typename SharedMutex = std::shared_timed_mutex>
 class Signal_impl;
 
 template <typename Ret,
@@ -34,13 +35,13 @@ template <typename Ret,
           typename Group,
           typename GroupCompare,
           typename SlotFunction,
-          typename Mutex>
+          typename SharedMutex>
 class Signal_impl<Ret(Args...),
                   Combiner,
                   Group,
                   GroupCompare,
                   SlotFunction,
-                  Mutex> {
+                  SharedMutex> {
    public:
     // Types
     using Result_t = typename Combiner::Result_t;
@@ -55,13 +56,16 @@ class Signal_impl<Ret(Args...),
     Signal_impl(Combiner_t combiner, const Group_compare_t& group_compare)
         : grouped_connections_{group_compare}, combiner_{std::move(combiner)} {}
 
-    Signal_impl(const Signal_impl& other)
-        : front_connections_{other.front_connections_},
-          grouped_connections_{other.grouped_connections_},
-          back_connections_{other.back_connections_},
-          combiner_{other.combiner_} {}
+    Signal_impl(const Signal_impl& other) {
+        std::shared_lock<SharedMutex> lock{other.mtx_};
+        front_connections_ = other.front_connections_;
+        grouped_connections_ = other.grouped_connections_;
+        back_connections_ = other.back_connections_;
+        combiner_ = other.combiner_;
+    }
 
     Signal_impl(Signal_impl&& other) {
+        std::lock_guard<SharedMutex> lock{other.mtx_};
         front_connections_ = std::move(other.front_connections_);
         grouped_connections_ = std::move(other.grouped_connections_);
         back_connections_ = std::move(other.back_connections_);
@@ -69,8 +73,10 @@ class Signal_impl<Ret(Args...),
     }
 
     Signal_impl& operator=(const Signal_impl& other) {
-        // lock other first for all constructors/assignment
         if (this != &other) {
+            std::unique_lock<SharedMutex> lhs_lock{this->mtx_, std::defer_lock};
+            std::shared_lock<SharedMutex> rhs_lock{other.mtx_, std::defer_lock};
+            std::lock(lhs_lock, rhs_lock);
             front_connections_ = other.front_connections_;
             grouped_connections_ = other.grouped_connections_;
             back_connections_ = other.back_connections_;
@@ -81,6 +87,9 @@ class Signal_impl<Ret(Args...),
 
     Signal_impl& operator=(Signal_impl&& other) {
         if (this != &other) {
+            std::unique_lock<SharedMutex> lhs_lock{this->mtx_, std::defer_lock};
+            std::unique_lock<SharedMutex> rhs_lock{other.mtx_, std::defer_lock};
+            std::lock(lhs_lock, rhs_lock);
             front_connections_ = std::move(other.front_connections_);
             grouped_connections_ = std::move(other.grouped_connections_);
             back_connections_ = std::move(other.back_connections_);
@@ -90,8 +99,8 @@ class Signal_impl<Ret(Args...),
     }
 
     Connection connect(const Slot_t& slot, Position position) {
-        std::lock_guard<Mutex> guard(mtx_);
         auto c_impl = std::make_shared<Connection_impl<Signature_t>>(slot);
+        std::lock_guard<SharedMutex> lock(mtx_);
         position == Position::at_front ? front_connections_.push_front(c_impl)
                                        : back_connections_.push_back(c_impl);
         return Connection(c_impl);
@@ -101,6 +110,7 @@ class Signal_impl<Ret(Args...),
                        const Slot_t& slot,
                        Position position) {
         auto c_impl = std::make_shared<Connection_impl<Signature_t>>(slot);
+        std::lock_guard<SharedMutex> lock(mtx_);
         position == Position::at_front
             ? grouped_connections_[group].push_front(c_impl)
             : grouped_connections_[group].push_back(c_impl);
@@ -112,6 +122,7 @@ class Signal_impl<Ret(Args...),
         auto c_impl = std::make_shared<Connection_impl<Signature_t>>();
         auto c = Connection(c_impl);
         c_impl->emplace_extended(ext_slot, c);
+        std::lock_guard<SharedMutex> lock(mtx_);
         position == Position::at_front ? front_connections_.push_front(c_impl)
                                        : back_connections_.push_back(c_impl);
         return c;
@@ -123,6 +134,7 @@ class Signal_impl<Ret(Args...),
         auto c_impl = std::make_shared<Connection_impl<Signature_t>>();
         auto c = Connection(c_impl);
         c_impl->emplace_extended(ext_slot, c);
+        std::lock_guard<SharedMutex> lock(mtx_);
         position == Position::at_front
             ? grouped_connections_[group].push_front(c_impl)
             : grouped_connections_[group].push_back(c_impl);
@@ -130,6 +142,7 @@ class Signal_impl<Ret(Args...),
     }
 
     void disconnect(const Group_t& group) {
+        std::lock_guard<SharedMutex> lock(mtx_);
         for (auto& c_impl_ptr : grouped_connections_[group]) {
             c_impl_ptr->disconnect();
         }
@@ -137,6 +150,7 @@ class Signal_impl<Ret(Args...),
     }
 
     void disconnect_all_slots() {
+        std::lock_guard<SharedMutex> lock(mtx_);
         for (auto& c_impl_ptr : front_connections_) {
             c_impl_ptr->disconnect();
         }
@@ -154,6 +168,7 @@ class Signal_impl<Ret(Args...),
     }
 
     bool empty() const {
+        std::shared_lock<SharedMutex> lock{mtx_};
         for (auto& c_impl_ptr : front_connections_) {
             if (c_impl_ptr->connected()) {
                 return false;
@@ -175,6 +190,7 @@ class Signal_impl<Ret(Args...),
     }
 
     std::size_t num_slots() const {
+        std::shared_lock<SharedMutex> lock{mtx_};
         std::size_t size{0};
         for (auto& c_impl_ptr : front_connections_) {
             if (c_impl_ptr->connected()) {
@@ -207,15 +223,23 @@ class Signal_impl<Ret(Args...),
     template <typename... Arguments>
     Result_t operator()(Arguments&&... args) const {
         auto slots = bind_args(std::forward<Arguments>(args)...);
+        std::shared_lock<SharedMutex> lock{mtx_};
         const Combiner_t const_comb = combiner_;
+        lock.unlock();
         return const_comb(
             Slot_iterator<typename Container_t::iterator>(std::begin(slots)),
             Slot_iterator<typename Container_t::iterator>(std::end(slots)));
     }
 
-    Combiner_t combiner() const { return combiner_; }
+    Combiner_t combiner() const {
+        std::shared_lock<SharedMutex> lock{mtx_};
+        return combiner_;
+    }
 
-    void set_combiner(const Combiner_t& comb) { combiner_ = comb; }
+    void set_combiner(const Combiner_t& comb) {
+        std::unique_lock<SharedMutex> lock{mtx_};
+        combiner_ = comb;
+    }
 
    private:
     using Container_t = std::vector<std::function<Ret()>>;
@@ -229,6 +253,7 @@ class Signal_impl<Ret(Args...),
     template <typename... Arguments>
     Container_t bind_args(Arguments&&... args) const {
         Container_t bound_slot_container;
+        std::shared_lock<SharedMutex> lock{mtx_};
         for (auto& c_impl_ptr : front_connections_) {
             if (c_impl_ptr->connected() && !c_impl_ptr->blocked() &&
                 !c_impl_ptr->get_slot().expired()) {
@@ -267,7 +292,7 @@ class Signal_impl<Ret(Args...),
     Position_container_t back_connections_;
 
     Combiner_t combiner_;
-    mutable Mutex mtx_;
+    mutable SharedMutex mtx_;
 };
 
 }  // namespace sig

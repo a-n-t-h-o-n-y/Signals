@@ -23,7 +23,7 @@ class Connection {
     ///
     /// Signal uses this constructor to build Connection objects.
     /// Each Signal owns the Connection_impl, and each Connection_impl owns the
-    /// connecte Slot.
+    /// connected Slot.
     /// \param wp_cib Implementation object that holds Connection's state.
     /// \sa Signal Slot
     explicit Connection(std::weak_ptr<Connection_impl_base> wp_cib)

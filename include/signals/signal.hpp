@@ -44,9 +44,10 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     using Signature_t = Ret(Args...);
     using Result_t = typename Combiner::Result_t;
     using Combiner_t = Combiner;
-    using Group_t = Group;
+    using Group_t = Group;  // Don't need these, just use template params
     using Group_compare_t = GroupCompare;
     using Slot_function_t = SlotFunction;
+    using Mutex_t = Mutex;
     using Slot_t = Slot<Signature_t, SlotFunction>;
     using Extended_slot_function_t =
         std::function<Ret(const Connection&, Args...)>;
@@ -58,7 +59,8 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
                                Combiner_t,
                                Group_t,
                                Group_compare_t,
-                               Slot_function_t>;
+                               Slot_function_t,
+                               Mutex_t>;
 
     /// Number of arguments the Signal takes.
     static const int arity = std::tuple_size<Argument_t>::value;
@@ -195,6 +197,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     /// \returns An Optional containing a value determined by the Combiner.
     template <typename... Arguments>
     Result_t operator()(Arguments&&... args) const {
+        // enabled check needs to be within mutex lock, put in Signal_impl.
         return enabled_ ? pimpl_->operator()(std::forward<Arguments>(args)...)
                         : Result_t();  // Empty Optional<T>
     }
@@ -238,7 +241,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
     void disable() { enabled_ = false; }
 
    private:
-    std::shared_ptr<Impl_t> pimpl_;
+    std::shared_ptr<Impl_t> pimpl_;  // needed so that Slot can track a Signal.
     bool enabled_ = true;
 };
 
