@@ -215,7 +215,10 @@ class Signal_impl<Ret(Args...),
     template <typename... Arguments>
     Result_t operator()(Arguments&&... args) {
         auto slots = bind_args(std::forward<Arguments>(args)...);
-        return combiner_(
+        std::shared_lock<SharedMutex> lock{mtx_};
+        auto comb = combiner_;
+        lock.unlock();
+        return comb(
             Slot_iterator<typename Container_t::iterator>(std::begin(slots)),
             Slot_iterator<typename Container_t::iterator>(std::end(slots)));
     }
