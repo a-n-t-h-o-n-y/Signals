@@ -50,7 +50,7 @@ auto to_track = std::make_shared<int>(5);
 sig::Slot<void()> slot{[] { std::cout << "to_track is still alive.\n"; }};
 slot.track(to_track);
 sig::Signal<void()> my_sig;
-my_sig.connect(slot_1);
+my_sig.connect(slot);
 my_sig();   // Outputs: "to_track is still alive."
 to_track.reset();
 my_sig();   // No Output
@@ -115,8 +115,8 @@ mkdir Signals/build && cd Signals/build
 git submodule init      # Initialize Optional Library dependency
 git submodule update
 cmake ..
-make                    # Build tests
-ctest                   # Run tests
+make testsignals        # Build tests(Optional)
+ctest                   # Run tests(Optional)
 sudo make install       # Install headers to system default include directory
 ```
 

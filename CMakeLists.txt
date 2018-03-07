@@ -23,7 +23,7 @@ set(TEST_SOURCES
     "test/optional_last_value_test.cpp"
     )
 
-add_executable(testsignals ${TEST_SOURCES})
+add_executable(testsignals EXCLUDE_FROM_ALL ${TEST_SOURCES})
 
 find_package(GTest REQUIRED)
 if (GTEST_FOUND)
