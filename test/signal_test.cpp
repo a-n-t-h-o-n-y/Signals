@@ -735,14 +735,14 @@ TEST(SignalTest, ConstOperatorParenthesis) {
 }
 
 template <typename return_type>
-class new_combiner {
+class New_combiner {
    public:
-    new_combiner() = default;
-    explicit new_combiner(int val) : value_{val} {}
-    using Result_t = return_type;
+    New_combiner() = default;
+    explicit New_combiner(int val) : value_{val} {}
+    using Result_type = return_type;
     template <typename InputIterator>
-    Result_t operator()(InputIterator first, InputIterator last) {
-        return Result_t();
+    Result_type operator()(InputIterator first, InputIterator last) {
+        return Result_type();
     }
     int get_value() { return value_; }
 
@@ -757,8 +757,8 @@ TEST(SignalTest, Combiner) {
     Signal<int(double), Optional_last_value<int>> sig2;
     EXPECT_EQ(typeid(Optional_last_value<int>{}), typeid(sig2.combiner()));
 
-    Signal<int(double), new_combiner<int>> sig3;
-    EXPECT_EQ(typeid(new_combiner<int>{}), typeid(sig3.combiner()));
+    Signal<int(double), New_combiner<int>> sig3;
+    EXPECT_EQ(typeid(New_combiner<int>{}), typeid(sig3.combiner()));
 }
 
 TEST(SignalTest, SetCombiner) {
@@ -766,14 +766,14 @@ TEST(SignalTest, SetCombiner) {
     sig1.set_combiner(Optional_last_value<int>{});
     EXPECT_EQ(typeid(Optional_last_value<int>{}), typeid(sig1.combiner()));
 
-    Signal<int(double, char), new_combiner<int>> sig2;
-    sig2.set_combiner(new_combiner<int>{});
-    EXPECT_EQ(typeid(new_combiner<int>{}), typeid(sig2.combiner()));
+    Signal<int(double, char), New_combiner<int>> sig2;
+    sig2.set_combiner(New_combiner<int>{});
+    EXPECT_EQ(typeid(New_combiner<int>{}), typeid(sig2.combiner()));
 
-    Signal<int(double, char), new_combiner<int>> sig3;
-    sig3.set_combiner(new_combiner<int>{7});
+    Signal<int(double, char), New_combiner<int>> sig3;
+    sig3.set_combiner(New_combiner<int>{7});
     EXPECT_EQ(7, sig3.combiner().get_value());
-    sig3.set_combiner(new_combiner<int>{3});
+    sig3.set_combiner(New_combiner<int>{3});
     EXPECT_EQ(3, sig3.combiner().get_value());
 }
 

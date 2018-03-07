@@ -42,7 +42,7 @@ class Signal<Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex> {
    public:
     // Types
     using Signature_t = Ret(Args...);
-    using Result_t = typename Combiner::Result_t;
+    using Result_t = typename Combiner::Result_type;
     using Combiner_t = Combiner;
     using Group_t = Group;  // Don't need these, just use template params
     using Group_compare_t = GroupCompare;
