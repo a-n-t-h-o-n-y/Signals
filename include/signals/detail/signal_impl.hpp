@@ -201,6 +201,9 @@ class Signal_impl<Ret(Args...),
 
     template <typename... Arguments>
     Result_type operator()(Arguments&&... args) {
+        if (!this->enabled()) {
+            return Result_type();
+        }
         auto slots = bind_args(std::forward<Arguments>(args)...);
         std::shared_lock<Shared_mutex> lock{mtx_};
         auto comb = combiner_;
@@ -211,6 +214,9 @@ class Signal_impl<Ret(Args...),
 
     template <typename... Arguments>
     Result_type operator()(Arguments&&... args) const {
+        if (!this->enabled()) {
+            return Result_type();
+        }
         auto slots = bind_args(std::forward<Arguments>(args)...);
         std::shared_lock<Shared_mutex> lock{mtx_};
         const Combiner const_comb = combiner_;
@@ -227,6 +233,21 @@ class Signal_impl<Ret(Args...),
     void set_combiner(const Combiner& comb) {
         std::unique_lock<Shared_mutex> lock{mtx_};
         combiner_ = comb;
+    }
+
+    bool enabled() const {
+        std::shared_lock<Shared_mutex> lock{mtx_};
+        return enabled_;
+    }
+
+    void enable() {
+        std::lock_guard<Shared_mutex> lock{mtx_};
+        enabled_ = true;
+    }
+
+    void disable() {
+        std::lock_guard<Shared_mutex> lock{mtx_};
+        enabled_ = false;
     }
 
    private:
@@ -247,23 +268,24 @@ class Signal_impl<Ret(Args...),
         Position_container back;
     };
 
-    // Prepares the functions to be processed by the Combiner.
-    // Returns a container of std::functions with signature Ret().
-    template <typename... Arguments>
-    Bound_slot_container bind_args(Arguments&&... args) const {
+    // Binds parameters to each Slot so Combiner does not need to know them.
+    template <typename... Params>
+    Bound_slot_container bind_args(Params&&... args) const {
         Bound_slot_container bound_slots;
+        // Helper Function
         auto bind_slots = [&bound_slots, &args...](auto& conn_container) {
             for (auto& connection : conn_container) {
                 if (connection->connected() && !connection->blocked() &&
                     !connection->get_slot().expired()) {
                     auto& slot = connection->get_slot();
                     bound_slots.push_back([slot, &args...] {
-                        return slot(std::forward<Arguments>(args)...);
+                        return slot(std::forward<Params>(args)...);
                     });
                 }
             }
         };
         std::shared_lock<Shared_mutex> lock{mtx_};
+        // Bind arguments to all three types of connected Slots.
         bind_slots(connections_.front);
         for (auto& group : connections_.grouped) {
             bind_slots(group.second);
@@ -272,6 +294,7 @@ class Signal_impl<Ret(Args...),
         return bound_slots;
     }
 
+    bool enabled_{true};
     Connection_container connections_;
 
     Combiner combiner_;
