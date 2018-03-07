@@ -10,6 +10,7 @@ Slots(functions). Some features:
   tracking, allowing Slots to disconnect when a tracked object is destroyed.
 - Signal's return value is determined by a Combiner, which establishes how
   to return a single value from all of the individual Slots' return values.
+- Thread-safe
 
 
 ## Code Examples
