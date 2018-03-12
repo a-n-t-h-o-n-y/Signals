@@ -29,7 +29,7 @@ namespace sig {
 /// \param Group Type used to group Slots together to determine call order.
 /// \param Group_compare Comparison functor to determine order to call Slots.
 /// \param Slot_function Function wrapper type for Slots
-/// \param Shared_mutex Mutex type for multithreaded use of Signals
+/// \param Mutex Mutex type for multithreaded use of Signals
 /// \sa Slot signal_fwd.hpp
 template <typename Ret,
           typename... Args,
@@ -37,13 +37,13 @@ template <typename Ret,
           typename Group,
           typename Group_compare,
           typename Slot_function,
-          typename Shared_mutex>
+          typename Mutex>
 class Signal<Ret(Args...),
              Combiner,
              Group,
              Group_compare,
              Slot_function,
-             Shared_mutex> {
+             Mutex> {
    public:
     // Types
     using Result_type = typename Combiner::Result_type;
@@ -59,7 +59,7 @@ class Signal<Ret(Args...),
                                        Group,
                                        Group_compare,
                                        Slot_function,
-                                       Shared_mutex>;
+                                       Mutex>;
 
     /// Number of arguments the Signal takes.
     static const int arity = std::tuple_size<Arguments>::value;
@@ -246,13 +246,10 @@ template <typename Ret,
           typename Group,
           typename Group_compare,
           typename Slot_function,
-          typename Shared_mutex>
-const int Signal<Ret(Args...),
-                 Combiner,
-                 Group,
-                 Group_compare,
-                 Slot_function,
-                 Shared_mutex>::arity;
+          typename Mutex>
+const int
+    Signal<Ret(Args...), Combiner, Group, Group_compare, Slot_function, Mutex>::
+        arity;
 
 }  // namespace sig
 #endif  // SIGNAL_HPP

@@ -9,7 +9,7 @@
 #include <boost/function.hpp>
 
 #include <functional>
-#include <shared_mutex>
+#include <mutex>
 #include <type_traits>
 #include <typeinfo>
 #include <vector>
@@ -30,28 +30,28 @@ class SignalImplTest : public testing::Test {
                                int,
                                std::less<int>,
                                std::function<void(int)>,
-                               std::shared_timed_mutex>;
+                               std::mutex>;
 
     using type_2 = Signal_impl<double(char, int),
                                Optional_last_value<double>,
                                char,
                                std::less<char>,
                                std::function<double(char, int)>,
-                               std::shared_timed_mutex>;
+                               std::mutex>;
 
     using type_3 = Signal_impl<unsigned(long long),
                                Optional_last_value<unsigned>,
                                double,
                                std::greater<double>,
                                boost::function<unsigned(long long)>,
-                               std::shared_timed_mutex>;
+                               std::mutex>;
 
     using type_4 = Signal_impl<char(int, double),
                                Optional_last_value<char>,
                                int,
                                std::less<int>,
                                std::function<char(int, double)>,
-                               std::shared_timed_mutex>;
+                               std::mutex>;
 
     SignalImplTest() {
         signal_std.connect(boost_slot_non_empty1);

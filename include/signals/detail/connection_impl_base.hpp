@@ -2,7 +2,6 @@
 #define DETAIL_CONNECTION_IMPL_BASE_HPP
 #include <cstddef>
 #include <mutex>
-#include <shared_mutex>
 
 namespace sig {
 
@@ -13,19 +12,19 @@ class Connection_impl_base {
    public:
     Connection_impl_base() = default;
     Connection_impl_base(const Connection_impl_base& other) {
-        std::shared_lock<SharedMutex> lock{other.mtx_};
+        std::lock_guard<Mutex> lock{other.mtx_};
         blocking_object_count_ = other.blocking_object_count_;
     }
 
     Connection_impl_base(Connection_impl_base&& other) {
-        std::lock_guard<SharedMutex> lock{other.mtx_};
+        std::lock_guard<Mutex> lock{other.mtx_};
         blocking_object_count_ = std::move(other.blocking_object_count_);
     }
 
     Connection_impl_base& operator=(const Connection_impl_base& rhs) {
         if (this != &rhs) {
-            std::unique_lock<SharedMutex> lhs_lock{this->mtx_, std::defer_lock};
-            std::shared_lock<SharedMutex> rhs_lock{rhs.mtx_, std::defer_lock};
+            std::unique_lock<Mutex> lhs_lock{this->mtx_, std::defer_lock};
+            std::unique_lock<Mutex> rhs_lock{rhs.mtx_, std::defer_lock};
             std::lock(lhs_lock, rhs_lock);
             blocking_object_count_ = rhs.blocking_object_count_;
         }
@@ -34,8 +33,8 @@ class Connection_impl_base {
 
     Connection_impl_base& operator=(Connection_impl_base&& rhs) {
         if (this != &rhs) {
-            std::unique_lock<SharedMutex> lhs_lock{this->mtx_, std::defer_lock};
-            std::unique_lock<SharedMutex> rhs_lock{rhs.mtx_, std::defer_lock};
+            std::unique_lock<Mutex> lhs_lock{this->mtx_, std::defer_lock};
+            std::unique_lock<Mutex> rhs_lock{rhs.mtx_, std::defer_lock};
             std::lock(lhs_lock, rhs_lock);
             blocking_object_count_ = std::move(rhs.blocking_object_count_);
         }
@@ -49,25 +48,25 @@ class Connection_impl_base {
     virtual bool connected() const = 0;
 
     inline bool blocked() const {
-        std::shared_lock<SharedMutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         return blocking_object_count_ < 1 ? false : true;
     }
 
     inline void add_block() {
-        std::lock_guard<SharedMutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         ++blocking_object_count_;
     }
 
     inline void remove_block() {
-        std::lock_guard<SharedMutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         --blocking_object_count_;
     }
 
    protected:
     std::size_t blocking_object_count_ = 0;
 
-    using SharedMutex = std::shared_timed_mutex;
-    mutable SharedMutex mtx_;
+    using Mutex = std::mutex;
+    mutable Mutex mtx_;
 };
 
 }  // namespace sig

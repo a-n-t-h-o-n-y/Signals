@@ -31,7 +31,7 @@ class Connection_impl<Ret(Args...)> : public Connection_impl_base {
     // Then copies tracked items from the extended slot into the new slot.
     Connection_impl& emplace_extended(const Extended_slot_t& es,
                                       const Connection& c) {
-        std::lock_guard<SharedMutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         connected_ = true;
         slot_.slot_function() = [c, es](Args&&... args) {
             return es.slot_function()(c, std::forward<Args>(args)...);
@@ -43,12 +43,12 @@ class Connection_impl<Ret(Args...)> : public Connection_impl_base {
     }
 
     void disconnect() override {
-        std::lock_guard<SharedMutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         connected_ = false;
     }
 
     bool connected() const override {
-        std::shared_lock<SharedMutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         return connected_;
     }
 

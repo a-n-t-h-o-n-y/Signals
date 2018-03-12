@@ -11,7 +11,6 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <shared_mutex>
 #include <utility>
 
 namespace sig {
@@ -26,7 +25,7 @@ template <typename Signature,
           typename Group,
           typename Group_compare,
           typename Slot_function,
-          typename Shared_mutex>
+          typename Mutex>
 class Signal_impl;
 
 template <typename Ret,
@@ -35,13 +34,13 @@ template <typename Ret,
           typename Group,
           typename Group_compare,
           typename Slot_function,
-          typename Shared_mutex>
+          typename Mutex>
 class Signal_impl<Ret(Args...),
                   Combiner,
                   Group,
                   Group_compare,
                   Slot_function,
-                  Shared_mutex> {
+                  Mutex> {
    public:
     using Result_type = typename Combiner::Result_type;
     using Signature = Ret(Args...);
@@ -52,21 +51,21 @@ class Signal_impl<Ret(Args...),
         : connections_{group_compare}, combiner_{std::move(combiner)} {}
 
     Signal_impl(const Signal_impl& other) {
-        std::shared_lock<Shared_mutex> lock{other.mtx_};
+        std::lock_guard<Mutex> lock{other.mtx_};
         connections_ = other.connections_;
         combiner_ = other.combiner_;
     }
 
     Signal_impl(Signal_impl&& other) {
-        std::lock_guard<Shared_mutex> lock{other.mtx_};
+        std::lock_guard<Mutex> lock{other.mtx_};
         connections_ = std::move(other.connections_);
         combiner_ = std::move(other.combiner_);
     }
 
     Signal_impl& operator=(const Signal_impl& other) {
         if (this != &other) {
-            std::unique_lock<Shared_mutex> lhs_lck{this->mtx_, std::defer_lock};
-            std::shared_lock<Shared_mutex> rhs_lck{other.mtx_, std::defer_lock};
+            std::unique_lock<Mutex> lhs_lck{this->mtx_, std::defer_lock};
+            std::unique_lock<Mutex> rhs_lck{other.mtx_, std::defer_lock};
             std::lock(lhs_lck, rhs_lck);
             connections_ = other.connections_;
             combiner_ = other.combiner_;
@@ -76,8 +75,8 @@ class Signal_impl<Ret(Args...),
 
     Signal_impl& operator=(Signal_impl&& other) {
         if (this != &other) {
-            std::unique_lock<Shared_mutex> lhs_lck{this->mtx_, std::defer_lock};
-            std::unique_lock<Shared_mutex> rhs_lck{other.mtx_, std::defer_lock};
+            std::unique_lock<Mutex> lhs_lck{this->mtx_, std::defer_lock};
+            std::unique_lock<Mutex> rhs_lck{other.mtx_, std::defer_lock};
             std::lock(lhs_lck, rhs_lck);
             connections_ = std::move(other.connections_);
             combiner_ = std::move(other.combiner_);
@@ -87,7 +86,7 @@ class Signal_impl<Ret(Args...),
 
     Connection connect(const Slot_type& slot, Position position) {
         auto c_impl = std::make_shared<Connection_impl<Signature>>(slot);
-        std::lock_guard<Shared_mutex> lock(mtx_);
+        std::lock_guard<Mutex> lock(mtx_);
         position == Position::at_front ? connections_.front.push_front(c_impl)
                                        : connections_.back.push_back(c_impl);
         return Connection(c_impl);
@@ -97,7 +96,7 @@ class Signal_impl<Ret(Args...),
                        const Slot_type& slot,
                        Position position) {
         auto c_impl = std::make_shared<Connection_impl<Signature>>(slot);
-        std::lock_guard<Shared_mutex> lock(mtx_);
+        std::lock_guard<Mutex> lock(mtx_);
         position == Position::at_front
             ? connections_.grouped[group].push_front(c_impl)
             : connections_.grouped[group].push_back(c_impl);
@@ -109,7 +108,7 @@ class Signal_impl<Ret(Args...),
         auto c_impl = std::make_shared<Connection_impl<Signature>>();
         auto c = Connection(c_impl);
         c_impl->emplace_extended(ext_slot, c);
-        std::lock_guard<Shared_mutex> lock(mtx_);
+        std::lock_guard<Mutex> lock(mtx_);
         position == Position::at_front ? connections_.front.push_front(c_impl)
                                        : connections_.back.push_back(c_impl);
         return c;
@@ -121,7 +120,7 @@ class Signal_impl<Ret(Args...),
         auto c_impl = std::make_shared<Connection_impl<Signature>>();
         auto c = Connection(c_impl);
         c_impl->emplace_extended(ext_slot, c);
-        std::lock_guard<Shared_mutex> lock(mtx_);
+        std::lock_guard<Mutex> lock(mtx_);
         position == Position::at_front
             ? connections_.grouped[group].push_front(c_impl)
             : connections_.grouped[group].push_back(c_impl);
@@ -129,7 +128,7 @@ class Signal_impl<Ret(Args...),
     }
 
     void disconnect(const Group& group) {
-        std::lock_guard<Shared_mutex> lock(mtx_);
+        std::lock_guard<Mutex> lock(mtx_);
         for (auto& connection : connections_.grouped[group]) {
             connection->disconnect();
         }
@@ -137,7 +136,7 @@ class Signal_impl<Ret(Args...),
     }
 
     void disconnect_all_slots() {
-        std::lock_guard<Shared_mutex> lock(mtx_);
+        std::lock_guard<Mutex> lock(mtx_);
         for (auto& connection : connections_.front) {
             connection->disconnect();
         }
@@ -155,7 +154,7 @@ class Signal_impl<Ret(Args...),
     }
 
     bool empty() const {
-        std::shared_lock<Shared_mutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         for (auto& connection : connections_.front) {
             if (connection->connected()) {
                 return false;
@@ -177,7 +176,7 @@ class Signal_impl<Ret(Args...),
     }
 
     std::size_t num_slots() const {
-        std::shared_lock<Shared_mutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         std::size_t size{0};
         for (auto& connection : connections_.front) {
             if (connection->connected()) {
@@ -205,7 +204,7 @@ class Signal_impl<Ret(Args...),
             return Result_type();
         }
         auto slots = bind_args(std::forward<Arguments>(args)...);
-        std::shared_lock<Shared_mutex> lock{mtx_};
+        std::unique_lock<Mutex> lock{mtx_};
         auto comb = combiner_;
         lock.unlock();
         return comb(Bound_slot_iterator{std::begin(slots)},
@@ -218,7 +217,7 @@ class Signal_impl<Ret(Args...),
             return Result_type();
         }
         auto slots = bind_args(std::forward<Arguments>(args)...);
-        std::shared_lock<Shared_mutex> lock{mtx_};
+        std::unique_lock<Mutex> lock{mtx_};
         const Combiner const_comb = combiner_;
         lock.unlock();
         return const_comb(Bound_slot_iterator{std::begin(slots)},
@@ -226,27 +225,27 @@ class Signal_impl<Ret(Args...),
     }
 
     Combiner combiner() const {
-        std::shared_lock<Shared_mutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         return combiner_;
     }
 
     void set_combiner(const Combiner& comb) {
-        std::unique_lock<Shared_mutex> lock{mtx_};
+        std::unique_lock<Mutex> lock{mtx_};
         combiner_ = comb;
     }
 
     bool enabled() const {
-        std::shared_lock<Shared_mutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         return enabled_;
     }
 
     void enable() {
-        std::lock_guard<Shared_mutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         enabled_ = true;
     }
 
     void disable() {
-        std::lock_guard<Shared_mutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         enabled_ = false;
     }
 
@@ -284,7 +283,7 @@ class Signal_impl<Ret(Args...),
                 }
             }
         };
-        std::shared_lock<Shared_mutex> lock{mtx_};
+        std::lock_guard<Mutex> lock{mtx_};
         // Bind arguments to all three types of connected Slots.
         bind_slots(connections_.front);
         for (auto& group : connections_.grouped) {
@@ -298,7 +297,7 @@ class Signal_impl<Ret(Args...),
     Connection_container connections_;
 
     Combiner combiner_;
-    mutable Shared_mutex mtx_;
+    mutable Mutex mtx_;
 };
 
 }  // namespace sig

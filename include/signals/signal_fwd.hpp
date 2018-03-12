@@ -7,7 +7,7 @@
 #include <signals/optional_last_value.hpp>
 
 #include <functional>
-#include <shared_mutex>
+#include <mutex>
 
 namespace sig {
 
@@ -15,9 +15,9 @@ template <typename Signature,
           typename Combiner = sig::Optional_last_value<
               typename sig::Function_type_splitter<Signature>::Return_t>,
           typename Group = int,
-          typename GroupCompare = std::less<Group>,
-          typename SlotFunction = std::function<Signature>,
-          typename SharedMutex = std::shared_timed_mutex>
+          typename Group_compare = std::less<Group>,
+          typename Slot_function = std::function<Signature>,
+          typename Mutex = std::mutex>
 class Signal;
 
 }  // namespace sig
