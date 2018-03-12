@@ -30,9 +30,6 @@ if (GTEST_FOUND)
     target_link_libraries(testsignals ${GTEST_BOTH_LIBRARIES})
 endif()
 
-# find_package(Threads)
-# target_link_libraries(testsignals ${CMAKE_THREAD_LIBS_INIT})
-
 add_test(testsignals testsignals)
 
 # Build System Info For Clang-Tidy
