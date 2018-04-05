@@ -1,49 +1,49 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(libsignals LANGUAGES CXX)
-
-add_subdirectory(libs/Optional)
 include(GNUInstallDirs)
 enable_testing()
-add_compile_options(-std=c++14)
+set_property(GLOBAL PROPERTY ALLOW_DUPLICATE_CUSTOM_TARGETS TRUE)
 
+add_subdirectory(libs/Optional)
+
+# CREATE SIGNALS LIBRARY
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+add_library(libsignals INTERFACE)
+
+target_include_directories(libsignals
+    INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+
+target_compile_features(libsignals INTERFACE cxx_std_14)
+target_link_libraries(libsignals INTERFACE liboptional)
+
+# LIBRARY INSTALLATION
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(TARGETS libsignals EXPORT SignalsLibraryConfig)
+install(EXPORT SignalsLibraryConfig DESTINATION share/SignalsLibrary/cmake)
+export(TARGETS libsignals FILE SignalsLibraryConfig.cmake)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include
-                    ${CMAKE_CURRENT_SOURCE_DIR}/libs/Optional/include
-                    )
+# ADD TESTS
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+add_subdirectory(test)
 
-set(TEST_SOURCES 
-    "test/slot_test.cpp"
-    "test/slot_base_test.cpp"
-    "test/connection_test.cpp"
-    "test/connection_impl_test.cpp"
-    "test/signal_test.cpp"
-    "test/signal_impl_test.cpp"
-    "test/shared_connection_block_test.cpp"
-    "test/optional_last_value_test.cpp"
-    )
-
-add_executable(testsignals EXCLUDE_FROM_ALL ${TEST_SOURCES})
-
-find_package(GTest REQUIRED)
-if (GTEST_FOUND)
-    target_link_libraries(testsignals ${GTEST_BOTH_LIBRARIES})
-endif()
-
-add_test(testsignals testsignals)
-
-# Build System Info For Clang-Tidy
+# CLANG TIDY
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-add_custom_target(compile_commands_signals ALL
+add_custom_target(compile_commands ALL
     COMMAND [ -f ${CMAKE_SOURCE_DIR}/build/compile_commands.json ] && mv
     	${CMAKE_SOURCE_DIR}/build/compile_commands.json
     	${CMAKE_SOURCE_DIR}/compile_commands.json || :)
 
-# Doxygen Target
+# DOXYGEN
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-    add_custom_target(docs_signals
-    ${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/Doxyfile
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs
-    COMMENT "Generating API documentation with Doxygen" VERBATIM)
+    add_custom_target(docs
+        ${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/Doxyfile
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs
+        COMMENT "Generating API documentation with Doxygen" VERBATIM)
 endif()
