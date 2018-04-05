@@ -24,7 +24,13 @@ target_link_libraries(libsignals INTERFACE liboptional)
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(TARGETS libsignals EXPORT SignalsLibraryConfig)
 install(EXPORT SignalsLibraryConfig DESTINATION share/SignalsLibrary/cmake)
-export(TARGETS libsignals FILE SignalsLibraryConfig.cmake)
+export(
+    TARGETS
+        libsignals
+        liboptional
+    FILE
+        SignalsLibraryConfig.cmake
+)
 
 # ADD TESTS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
