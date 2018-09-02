@@ -8,26 +8,26 @@ add_subdirectory(libs/Optional)
 
 # CREATE SIGNALS LIBRARY
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-add_library(libsignals INTERFACE)
+add_library(signals INTERFACE)
 
-target_include_directories(libsignals
+target_include_directories(signals
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 
-target_compile_features(libsignals INTERFACE cxx_std_14)
-target_link_libraries(libsignals INTERFACE liboptional)
+target_compile_features(signals INTERFACE cxx_std_14)
+target_link_libraries(signals INTERFACE optional)
 
 # LIBRARY INSTALLATION
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(TARGETS libsignals EXPORT SignalsLibraryConfig)
+install(TARGETS signals EXPORT SignalsLibraryConfig)
 install(EXPORT SignalsLibraryConfig DESTINATION share/SignalsLibrary/cmake)
 export(
     TARGETS
-        libsignals
-        liboptional
+        signals
+        optional
     FILE
         SignalsLibraryConfig.cmake
 )
