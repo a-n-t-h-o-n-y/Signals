@@ -20,7 +20,7 @@ add_executable(test_signals EXCLUDE_FROM_ALL
     optional_last_value_test.cpp
 )
 
-target_link_libraries(test_signals PRIVATE gtest libsignals)
+target_link_libraries(test_signals PRIVATE gtest signals)
 target_compile_features(test_signals PRIVATE cxx_std_14)
 
 add_custom_target(tests DEPENDS test_signals)
