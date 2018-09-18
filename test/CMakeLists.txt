@@ -1,6 +1,6 @@
 # FIND GTEST
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-find_package(GTest REQUIRED)
+find_package(GTest)
 add_library(gtest INTERFACE IMPORTED)
 set_property(TARGET gtest PROPERTY
     INTERFACE_INCLUDE_DIRECTORIES ${GTEST_INCLUDE_DIRS})
