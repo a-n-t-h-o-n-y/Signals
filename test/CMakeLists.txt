@@ -21,7 +21,12 @@ add_executable(test_signals EXCLUDE_FROM_ALL
 )
 
 target_link_libraries(test_signals PRIVATE gtest signals)
-target_compile_features(test_signals PRIVATE cxx_std_14)
+
+if(${CMAKE_MAJOR_VERSION} VERSION_LESS "3.8")
+    set(CMAKE_CXX_STANDARD 14)
+else()
+    target_compile_features(optional INTERFACE cxx_std_14)
+endif()
 
 add_custom_target(tests DEPENDS test_signals)
 
