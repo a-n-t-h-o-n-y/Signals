@@ -19,7 +19,7 @@ target_include_directories(signals
 if(${CMAKE_MAJOR_VERSION} VERSION_LESS "3.8")
     set(CMAKE_CXX_STANDARD 14)
 else()
-    target_compile_features(optional INTERFACE cxx_std_14)
+    target_compile_features(signals INTERFACE cxx_std_14)
 endif()
 
 target_link_libraries(signals INTERFACE optional)
