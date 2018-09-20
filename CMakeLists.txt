@@ -16,7 +16,7 @@ target_include_directories(signals
         $<INSTALL_INTERFACE:include>
 )
 
-if(${CMAKE_MAJOR_VERSION} VERSION_LESS "3.8")
+if(${CMAKE_VERSION} VERSION_LESS "3.8")
     set(CMAKE_CXX_STANDARD 14)
 else()
     target_compile_features(signals INTERFACE cxx_std_14)
