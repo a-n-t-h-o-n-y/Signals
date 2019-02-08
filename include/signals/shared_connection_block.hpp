@@ -39,7 +39,7 @@ class Shared_connection_block {
         }
     }
 
-    /// \brief Resets *this' Connection to point to \p x's Connection.
+    /// \brief Reset *this' Connection to point to \p x's Connection.
     ///
     /// If *this was blocking, then the block count is decremented on the
     /// original Connection. If \p x is blocking, then \p x's Connection gets
@@ -81,9 +81,8 @@ class Shared_connection_block {
     Connection connection() const { return Connection(connection_); }
 
    private:
-    // Removes the block to the associated Connection and is reset with the
-    // contents of \p x, applying a block to the new Connection if x is
-    // blocking.
+    // Remove the block to the associated Connection and reset with the contents
+    // of \p x, applying a block to the new Connection if x is blocking.
     void reset(const Shared_connection_block& x) {
         this->unblock();
         connection_ = x.connection_;
@@ -93,7 +92,7 @@ class Shared_connection_block {
         }
     }
 
-    // Returns true if the connection pointed to is still alive and *this is
+    // Return true if the connection pointed to is still alive and *this is
     // currently blocking.
     bool active() { return !connection_.expired() && blocking_; }
 

@@ -64,7 +64,7 @@ class Slot<Ret(Args...), FunctionType> : public Slot_base {
         track(sig);
     }
 
-    /// \brief Calls underlying function if no tracked objects are expired.
+    /// \brief Call underlying function if no tracked objects are expired.
     ///
     /// Passes on args... to the FunctionType object. No-op if any tracked
     /// objects no longer exist. Throws std::bad_function_call if Slot is empty.
@@ -86,7 +86,7 @@ class Slot<Ret(Args...), FunctionType> : public Slot_base {
         return function_(std::forward<Arguments>(args)...);
     }
 
-    /// \brief Adds a shared object to the tracked objects list.
+    /// \brief Add a shared object to the tracked objects list.
     ///
     /// \param obj_ptr a weak_ptr to the object to be tracked.
     /// \returns Reference to *this.
@@ -95,7 +95,7 @@ class Slot<Ret(Args...), FunctionType> : public Slot_base {
         return *this;
     }
 
-    /// \brief Adds a Signal to the tracked objects list.
+    /// \brief Add a Signal to the tracked objects list.
     ///
     /// \param sig Signal with same signature as *this.
     /// \returns Reference to *this.
