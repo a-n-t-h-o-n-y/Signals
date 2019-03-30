@@ -10,7 +10,7 @@ set_property(TARGET gtest PROPERTY
 
 # CREATE TESTS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-add_executable(test_signals EXCLUDE_FROM_ALL
+add_executable(signals_test EXCLUDE_FROM_ALL
     slot_test.cpp
     slot_base_test.cpp
     connection_test.cpp
@@ -21,14 +21,12 @@ add_executable(test_signals EXCLUDE_FROM_ALL
     optional_last_value_test.cpp
 )
 
-target_link_libraries(test_signals PRIVATE gtest signals)
+target_link_libraries(signals_test PRIVATE gtest signals)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.8")
     set(CMAKE_CXX_STANDARD 14)
 else()
-    target_compile_features(test_signals INTERFACE cxx_std_14)
+    target_compile_features(signals_test INTERFACE cxx_std_14)
 endif()
 
-add_custom_target(tests DEPENDS test_signals)
-
-add_test(test_signals test_signals)
+add_test(signals_test signals_test)

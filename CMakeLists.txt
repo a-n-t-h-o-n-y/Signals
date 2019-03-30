@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(libsignals LANGUAGES CXX)
 include(GNUInstallDirs)
 enable_testing()
-set_property(GLOBAL PROPERTY ALLOW_DUPLICATE_CUSTOM_TARGETS TRUE)
 
 add_subdirectory(libs/Optional)
 
@@ -41,19 +40,11 @@ export(
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 add_subdirectory(test)
 
-# CLANG TIDY
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-add_custom_target(compile_commands ALL
-    COMMAND [ -f ${CMAKE_SOURCE_DIR}/build/compile_commands.json ] && mv
-    	${CMAKE_SOURCE_DIR}/build/compile_commands.json
-    	${CMAKE_SOURCE_DIR}/compile_commands.json || :)
-
 # DOXYGEN
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-    add_custom_target(docs
+    add_custom_target(signals_docs
         ${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/Doxyfile
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs
         COMMENT "Generating API documentation with Doxygen" VERBATIM)
