@@ -1,6 +1,6 @@
 /// \file
-/// \brief Contains the foward declaration of Signal. Use this header instead of
-/// trying to forward declare the class yourself.
+/// \brief Contains the forward declaration of Signal. Use this header instead
+/// of trying to forward declare the class yourself.
 #ifndef SIGNAL_FWD_HPP
 #define SIGNAL_FWD_HPP
 #include <signals/detail/function_type_splitter.hpp>

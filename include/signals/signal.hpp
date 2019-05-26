@@ -1,5 +1,5 @@
 /// \file
-/// \brief Contains the definiton for the Signal class.
+/// \brief Contains the definition for the Signal class.
 #ifndef SIGNAL_HPP
 #define SIGNAL_HPP
 #include <signals/connection.hpp>
