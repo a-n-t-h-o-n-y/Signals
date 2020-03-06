@@ -10,6 +10,7 @@
 
 #include <functional>
 #include <mutex>
+#include <optional>
 #include <type_traits>
 #include <typeinfo>
 #include <vector>
@@ -20,8 +21,6 @@ using sig::Position;
 using sig::Signal;
 using sig::Signal_impl;
 using sig::Slot;
-
-using opt::Optional;
 
 class SignalImplTest : public testing::Test {
    protected:
@@ -53,7 +52,8 @@ class SignalImplTest : public testing::Test {
                                std::function<char(int, double)>,
                                std::mutex>;
 
-    SignalImplTest() {
+    SignalImplTest()
+    {
         signal_std.connect(boost_slot_non_empty1);
         signal_std.connect(std_slot_non_empty1);
         std_slot_holds_signal = Slot<void(int)>{signal_std};
@@ -61,8 +61,9 @@ class SignalImplTest : public testing::Test {
         signal_boost.connect(boost_slot_empty2);
         signal_boost.connect(std_slot_empty2);
         boost_slot_holds_signal =
-            Slot<Optional<unsigned>(long long),
-                 boost::function<Optional<unsigned>(long long)>>{signal_boost};
+            Slot<std::optional<unsigned>(long long),
+                 boost::function<std::optional<unsigned>(long long)>>{
+                signal_boost};
 
         si_type1_2.connect([](int) { return; }, Position::at_back);
 
@@ -127,8 +128,8 @@ class SignalImplTest : public testing::Test {
            std::less<int>,
            boost::function<unsigned(long long)>>
         empty_signal_boost{};
-    Slot<Optional<unsigned>(long long),
-         boost::function<Optional<unsigned>(long long)>>
+    Slot<std::optional<unsigned>(long long),
+         boost::function<std::optional<unsigned>(long long)>>
         boost_slot_holds_empty_signal{empty_signal_boost};
 
     // Slot holds non-empty Signal - boost::function
@@ -138,8 +139,8 @@ class SignalImplTest : public testing::Test {
            std::less<int>,
            boost::function<unsigned(long long)>>
         signal_boost{};
-    Slot<Optional<unsigned>(long long),
-         boost::function<Optional<unsigned>(long long)>>
+    Slot<std::optional<unsigned>(long long),
+         boost::function<std::optional<unsigned>(long long)>>
         boost_slot_holds_signal{};
 
     // Empty Slot - std::function
@@ -177,7 +178,8 @@ class SignalImplTest : public testing::Test {
     };
 };
 
-TEST_F(SignalImplTest, Constructor) {
+TEST_F(SignalImplTest, Constructor)
+{
     EXPECT_EQ(0, si_type1_1.num_slots());
     EXPECT_EQ(0, si_type2_1.num_slots());
     EXPECT_EQ(0, si_type3_1.num_slots());
@@ -191,7 +193,8 @@ TEST_F(SignalImplTest, Constructor) {
     EXPECT_FALSE(bool(si_type3_1(99)));
 }
 
-TEST_F(SignalImplTest, CopyConstructor) {
+TEST_F(SignalImplTest, CopyConstructor)
+{
     type_1 copied = si_type1_1;
     EXPECT_EQ(0, copied.num_slots());
     EXPECT_TRUE(copied.empty());
@@ -210,7 +213,8 @@ TEST_F(SignalImplTest, CopyConstructor) {
     EXPECT_EQ(9, *(copied3(9997876)));
 }
 
-TEST_F(SignalImplTest, MoveConstructor) {
+TEST_F(SignalImplTest, MoveConstructor)
+{
     type_1 sig_impl_mv1{std::move(si_type1_1)};
     EXPECT_TRUE(si_type1_1.empty());
 
@@ -223,7 +227,8 @@ TEST_F(SignalImplTest, MoveConstructor) {
     EXPECT_EQ(6, sig_impl_mv3.num_slots());
 }
 
-TEST_F(SignalImplTest, CopyAssignmentOperator) {
+TEST_F(SignalImplTest, CopyAssignmentOperator)
+{
     EXPECT_TRUE(si_type1_1.empty());
     si_type1_1 = si_type1_2;
     EXPECT_EQ(1, si_type1_1.num_slots());
@@ -235,7 +240,8 @@ TEST_F(SignalImplTest, CopyAssignmentOperator) {
     EXPECT_EQ(6, si_type3_2.num_slots());
 }
 
-TEST_F(SignalImplTest, MoveAssignmentOperator) {
+TEST_F(SignalImplTest, MoveAssignmentOperator)
+{
     EXPECT_TRUE(si_type1_1.empty());
     si_type1_1 = std::move(si_type1_2);
     EXPECT_EQ(1, si_type1_1.num_slots());
@@ -247,7 +253,8 @@ TEST_F(SignalImplTest, MoveAssignmentOperator) {
     EXPECT_TRUE(si_type3_2.empty());
 }
 
-TEST_F(SignalImplTest, ConnectPosition) {
+TEST_F(SignalImplTest, ConnectPosition)
+{
     // void(int)
     // this slot calls a signal which calls both a std slot and a boost slot.
     Connection conn1 =
@@ -284,7 +291,8 @@ TEST_F(SignalImplTest, ConnectPosition) {
     EXPECT_EQ(2, *si_type3_1(1234567));
 }
 
-TEST_F(SignalImplTest, ConnectGroupPosition) {
+TEST_F(SignalImplTest, ConnectGroupPosition)
+{
     // void(int), less<int>
     Connection conn1 =
         si_type1_1.connect(3, std_slot_holds_signal, Position::at_back);
@@ -294,12 +302,12 @@ TEST_F(SignalImplTest, ConnectGroupPosition) {
     si_type1_1(7);  // returns void
 
     // double(char, int), less<char>
-    Connection conn3 = si_type2_1.connect('a', [](char, int) { return 8.3; },
-                                          Position::at_back);
-    Connection conn4 = si_type2_1.connect('z', [](char, int) { return 2.8; },
-                                          Position::at_front);
-    Connection conn5 = si_type2_1.connect('z', [](char, int) { return 7.3; },
-                                          Position::at_back);
+    Connection conn3 = si_type2_1.connect(
+        'a', [](char, int) { return 8.3; }, Position::at_back);
+    Connection conn4 = si_type2_1.connect(
+        'z', [](char, int) { return 2.8; }, Position::at_front);
+    Connection conn5 = si_type2_1.connect(
+        'z', [](char, int) { return 7.3; }, Position::at_back);
     EXPECT_EQ(3, si_type2_1.num_slots());
     EXPECT_DOUBLE_EQ(7.3, *si_type2_1('f', 5));
     conn5.disconnect();
@@ -314,10 +322,10 @@ TEST_F(SignalImplTest, ConnectGroupPosition) {
                                           Position::at_back);  // returns 7
     Connection conn7 = si_type3_1.connect(5.3, boost_slot_non_empty2,
                                           Position::at_back);  // returns 3
-    Connection conn8 = si_type3_1.connect(5.3, [](long long) { return 8; },
-                                          Position::at_front);
-    Connection conn9 = si_type3_1.connect(0.77, [](long long) { return 2; },
-                                          Position::at_front);
+    Connection conn8 = si_type3_1.connect(
+        5.3, [](long long) { return 8; }, Position::at_front);
+    Connection conn9 = si_type3_1.connect(
+        0.77, [](long long) { return 2; }, Position::at_front);
 
     EXPECT_EQ(4, si_type3_1.num_slots());
     EXPECT_EQ(2, *si_type3_1(9999999));
@@ -329,16 +337,17 @@ TEST_F(SignalImplTest, ConnectGroupPosition) {
     EXPECT_EQ(7, *si_type3_1(1234567));
 }
 
-TEST_F(SignalImplTest, BothConnects) {
+TEST_F(SignalImplTest, BothConnects)
+{
     // double(char, int), less<char>
-    Connection conn1 = si_type2_1.connect('a', [](char, int) { return 8.3; },
-                                          Position::at_back);
+    Connection conn1 = si_type2_1.connect(
+        'a', [](char, int) { return 8.3; }, Position::at_back);
     Connection conn2 =
         si_type2_1.connect([](char, int) { return 2.8; }, Position::at_front);
     Connection conn3 =
         si_type2_1.connect([](char, int) { return 9.1; }, Position::at_back);
-    Connection conn4 = si_type2_1.connect('z', [](char, int) { return 7.3; },
-                                          Position::at_front);
+    Connection conn4 = si_type2_1.connect(
+        'z', [](char, int) { return 7.3; }, Position::at_front);
 
     EXPECT_DOUBLE_EQ(9.1, *si_type2_1('f', 5));
     conn3.disconnect();
@@ -352,7 +361,8 @@ TEST_F(SignalImplTest, BothConnects) {
     EXPECT_DOUBLE_EQ(2.8, *si_type2_1('k', 8));
 }
 
-TEST_F(SignalImplTest, ConnectExtendedPosition) {
+TEST_F(SignalImplTest, ConnectExtendedPosition)
+{
     // char(int, double)
     Connection conn1 =
         si_type4.connect_extended(boost_extended_slot, Position::at_front);
@@ -374,7 +384,8 @@ TEST_F(SignalImplTest, ConnectExtendedPosition) {
     EXPECT_EQ('k', *si_type4(8, 0.43));
 }
 
-TEST_F(SignalImplTest, ConnectExtendedGroupPosition) {
+TEST_F(SignalImplTest, ConnectExtendedGroupPosition)
+{
     // char(int, double)
     Connection conn1 =
         si_type4.connect_extended(5, boost_extended_slot, Position::at_front);
@@ -396,7 +407,8 @@ TEST_F(SignalImplTest, ConnectExtendedGroupPosition) {
     EXPECT_EQ('k', *si_type4(8, 0.43));
 }
 
-TEST_F(SignalImplTest, ConnectExtendedBoth) {
+TEST_F(SignalImplTest, ConnectExtendedBoth)
+{
     // char(int, double)
     Connection conn1 =
         si_type4.connect_extended(5, boost_extended_slot, Position::at_front);
@@ -443,13 +455,17 @@ TEST_F(SignalImplTest, ConnectExtendedBoth) {
     EXPECT_FALSE(bool(si_type4(8, 0.43)));
 }
 
-TEST_F(SignalImplTest, DisconnectByGroup) {
+TEST_F(SignalImplTest, DisconnectByGroup)
+{
     // double(char, int), less<char>
-    si_type2_1.connect('a', [](char, int) { return 8.3; }, Position::at_back);
-    si_type2_1.connect('a', [](char, int) { return 1.3; }, Position::at_back);
+    si_type2_1.connect(
+        'a', [](char, int) { return 8.3; }, Position::at_back);
+    si_type2_1.connect(
+        'a', [](char, int) { return 1.3; }, Position::at_back);
     si_type2_1.connect([](char, int) { return 2.8; }, Position::at_front);
     si_type2_1.connect([](char, int) { return 9.1; }, Position::at_front);
-    si_type2_1.connect('z', [](char, int) { return 7.3; }, Position::at_front);
+    si_type2_1.connect(
+        'z', [](char, int) { return 7.3; }, Position::at_front);
 
     EXPECT_DOUBLE_EQ(7.3, *si_type2_1('f', 5));
     si_type2_1.disconnect('z');
@@ -460,7 +476,8 @@ TEST_F(SignalImplTest, DisconnectByGroup) {
     EXPECT_DOUBLE_EQ(2.8, *si_type2_1('k', 8));
 }
 
-TEST_F(SignalImplTest, DisconnectAllSlots) {
+TEST_F(SignalImplTest, DisconnectAllSlots)
+{
     EXPECT_EQ(6, si_type3_2.num_slots());
 
     si_type3_2.disconnect_all_slots();
@@ -469,7 +486,8 @@ TEST_F(SignalImplTest, DisconnectAllSlots) {
     EXPECT_TRUE(si_type3_2.empty());
 }
 
-TEST_F(SignalImplTest, Empty) {
+TEST_F(SignalImplTest, Empty)
+{
     EXPECT_TRUE(si_type1_1.empty());
 
     si_type1_1.disconnect_all_slots();
@@ -480,14 +498,16 @@ TEST_F(SignalImplTest, Empty) {
     EXPECT_TRUE(si_type3_2.empty());
 }
 
-TEST_F(SignalImplTest, NumSlots) {
+TEST_F(SignalImplTest, NumSlots)
+{
     EXPECT_EQ(0, si_type1_1.num_slots());
     EXPECT_EQ(1, si_type1_2.num_slots());
     EXPECT_EQ(3, si_type2_2.num_slots());
     EXPECT_EQ(6, si_type3_2.num_slots());
 }
 
-TEST_F(SignalImplTest, OperatorParenthesisCall) {
+TEST_F(SignalImplTest, OperatorParenthesisCall)
+{
     // call on empty signal that returns void
     si_type1_1(1);
 
@@ -507,7 +527,8 @@ TEST_F(SignalImplTest, OperatorParenthesisCall) {
     EXPECT_EQ('h', *si_type4(6, 3.2));
 }
 
-TEST_F(SignalImplTest, ConstOperatorParenthesisCall) {
+TEST_F(SignalImplTest, ConstOperatorParenthesisCall)
+{
     // call on empty signal that returns void
     const type_1 si_1 = si_type1_1;
     si_1(3);
@@ -532,7 +553,8 @@ TEST_F(SignalImplTest, ConstOperatorParenthesisCall) {
     EXPECT_EQ('h', *si_5(6, 3.2));
 }
 
-TEST_F(SignalImplTest, Combiner) {
+TEST_F(SignalImplTest, Combiner)
+{
     EXPECT_TRUE(typeid(si_type2_2.combiner()) ==
                 typeid(Optional_last_value<double>{}));
 
@@ -543,7 +565,8 @@ TEST_F(SignalImplTest, Combiner) {
     EXPECT_EQ(5, *i);
 }
 
-TEST_F(SignalImplTest, SetCombiner) {
+TEST_F(SignalImplTest, SetCombiner)
+{
     si_type1_2.set_combiner(Optional_last_value<void>{});
     EXPECT_TRUE(typeid(si_type1_2.combiner()) ==
                 typeid(Optional_last_value<void>{}));

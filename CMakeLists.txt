@@ -3,8 +3,6 @@ project(libsignals LANGUAGES CXX)
 include(GNUInstallDirs)
 enable_testing()
 
-add_subdirectory(libs/Optional)
-
 # CREATE SIGNALS LIBRARY
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 add_library(signals INTERFACE)
@@ -16,12 +14,10 @@ target_include_directories(signals
 )
 
 if(${CMAKE_VERSION} VERSION_LESS "3.8")
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
 else()
-    target_compile_features(signals INTERFACE cxx_std_14)
+    target_compile_features(signals INTERFACE cxx_std_17)
 endif()
-
-target_link_libraries(signals INTERFACE optional)
 
 # LIBRARY INSTALLATION
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -31,7 +27,6 @@ install(EXPORT SignalsLibraryConfig DESTINATION share/SignalsLibrary/cmake)
 export(
     TARGETS
         signals
-        optional
     FILE
         SignalsLibraryConfig.cmake
 )

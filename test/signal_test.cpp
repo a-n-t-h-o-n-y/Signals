@@ -6,11 +6,11 @@
 #include <signals/slot.hpp>
 
 #include <gtest/gtest.h>
-#include <optional/optional.hpp>
 
 #include <functional>
 #include <memory>
 #include <typeinfo>
+#include <optional>
 
 using sig::Connection;
 using sig::Expired_slot;
@@ -18,8 +18,6 @@ using sig::Optional_last_value;
 using sig::Position;
 using sig::Signal;
 using sig::Slot;
-
-using opt::Optional;
 
 TEST(SignalTest, Arity) {
     Signal<int(double, float, char, bool)> sig;
@@ -37,7 +35,7 @@ TEST(SignalTest, Arity) {
 TEST(SignalTest, Constructor) {
     Signal<double(int, char)> sig1;
     EXPECT_TRUE(sig1.empty());
-    EXPECT_FALSE(bool(sig1(5, 'h')));  // returns an empty Optional<double>
+    EXPECT_FALSE(bool(sig1(5, 'h')));  // returns an empty std::optional<double>
 
     Signal<void(int)> sig2;
     EXPECT_TRUE(sig2.empty());
@@ -57,7 +55,7 @@ TEST(SignalTest, Constructor) {
                  std::less<char>>
         sig5;
     EXPECT_TRUE(sig5.empty());
-    EXPECT_FALSE(bool(sig5(4, 8.4, 6.5)));  // returns Optional<char>
+    EXPECT_FALSE(bool(sig5(4, 8.4, 6.5)));  // returns std::optional<char>
     auto comb_char = Optional_last_value<char>();
     EXPECT_EQ(typeid(comb_char), typeid(sig5.combiner()));
 }
@@ -71,9 +69,9 @@ TEST(SignalTest, SignalInSlotConnectedToSignal) {
     Slot<int(double, char)> slot_3 = [](double, char) { return 3; };
     sig_child.connect(slot_3);
 
-    Slot<Optional<int>(double, char)> slot_holding_signal{sig_child};
+    Slot<std::optional<int>(double, char)> slot_holding_signal{sig_child};
 
-    Signal<Optional<int>(double, char)> sig_parent;
+    Signal<std::optional<int>(double, char)> sig_parent;
     sig_parent.connect(slot_holding_signal);
 
     // This slot will not be called by the signal containing sig_child

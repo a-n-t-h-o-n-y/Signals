@@ -3,8 +3,7 @@
 /// specialization.
 #ifndef OPTIONAL_LAST_VALUE_HPP
 #define OPTIONAL_LAST_VALUE_HPP
-#include <optional/none.hpp>
-#include <optional/optional.hpp>
+#include <optional>
 
 namespace sig {
 
@@ -16,24 +15,24 @@ namespace sig {
 template <typename T>
 class Optional_last_value {
    public:
-    ///	Type of object the iterator range points to.
-    using Result_type = opt::Optional<T>;
+    /// Type of object the iterator range points to.
+    using Result_type = std::optional<T>;
 
-    ///	\param  first  Input iterator to the first element in the range.
-    ///	\param 	last   Input iterator to one past the last element in the range.
-    ///	\returns	   The value stored in the last iterator of the range,
+    /// \param  first  Input iterator to the first element in the range.
+    /// \param  last   Input iterator to one past the last element in the range.
+    /// \returns       The value stored in the last iterator of the range,
     ///                wrapped in an opt::Optional.
     template <typename InputIterator>
-    Result_type operator()(InputIterator first, InputIterator last) const {
-        if (first == last) {
-            return opt::Optional<T>{opt::none};
-        }
-        T temp;
+    Result_type operator()(InputIterator first, InputIterator last) const
+    {
+        if (first == last)
+            return std::optional<T>{std::nullopt};
+        auto temp = T{};
         while (first != last) {
             temp = *first;
             ++first;
         }
-        return opt::Optional<T>{std::move(temp)};
+        return std::optional<T>{std::move(temp)};
     }
 };
 
@@ -43,13 +42,14 @@ class Optional_last_value {
 template <>
 class Optional_last_value<void> {
    public:
-    ///	Type of object the iterator range points to.
+    /// Type of object the iterator range points to.
     using Result_type = void;
 
-    ///	\param  first  Input iterator to the first element in the range.
-    ///	\param 	last   Input iterator to one past the last element in the range.
+    /// \param  first  Input iterator to the first element in the range.
+    /// \param  last   Input iterator to one past the last element in the range.
     template <typename InputIterator>
-    Result_type operator()(InputIterator first, InputIterator last) const {
+    Result_type operator()(InputIterator first, InputIterator last) const
+    {
         while (first != last) {
             *first;
             ++first;

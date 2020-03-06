@@ -4,19 +4,18 @@
 
 #include <gtest/gtest.h>
 #include <boost/function.hpp>
-#include <optional/optional.hpp>
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <typeinfo>
 
 using sig::Expired_slot;
 using sig::Signal;
 using sig::Slot;
 
-using opt::Optional;
-
-TEST(SlotTest, Arity) {
+TEST(SlotTest, Arity)
+{
     Slot<void(int, int, double, float)> a_slot = {
         [](int, int, double, float) { return; }};
 
@@ -25,7 +24,8 @@ TEST(SlotTest, Arity) {
     EXPECT_EQ(3, Slot<int(char, int, double)>::arity);
 }
 
-TEST(SlotTest, ArgumentNTypeAccess) {
+TEST(SlotTest, ArgumentNTypeAccess)
+{
     using type_zero =
         Slot<long(int, double, float, float, char, bool)>::arg<0>::type;
     using type_one =
@@ -46,12 +46,14 @@ TEST(SlotTest, ArgumentNTypeAccess) {
     EXPECT_EQ(typeid(bool), typeid(type_five));
 }
 
-TEST(SlotTest, DefaultConstructor) {
+TEST(SlotTest, DefaultConstructor)
+{
     Slot<void(int)> s;
     EXPECT_TRUE(s.slot_function() == nullptr);
 }
 
-TEST(SlotTest, CopyAssignmentOperator) {
+TEST(SlotTest, CopyAssignmentOperator)
+{
     Slot<int(int, double)> s;
     Slot<int(int, double)> s2{[](int, double) { return 3; }};
 
@@ -70,13 +72,15 @@ TEST(SlotTest, CopyAssignmentOperator) {
     EXPECT_TRUE(s.expired());
 }
 
-TEST(SlotTest, WithDefaultFunctionType) {
+TEST(SlotTest, WithDefaultFunctionType)
+{
     Slot<double(int, double)> a_slot = {[](int i, double d) { return i + d; }};
 
     EXPECT_DOUBLE_EQ(7.2, a_slot(4, 3.2));
 }
 
-TEST(SlotTest, WithBoostFunctionType) {
+TEST(SlotTest, WithBoostFunctionType)
+{
     Slot<int(int), boost::function<int(int)>> a_slot{
         [](int i) { return i * 2; }};
 
@@ -84,14 +88,16 @@ TEST(SlotTest, WithBoostFunctionType) {
 }
 
 // Update with checks once implemented(?)
-TEST(SlotTest, TrackWeakPointer) {
+TEST(SlotTest, TrackWeakPointer)
+{
     Slot<void(int, double)> s = {[](int, double) { return; }};
-    auto s_i = std::make_shared<int>(5);
+    auto s_i                  = std::make_shared<int>(5);
     s.track(s_i);
     s.track(std::make_shared<char>('g'));
 }
 
-TEST(SlotTest, TrackSignal) {
+TEST(SlotTest, TrackSignal)
+{
     auto sig = std::make_shared<Signal<void(int)>>();
     sig->connect([](int) { return; });
 
@@ -115,11 +121,12 @@ TEST(SlotTest, TrackSignal) {
     EXPECT_NO_THROW(sig2(1, 1.0));
 }
 
-TEST(SlotTest, TrackSlot) {
-    Slot<void(int)> s1 = [](int) { return; };
-    Slot<void(int)> s2 = [](int) { return; };
+TEST(SlotTest, TrackSlot)
+{
+    Slot<void(int)> s1         = [](int) { return; };
+    Slot<void(int)> s2         = [](int) { return; };
     Slot<double(char, int)> s3 = [](char, int) { return 3.4; };
-    Slot<void(int)> s4 = [](int) { return; };
+    Slot<void(int)> s4         = [](int) { return; };
 
     auto obj1 = std::make_shared<int>(5);
     s1.track(obj1);
@@ -146,7 +153,8 @@ TEST(SlotTest, TrackSlot) {
     EXPECT_TRUE(s4.expired());
 }
 
-TEST(SlotTest, SlotFunction) {
+TEST(SlotTest, SlotFunction)
+{
     Slot<int(char, double)> s{[](char, double) { return 5; }};
 
     EXPECT_EQ(5, s.slot_function()('g', 3.7));
@@ -160,19 +168,22 @@ TEST(SlotTest, SlotFunction) {
     s_v.slot_function()('h', 7.3);
 }
 
-TEST(SlotTest, ConstSlotFunction) {
+TEST(SlotTest, ConstSlotFunction)
+{
     const Slot<int(char, double)> s{[](char, double) { return 5; }};
 
     EXPECT_EQ(5, s.slot_function()('g', 3.7));
 }
 
 // Update
-TEST(SlotTest, ConstructWithSignal) {
+TEST(SlotTest, ConstructWithSignal)
+{
     Signal<int(int)> sig;
-    Slot<Optional<int>(int)> a_slot{sig};
+    Slot<std::optional<int>(int)> a_slot{sig};
 }
 
-TEST(SlotTest, CopyConstructor) {
+TEST(SlotTest, CopyConstructor)
+{
     Slot<double(int)> s{[](int) { return 7.3; }};
     auto obj = std::make_shared<char>('u');
     s.track(obj);
@@ -189,7 +200,8 @@ TEST(SlotTest, CopyConstructor) {
     EXPECT_TRUE(s.expired());
 }
 
-TEST(SlotTest, BindWithConstructor) {
+TEST(SlotTest, BindWithConstructor)
+{
     auto lmda = [](int i, double d, char c) { return i + d; };
 
     Slot<double(char)> s{std::bind(lmda, 5, 2.3, std::placeholders::_1)};
@@ -198,7 +210,8 @@ TEST(SlotTest, BindWithConstructor) {
     // s(2.3, 'h');
 }
 
-TEST(SlotTest, ParenthesisOperator) {
+TEST(SlotTest, ParenthesisOperator)
+{
     // result returned
     Slot<int(int, int)> s{[](int i, int ii) { return i + ii; }};
 

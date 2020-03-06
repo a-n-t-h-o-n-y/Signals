@@ -1,7 +1,7 @@
 # FIND GTEST
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-find_package(GTest)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - find_package(GTest)
 find_package(Threads)
+find_package(GTest REQUIRED)
 add_library(gtest INTERFACE IMPORTED)
 set_property(TARGET gtest PROPERTY
     INTERFACE_INCLUDE_DIRECTORIES ${GTEST_INCLUDE_DIRS})
@@ -21,12 +21,12 @@ add_executable(signals_test EXCLUDE_FROM_ALL
     optional_last_value_test.cpp
 )
 
-target_link_libraries(signals_test PUBLIC gtest signals)
+target_link_libraries(signals_test PUBLIC signals gtest)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.8")
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
 else()
-    target_compile_features(signals_test INTERFACE cxx_std_14)
+    target_compile_features(signals_test INTERFACE cxx_std_17)
 endif()
 
 add_test(signals_test signals_test)
