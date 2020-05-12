@@ -48,7 +48,7 @@ class Slot<Ret(Args...), FunctionType> : public Slot_base {
     ///
     /// \param func Function pointer, lambda, functor, etc... to be stored.
     template <typename Function>
-    Slot(const Function& func) noexcept(noexcept(decltype(function_){func})) : function_{func} {}
+    Slot(const Function& func) noexcept(noexcept(Slot_function_t{func})) : function_{func} {}
 
     /// \brief Constructs from a Signal, automatically tracks the Signal.
     ///
