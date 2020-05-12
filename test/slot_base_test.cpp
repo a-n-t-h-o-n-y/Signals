@@ -8,7 +8,8 @@
 
 using sig::Slot;
 
-TEST(SlotBaseTest, Expired) {
+TEST(SlotBaseTest, Expired)
+{
     Slot<void(int)> s = {[](int) { return; }};
     EXPECT_FALSE(s.expired());
 
@@ -20,8 +21,8 @@ TEST(SlotBaseTest, Expired) {
     EXPECT_TRUE(s.expired());
 
     Slot<void(int)> s2 = {[](int) { return; }};
-    auto s_int = std::make_shared<int>(7);
-    auto s_char2 = std::make_shared<char>('y');
+    auto s_int         = std::make_shared<int>(7);
+    auto s_char2       = std::make_shared<char>('y');
     s2.track(s_int);
     s2.track(s_char2);
     EXPECT_FALSE(s2.expired());
@@ -34,7 +35,8 @@ TEST(SlotBaseTest, Expired) {
 }
 
 // Add Tracked items and check again
-TEST(SlotBaseTest, Lock) {
+TEST(SlotBaseTest, Lock)
+{
     Slot<void(int)> s = {[](int) { return; }};
     EXPECT_EQ(std::vector<std::shared_ptr<void>>{}, s.lock());
 

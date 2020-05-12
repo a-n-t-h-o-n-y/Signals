@@ -10,20 +10,23 @@ using sig::Connection;
 using sig::Connection_impl;
 using sig::Slot;
 
-TEST(ConnectionImplTest, DefaultConstructor) {
+TEST(ConnectionImplTest, DefaultConstructor)
+{
     Connection_impl<void(int)> impl;
     EXPECT_FALSE(impl.connected());
     EXPECT_FALSE(impl.blocked());
 }
 
-TEST(ConnectionImplTest, SlotConstructor) {
+TEST(ConnectionImplTest, SlotConstructor)
+{
     Slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl(s);
     EXPECT_TRUE(impl.connected());
     EXPECT_FALSE(impl.blocked());
 }
 
-TEST(ConnectionImplTest, DisconnectMethod) {
+TEST(ConnectionImplTest, DisconnectMethod)
+{
     Slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl(s);
     EXPECT_TRUE(impl.connected());
@@ -34,7 +37,8 @@ TEST(ConnectionImplTest, DisconnectMethod) {
     EXPECT_FALSE(impl.blocked());
 }
 
-TEST(ConnectionImplTest, BlockedMethod) {
+TEST(ConnectionImplTest, BlockedMethod)
+{
     Connection_impl<void(int)> impl1;
     EXPECT_FALSE(impl1.blocked());
 
@@ -43,7 +47,8 @@ TEST(ConnectionImplTest, BlockedMethod) {
     EXPECT_FALSE(impl2.blocked());
 }
 
-TEST(ConnectionImplTest, ConnectedMethod) {
+TEST(ConnectionImplTest, ConnectedMethod)
+{
     Slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl1(s);
     EXPECT_TRUE(impl1.connected());
@@ -52,26 +57,29 @@ TEST(ConnectionImplTest, ConnectedMethod) {
     EXPECT_FALSE(impl2.connected());
 }
 
-TEST(ConnectionImplTest, GetSlotMethod) {
+TEST(ConnectionImplTest, GetSlotMethod)
+{
     Slot<int(int)> s1 = [](int) { return 5; };
     Connection_impl<int(int)> impl(s1);
 
     EXPECT_EQ(5, (impl.get_slot())(1));
 
     Slot<int(int)> s2 = [](int) { return 7; };
-    impl.get_slot() = s2;
+    impl.get_slot()   = s2;
 
     EXPECT_EQ(7, (impl.get_slot())(1));
 }
 
-TEST(ConnectionImplTest, ConstGetSlotMethod) {
+TEST(ConnectionImplTest, ConstGetSlotMethod)
+{
     Slot<int(int)> s1 = [](int) { return 5; };
     const Connection_impl<int(int)> impl(s1);
 
     EXPECT_EQ(5, (impl.get_slot())(1));
 }
 
-TEST(ConnectionImplTest, EmplaceExtended) {
+TEST(ConnectionImplTest, EmplaceExtended)
+{
     auto ci = std::make_shared<Connection_impl<int(double)>>();
     Slot<int(const Connection&, double)> es = [](const Connection&, double) {
         return 3;

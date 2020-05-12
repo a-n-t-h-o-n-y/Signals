@@ -1,5 +1,5 @@
-#ifndef DETAIL_SLOT_ITERATOR_HPP
-#define DETAIL_SLOT_ITERATOR_HPP
+#ifndef SIGNALS_DETAIL_SLOT_ITERATOR_HPP
+#define SIGNALS_DETAIL_SLOT_ITERATOR_HPP
 #include <iterator>
 
 namespace sig {
@@ -17,23 +17,27 @@ class Slot_iterator {
         typename std::iterator_traits<InputIterator>::value_type;
     using Result_t = typename Iter_value_t::result_type;
 
+   public:
     Slot_iterator() = default;
 
     explicit Slot_iterator(InputIterator iter) : iter_{iter} {}
 
-    Result_t operator*() {
+   public:
+    auto operator*() -> Result_t
+    {
         auto slot = *iter_;
         return slot();
     }
 
-    Slot_iterator& operator++() {
+    auto operator++() -> Slot_iterator&
+    {
         ++iter_;
         return *this;
     }
 
-    bool operator==(const Slot_iterator& x) { return iter_ == x.iter_; }
+    auto operator==(Slot_iterator const& x) -> bool { return iter_ == x.iter_; }
 
-    bool operator!=(const Slot_iterator& x) { return !operator==(x); }
+    auto operator!=(Slot_iterator const& x) -> bool { return !operator==(x); }
 
    private:
     InputIterator iter_;
@@ -41,4 +45,4 @@ class Slot_iterator {
 
 }  // namespace sig
 
-#endif  // DETAIL_SLOT_ITERATOR_HPP
+#endif  // SIGNALS_DETAIL_SLOT_ITERATOR_HPP

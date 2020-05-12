@@ -1,7 +1,8 @@
-#ifndef DETAIL_CONNECTION_IMPL_BASE_HPP
-#define DETAIL_CONNECTION_IMPL_BASE_HPP
+#ifndef SIGNALS_DETAIL_CONNECTION_IMPL_BASE_HPP
+#define SIGNALS_DETAIL_CONNECTION_IMPL_BASE_HPP
 #include <cstddef>
 #include <mutex>
+#include <utility>
 
 namespace sig {
 
@@ -10,64 +11,72 @@ namespace sig {
 // having an internal implementation vary on the Slot type.
 class Connection_impl_base {
    public:
+    virtual ~Connection_impl_base() = default;
+
     Connection_impl_base() = default;
-    Connection_impl_base(const Connection_impl_base& other) {
-        std::lock_guard<Mutex> lock{other.mtx_};
+
+    Connection_impl_base(Connection_impl_base const& other)
+    {
+        auto const lock        = std::lock_guard{other.mtx_};
         blocking_object_count_ = other.blocking_object_count_;
     }
 
-    Connection_impl_base(Connection_impl_base&& other) {
-        std::lock_guard<Mutex> lock{other.mtx_};
+    Connection_impl_base(Connection_impl_base&& other)
+    {
+        auto const lock        = std::lock_guard{other.mtx_};
         blocking_object_count_ = std::move(other.blocking_object_count_);
     }
 
-    Connection_impl_base& operator=(const Connection_impl_base& rhs) {
+    auto operator=(Connection_impl_base const& rhs) -> Connection_impl_base&
+    {
         if (this != &rhs) {
-            std::unique_lock<Mutex> lhs_lock{this->mtx_, std::defer_lock};
-            std::unique_lock<Mutex> rhs_lock{rhs.mtx_, std::defer_lock};
+            auto lhs_lock = std::unique_lock{this->mtx_, std::defer_lock};
+            auto rhs_lock = std::unique_lock{rhs.mtx_, std::defer_lock};
             std::lock(lhs_lock, rhs_lock);
             blocking_object_count_ = rhs.blocking_object_count_;
         }
         return *this;
     }
 
-    Connection_impl_base& operator=(Connection_impl_base&& rhs) {
+    auto operator=(Connection_impl_base&& rhs) -> Connection_impl_base&
+    {
         if (this != &rhs) {
-            std::unique_lock<Mutex> lhs_lock{this->mtx_, std::defer_lock};
-            std::unique_lock<Mutex> rhs_lock{rhs.mtx_, std::defer_lock};
+            auto lhs_lock = std::unique_lock{this->mtx_, std::defer_lock};
+            auto rhs_lock = std::unique_lock{rhs.mtx_, std::defer_lock};
             std::lock(lhs_lock, rhs_lock);
             blocking_object_count_ = std::move(rhs.blocking_object_count_);
         }
         return *this;
     }
 
-    virtual ~Connection_impl_base() = default;
-
+   public:
     virtual void disconnect() = 0;
 
-    virtual bool connected() const = 0;
+    virtual auto connected() const -> bool = 0;
 
-    inline bool blocked() const {
-        std::lock_guard<Mutex> lock{mtx_};
+    auto blocked() const -> bool
+    {
+        auto const lock = std::lock_guard{mtx_};
         return blocking_object_count_ < 1 ? false : true;
     }
 
-    inline void add_block() {
-        std::lock_guard<Mutex> lock{mtx_};
+    void add_block()
+    {
+        auto const lock = std::lock_guard{mtx_};
         ++blocking_object_count_;
     }
 
-    inline void remove_block() {
-        std::lock_guard<Mutex> lock{mtx_};
+    void remove_block()
+    {
+        auto const lock = std::lock_guard{mtx_};
         --blocking_object_count_;
     }
 
    protected:
     std::size_t blocking_object_count_ = 0;
 
-    using Mutex = std::mutex;
-    mutable Mutex mtx_;
+    mutable std::mutex mtx_;
 };
 
 }  // namespace sig
-#endif  // DETAIL_CONNECTION_IMPL_BASE_HPP
+#endif  // SIGNALS_DETAIL_CONNECTION_IMPL_BASE_HPP

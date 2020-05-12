@@ -1,5 +1,5 @@
-#ifndef DETAIL_FUNCTION_TYPE_SPLITTER_HPP
-#define DETAIL_FUNCTION_TYPE_SPLITTER_HPP
+#ifndef SIGNALS_DETAIL_FUNCTION_TYPE_SPLITTER_HPP
+#define SIGNALS_DETAIL_FUNCTION_TYPE_SPLITTER_HPP
 #include <tuple>
 
 namespace sig {
@@ -8,14 +8,14 @@ template <typename Function>
 class Function_type_splitter;
 
 // For extracting the return and argument types from a function.
-template <typename Ret, typename... Args>
-class Function_type_splitter<Ret(Args...)> {
+template <typename R, typename... Args>
+class Function_type_splitter<R(Args...)> {
    public:
-    static const int arity = sizeof...(Args);
+    static constexpr auto arity = sizeof...(Args);
 
-    using Return_t = Ret;
+    using Return_t         = R;
     using Argument_tuple_t = std::tuple<Args...>;
 };
 
 }  // namespace sig
-#endif  // DETAIL_FUNCTION_TYPE_SPLITTER_HPP
+#endif  // SIGNALS_DETAIL_FUNCTION_TYPE_SPLITTER_HPP

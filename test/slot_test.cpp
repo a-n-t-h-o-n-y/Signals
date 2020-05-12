@@ -26,18 +26,13 @@ TEST(SlotTest, Arity)
 
 TEST(SlotTest, ArgumentNTypeAccess)
 {
-    using type_zero =
-        Slot<long(int, double, float, float, char, bool)>::arg<0>::type;
-    using type_one =
-        Slot<long(int, double, float, float, char, bool)>::arg<1>::type;
-    using type_two =
-        Slot<long(int, double, float, float, char, bool)>::arg<2>::type;
+    using type_zero = Slot<long(int, double, float, float, char, bool)>::arg<0>;
+    using type_one  = Slot<long(int, double, float, float, char, bool)>::arg<1>;
+    using type_two  = Slot<long(int, double, float, float, char, bool)>::arg<2>;
     using type_three =
-        Slot<long(int, double, float, float, char, bool)>::arg<3>::type;
-    using type_four =
-        Slot<long(int, double, float, float, char, bool)>::arg<4>::type;
-    using type_five =
-        Slot<long(int, double, float, float, char, bool)>::arg<5>::type;
+        Slot<long(int, double, float, float, char, bool)>::arg<3>;
+    using type_four = Slot<long(int, double, float, float, char, bool)>::arg<4>;
+    using type_five = Slot<long(int, double, float, float, char, bool)>::arg<5>;
     EXPECT_EQ(typeid(int), typeid(type_zero));
     EXPECT_EQ(typeid(double), typeid(type_one));
     EXPECT_EQ(typeid(float), typeid(type_two));

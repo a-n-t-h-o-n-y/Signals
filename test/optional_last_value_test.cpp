@@ -6,7 +6,8 @@
 
 using sig::Optional_last_value;
 
-TEST(OptionalLastValueTest, VectorTest) {
+TEST(OptionalLastValueTest, VectorTest)
+{
     std::vector<int> vec{1, 2, 3, 4, 5};
     Optional_last_value<int> olv{};
     Optional_last_value<int>::Result_type result;
@@ -15,7 +16,8 @@ TEST(OptionalLastValueTest, VectorTest) {
     EXPECT_EQ(5, *result);
 }
 
-TEST(OptionalLastValueTest, EmptyRange) {
+TEST(OptionalLastValueTest, EmptyRange)
+{
     std::vector<int> vec{};
     Optional_last_value<int> olv{};
     Optional_last_value<int>::Result_type result;
