@@ -1,7 +1,9 @@
 # FIND GTEST
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - find_package(GTest)
 find_package(Threads)
-find_package(GTest REQUIRED)
+find_package(GTest)
+
+if (GTEST_FOUND)
 add_library(gtest INTERFACE IMPORTED)
 set_property(TARGET gtest PROPERTY
     INTERFACE_INCLUDE_DIRECTORIES ${GTEST_INCLUDE_DIRS})
@@ -30,3 +32,4 @@ else()
 endif()
 
 add_test(signals_test signals_test)
+endif()
