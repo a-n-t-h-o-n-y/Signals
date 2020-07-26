@@ -23,7 +23,7 @@ add_executable(signals_test EXCLUDE_FROM_ALL
     optional_last_value_test.cpp
 )
 
-target_link_libraries(signals_test PUBLIC signals gtest)
+target_link_libraries(signals_test PUBLIC signals gtest catch_two)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.8")
     set(CMAKE_CXX_STANDARD 17)
