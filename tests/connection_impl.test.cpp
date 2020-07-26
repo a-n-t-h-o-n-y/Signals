@@ -1,84 +1,84 @@
+#include <memory>
+
 #include <signals/connection.hpp>
 #include <signals/detail/connection_impl.hpp>
 #include <signals/slot.hpp>
 
-#include <gtest/gtest.h>
-
-#include <memory>
+#include <catch2/catch.hpp>
 
 using sig::Connection;
 using sig::Connection_impl;
 using sig::Slot;
 
-TEST(ConnectionImplTest, DefaultConstructor)
+TEST_CASE("Connection_impl()", "[connection_impl]")
 {
     Connection_impl<void(int)> impl;
-    EXPECT_FALSE(impl.connected());
-    EXPECT_FALSE(impl.blocked());
+    CHECK_FALSE(impl.connected());
+    CHECK_FALSE(impl.blocked());
 }
 
-TEST(ConnectionImplTest, SlotConstructor)
+TEST_CASE("Connection_impl(Slot)", "[connection_impl]")
 {
     Slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl(s);
-    EXPECT_TRUE(impl.connected());
-    EXPECT_FALSE(impl.blocked());
+    CHECK(impl.connected());
+    CHECK_FALSE(impl.blocked());
 }
 
-TEST(ConnectionImplTest, DisconnectMethod)
+TEST_CASE("Connection_impl::disconnect()", "[connection_impl]")
 {
     Slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl(s);
-    EXPECT_TRUE(impl.connected());
-    EXPECT_FALSE(impl.blocked());
+    CHECK(impl.connected());
+    CHECK_FALSE(impl.blocked());
 
     impl.disconnect();
-    EXPECT_FALSE(impl.connected());
-    EXPECT_FALSE(impl.blocked());
+    CHECK_FALSE(impl.connected());
+    CHECK_FALSE(impl.blocked());
 }
 
-TEST(ConnectionImplTest, BlockedMethod)
+TEST_CASE("Connection_impl::blocked()", "[connection_impl]")
 {
     Connection_impl<void(int)> impl1;
-    EXPECT_FALSE(impl1.blocked());
+    CHECK_FALSE(impl1.blocked());
 
     Slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl2(s);
-    EXPECT_FALSE(impl2.blocked());
+    CHECK_FALSE(impl2.blocked());
 }
 
-TEST(ConnectionImplTest, ConnectedMethod)
+TEST_CASE("Connection_impl::connected()", "[connection_impl]")
 {
     Slot<void(int)> s = [](int) { return; };
     Connection_impl<void(int)> impl1(s);
-    EXPECT_TRUE(impl1.connected());
+    CHECK(impl1.connected());
 
     Connection_impl<void(int)> impl2;
-    EXPECT_FALSE(impl2.connected());
+    CHECK_FALSE(impl2.connected());
 }
 
-TEST(ConnectionImplTest, GetSlotMethod)
+TEST_CASE("Connection_impl::get_slot()", "[connection_impl]")
 {
     Slot<int(int)> s1 = [](int) { return 5; };
     Connection_impl<int(int)> impl(s1);
 
-    EXPECT_EQ(5, (impl.get_slot())(1));
+    CHECK((impl.get_slot())(1) == 5);
 
     Slot<int(int)> s2 = [](int) { return 7; };
     impl.get_slot()   = s2;
 
-    EXPECT_EQ(7, (impl.get_slot())(1));
+    CHECK((impl.get_slot())(1) == 7);
 }
 
-TEST(ConnectionImplTest, ConstGetSlotMethod)
+TEST_CASE("Connection_impl::get_slot() const", "[connection_impl]")
 {
     Slot<int(int)> s1 = [](int) { return 5; };
     const Connection_impl<int(int)> impl(s1);
 
-    EXPECT_EQ(5, (impl.get_slot())(1));
+    CHECK((impl.get_slot())(1) == 5);
 }
 
-TEST(ConnectionImplTest, EmplaceExtended)
+TEST_CASE("Connection_impl::emplace_extended()", "[connection_impl]")
 {
     auto ci = std::make_shared<Connection_impl<int(double)>>();
     Slot<int(const Connection&, double)> es = [](const Connection&, double) {
@@ -86,6 +86,6 @@ TEST(ConnectionImplTest, EmplaceExtended)
     };
     Connection conn{ci};
     ci->emplace_extended(es, conn);
-    EXPECT_TRUE(conn.connected());
-    EXPECT_EQ(3, ci->get_slot()(5.4));
+    CHECK(conn.connected());
+    CHECK(ci->get_slot()(5.4) == 3);
 }

@@ -3,8 +3,7 @@ project(libsignals LANGUAGES CXX)
 include(GNUInstallDirs)
 enable_testing()
 
-# CREATE SIGNALS LIBRARY
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Create Signals Library
 add_library(signals INTERFACE)
 
 target_include_directories(signals
@@ -19,8 +18,7 @@ else()
     target_compile_features(signals INTERFACE cxx_std_17)
 endif()
 
-# LIBRARY INSTALLATION
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Install Signals Library
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(TARGETS signals EXPORT SignalsLibraryConfig)
 install(EXPORT SignalsLibraryConfig DESTINATION share/SignalsLibrary/cmake)
@@ -31,17 +29,6 @@ export(
         SignalsLibraryConfig.cmake
 )
 
-# ADD TESTS
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Tests
 add_subdirectory(external/)
-add_subdirectory(test/)
-
-# DOXYGEN
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-    add_custom_target(signals_docs
-        ${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/Doxyfile
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs
-        COMMENT "Generating API documentation with Doxygen" VERBATIM)
-endif()
+add_subdirectory(tests/)

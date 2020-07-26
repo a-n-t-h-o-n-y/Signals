@@ -2,7 +2,7 @@
 #define SIGNALS_SHARED_CONNECTION_BLOCK_HPP
 #include <memory>
 
-#include <signals/connection.hpp>
+#include "connection.hpp"
 
 namespace sig {
 class Connection_impl_base;

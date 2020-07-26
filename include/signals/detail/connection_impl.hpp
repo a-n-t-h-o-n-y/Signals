@@ -4,9 +4,9 @@
 #include <mutex>
 #include <utility>
 
-#include <signals/connection.hpp>
-#include <signals/detail/connection_impl_base.hpp>
-#include <signals/slot.hpp>
+#include "../connection.hpp"
+#include "../slot.hpp"
+#include "connection_impl_base.hpp"
 
 namespace sig {
 class Connection;

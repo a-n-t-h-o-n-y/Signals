@@ -1,10 +1,5 @@
 #ifndef SIGNALS_DETAIL_SIGNAL_IMPL_HPP
 #define SIGNALS_DETAIL_SIGNAL_IMPL_HPP
-#include <signals/connection.hpp>
-#include <signals/detail/connection_impl.hpp>
-#include <signals/detail/slot_iterator.hpp>
-#include <signals/position.hpp>
-
 #include <cstddef>
 #include <deque>
 #include <functional>
@@ -12,6 +7,11 @@
 #include <memory>
 #include <mutex>
 #include <utility>
+
+#include "../connection.hpp"
+#include "../position.hpp"
+#include "connection_impl.hpp"
+#include "slot_iterator.hpp"
 
 namespace sig {
 

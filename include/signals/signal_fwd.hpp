@@ -6,8 +6,8 @@
 #include <functional>
 #include <mutex>
 
-#include <signals/detail/function_type_splitter.hpp>
-#include <signals/optional_last_value.hpp>
+#include "detail/function_type_splitter.hpp"
+#include "optional_last_value.hpp"
 
 namespace sig {
 

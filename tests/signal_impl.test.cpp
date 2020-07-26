@@ -1,19 +1,20 @@
-#include <signals/connection.hpp>
-#include <signals/detail/signal_impl.hpp>
-#include <signals/optional_last_value.hpp>
-#include <signals/position.hpp>
-#include <signals/signal.hpp>
-#include <signals/slot.hpp>
-
-#include <gtest/gtest.h>
-#include <boost/function.hpp>
-
 #include <functional>
 #include <mutex>
 #include <optional>
 #include <type_traits>
 #include <typeinfo>
 #include <vector>
+
+#include <boost/function.hpp>
+
+#include <catch2/catch.hpp>
+
+#include <signals/connection.hpp>
+#include <signals/detail/signal_impl.hpp>
+#include <signals/optional_last_value.hpp>
+#include <signals/position.hpp>
+#include <signals/signal.hpp>
+#include <signals/slot.hpp>
 
 using sig::Connection;
 using sig::Optional_last_value;
@@ -22,7 +23,7 @@ using sig::Signal;
 using sig::Signal_impl;
 using sig::Slot;
 
-class SignalImplTest : public testing::Test {
+class Signal_impl_fixture {
    protected:
     using type_1 = Signal_impl<void(int),
                                Optional_last_value<void>,
@@ -52,7 +53,7 @@ class SignalImplTest : public testing::Test {
                                std::function<char(int, double)>,
                                std::mutex>;
 
-    SignalImplTest()
+    Signal_impl_fixture()
     {
         signal_std.connect(boost_slot_non_empty1);
         signal_std.connect(std_slot_non_empty1);
@@ -178,82 +179,92 @@ class SignalImplTest : public testing::Test {
     };
 };
 
-TEST_F(SignalImplTest, Constructor)
+TEST_CASE_METHOD(Signal_impl_fixture, "Signal_impl()", "[Signal_impl]")
 {
-    EXPECT_EQ(0, si_type1_1.num_slots());
-    EXPECT_EQ(0, si_type2_1.num_slots());
-    EXPECT_EQ(0, si_type3_1.num_slots());
+    CHECK(0 == si_type1_1.num_slots());
+    CHECK(0 == si_type2_1.num_slots());
+    CHECK(0 == si_type3_1.num_slots());
 
-    EXPECT_TRUE(si_type1_1.empty());
-    EXPECT_TRUE(si_type2_1.empty());
-    EXPECT_TRUE(si_type3_1.empty());
+    CHECK(si_type1_1.empty());
+    CHECK(si_type2_1.empty());
+    CHECK(si_type3_1.empty());
 
     si_type1_1(7);  // returns void
-    EXPECT_FALSE(bool(si_type2_1('l', 5)));
-    EXPECT_FALSE(bool(si_type3_1(99)));
+    CHECK_FALSE(bool(si_type2_1('l', 5)));
+    CHECK_FALSE(bool(si_type3_1(99)));
 }
 
-TEST_F(SignalImplTest, CopyConstructor)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl(Signal_impl const&)",
+                 "[Signal_impl]")
 {
     type_1 copied = si_type1_1;
-    EXPECT_EQ(0, copied.num_slots());
-    EXPECT_TRUE(copied.empty());
+    CHECK(0 == copied.num_slots());
+    CHECK(copied.empty());
     copied(7);  // returns void
 
     type_2 copied2 = si_type2_2;
-    EXPECT_EQ(3, copied2.num_slots());
-    EXPECT_FALSE(copied2.empty());
-    ASSERT_TRUE(bool(copied2('f', 7)));
-    EXPECT_DOUBLE_EQ(9.1, *(copied2('4', 6)));
+    CHECK(3 == copied2.num_slots());
+    CHECK_FALSE(copied2.empty());
+    REQUIRE(bool(copied2('f', 7)));
+    CHECK(9.1 == Approx(*(copied2('4', 6))).margin(1e-12));
 
     type_3 copied3 = si_type3_2;
-    EXPECT_EQ(6, copied3.num_slots());
-    EXPECT_FALSE(copied3.empty());
-    ASSERT_TRUE(bool(copied3(9999)));
-    EXPECT_EQ(9, *(copied3(9997876)));
+    CHECK(6 == copied3.num_slots());
+    CHECK_FALSE(copied3.empty());
+    REQUIRE(bool(copied3(9999)));
+    CHECK(9 == *(copied3(9997876)));
 }
 
-TEST_F(SignalImplTest, MoveConstructor)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl(Signal_impl&&)",
+                 "[Signal_impl]")
 {
     type_1 sig_impl_mv1{std::move(si_type1_1)};
-    EXPECT_TRUE(si_type1_1.empty());
+    CHECK(si_type1_1.empty());
 
     type_1 sig_impl_mv2{std::move(si_type1_2)};
-    EXPECT_TRUE(si_type1_2.empty());
-    EXPECT_EQ(1, sig_impl_mv2.num_slots());
+    CHECK(si_type1_2.empty());
+    CHECK(1 == sig_impl_mv2.num_slots());
 
     type_3 sig_impl_mv3{std::move(si_type3_2)};
-    EXPECT_TRUE(si_type3_2.empty());
-    EXPECT_EQ(6, sig_impl_mv3.num_slots());
+    CHECK(si_type3_2.empty());
+    CHECK(6 == sig_impl_mv3.num_slots());
 }
 
-TEST_F(SignalImplTest, CopyAssignmentOperator)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::operator=(Signal_impl const&)",
+                 "[Signal_impl]")
 {
-    EXPECT_TRUE(si_type1_1.empty());
+    CHECK(si_type1_1.empty());
     si_type1_1 = si_type1_2;
-    EXPECT_EQ(1, si_type1_1.num_slots());
-    EXPECT_EQ(1, si_type1_2.num_slots());
+    CHECK(1 == si_type1_1.num_slots());
+    CHECK(1 == si_type1_2.num_slots());
 
-    EXPECT_EQ(6, si_type3_2.num_slots());
+    CHECK(6 == si_type3_2.num_slots());
     si_type3_1 = si_type3_2;
-    EXPECT_EQ(6, si_type3_1.num_slots());
-    EXPECT_EQ(6, si_type3_2.num_slots());
+    CHECK(6 == si_type3_1.num_slots());
+    CHECK(6 == si_type3_2.num_slots());
 }
 
-TEST_F(SignalImplTest, MoveAssignmentOperator)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::operator=(Signal_impl&&)",
+                 "[Signal_impl]")
 {
-    EXPECT_TRUE(si_type1_1.empty());
+    CHECK(si_type1_1.empty());
     si_type1_1 = std::move(si_type1_2);
-    EXPECT_EQ(1, si_type1_1.num_slots());
-    EXPECT_TRUE(si_type1_2.empty());
+    CHECK(1 == si_type1_1.num_slots());
+    CHECK(si_type1_2.empty());
 
-    EXPECT_EQ(6, si_type3_2.num_slots());
+    CHECK(6 == si_type3_2.num_slots());
     si_type3_1 = std::move(si_type3_2);
-    EXPECT_EQ(6, si_type3_1.num_slots());
-    EXPECT_TRUE(si_type3_2.empty());
+    CHECK(6 == si_type3_1.num_slots());
+    CHECK(si_type3_2.empty());
 }
 
-TEST_F(SignalImplTest, ConnectPosition)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::connect() by position",
+                 "[Signal_impl]")
 {
     // void(int)
     // this slot calls a signal which calls both a std slot and a boost slot.
@@ -261,7 +272,7 @@ TEST_F(SignalImplTest, ConnectPosition)
         si_type1_1.connect(std_slot_holds_signal, Position::at_back);
     Connection conn2 =
         si_type1_1.connect(std_slot_non_empty1, Position::at_front);
-    EXPECT_EQ(2, si_type1_1.num_slots());
+    CHECK(2 == si_type1_1.num_slots());
     si_type1_1(7);  // returns void
 
     // double(char, int)
@@ -269,11 +280,11 @@ TEST_F(SignalImplTest, ConnectPosition)
         si_type2_1.connect([](char, int) { return 8.3; }, Position::at_back);
     Connection conn4 =
         si_type2_1.connect([](char, int) { return 2.8; }, Position::at_front);
-    EXPECT_EQ(2, si_type2_1.num_slots());
-    EXPECT_DOUBLE_EQ(8.3, *si_type2_1('f', 5));
+    CHECK(2 == si_type2_1.num_slots());
+    CHECK(8.3 == Approx(*si_type2_1('f', 5)).margin(1e-12));
     conn3.disconnect();
-    EXPECT_EQ(1, si_type2_1.num_slots());
-    EXPECT_DOUBLE_EQ(2.8, *si_type2_1('k', 8));
+    CHECK(1 == si_type2_1.num_slots());
+    CHECK(2.8 == Approx(*si_type2_1('k', 8)).margin(1e-12));
 
     // unsigned(long long)
     Connection conn5 = si_type3_1.connect(std_slot_non_empty2,
@@ -283,22 +294,24 @@ TEST_F(SignalImplTest, ConnectPosition)
     Connection conn7 =
         si_type3_1.connect([](long long) { return 2; }, Position::at_front);
 
-    EXPECT_EQ(3, si_type3_1.num_slots());
-    EXPECT_EQ(3, *si_type3_1(9999999));
+    CHECK(3 == si_type3_1.num_slots());
+    CHECK(3 == *si_type3_1(9999999));
     conn6.disconnect();
-    EXPECT_EQ(7, *si_type3_1(7654321));
+    CHECK(7 == *si_type3_1(7654321));
     conn5.disconnect();
-    EXPECT_EQ(2, *si_type3_1(1234567));
+    CHECK(2 == *si_type3_1(1234567));
 }
 
-TEST_F(SignalImplTest, ConnectGroupPosition)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::connect() by group and position",
+                 "[Signal_impl]")
 {
     // void(int), less<int>
     Connection conn1 =
         si_type1_1.connect(3, std_slot_holds_signal, Position::at_back);
     Connection conn2 =
         si_type1_1.connect(1, std_slot_non_empty1, Position::at_front);
-    EXPECT_EQ(2, si_type1_1.num_slots());
+    CHECK(2 == si_type1_1.num_slots());
     si_type1_1(7);  // returns void
 
     // double(char, int), less<char>
@@ -308,14 +321,14 @@ TEST_F(SignalImplTest, ConnectGroupPosition)
         'z', [](char, int) { return 2.8; }, Position::at_front);
     Connection conn5 = si_type2_1.connect(
         'z', [](char, int) { return 7.3; }, Position::at_back);
-    EXPECT_EQ(3, si_type2_1.num_slots());
-    EXPECT_DOUBLE_EQ(7.3, *si_type2_1('f', 5));
+    CHECK(3 == si_type2_1.num_slots());
+    CHECK(7.3 == Approx(*si_type2_1('f', 5)).margin(1e-12));
     conn5.disconnect();
-    EXPECT_EQ(2, si_type2_1.num_slots());
-    EXPECT_DOUBLE_EQ(2.8, *si_type2_1('k', 8));
+    CHECK(2 == si_type2_1.num_slots());
+    CHECK(2.8 == Approx(*si_type2_1('k', 8)).margin(1e-12));
     conn4.disconnect();
-    EXPECT_EQ(1, si_type2_1.num_slots());
-    EXPECT_DOUBLE_EQ(8.3, *si_type2_1('k', 8));
+    CHECK(1 == si_type2_1.num_slots());
+    CHECK(8.3 == Approx(*si_type2_1('k', 8)).margin(1e-12));
 
     // unsigned(long long), greater<double>
     Connection conn6 = si_type3_1.connect(5.4, std_slot_non_empty2,
@@ -327,17 +340,19 @@ TEST_F(SignalImplTest, ConnectGroupPosition)
     Connection conn9 = si_type3_1.connect(
         0.77, [](long long) { return 2; }, Position::at_front);
 
-    EXPECT_EQ(4, si_type3_1.num_slots());
-    EXPECT_EQ(2, *si_type3_1(9999999));
+    CHECK(4 == si_type3_1.num_slots());
+    CHECK(2 == *si_type3_1(9999999));
     conn9.disconnect();
-    EXPECT_EQ(3, *si_type3_1(7654321));
+    CHECK(3 == *si_type3_1(7654321));
     conn7.disconnect();
-    EXPECT_EQ(8, *si_type3_1(1234567));
+    CHECK(8 == *si_type3_1(1234567));
     conn8.disconnect();
-    EXPECT_EQ(7, *si_type3_1(1234567));
+    CHECK(7 == *si_type3_1(1234567));
 }
 
-TEST_F(SignalImplTest, BothConnects)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::connect() both overloads",
+                 "[Signal_impl]")
 {
     // double(char, int), less<char>
     Connection conn1 = si_type2_1.connect(
@@ -349,113 +364,121 @@ TEST_F(SignalImplTest, BothConnects)
     Connection conn4 = si_type2_1.connect(
         'z', [](char, int) { return 7.3; }, Position::at_front);
 
-    EXPECT_DOUBLE_EQ(9.1, *si_type2_1('f', 5));
+    CHECK(9.1 == Approx(*si_type2_1('f', 5)).margin(1e-12));
     conn3.disconnect();
 
-    EXPECT_DOUBLE_EQ(7.3, *si_type2_1('f', 5));
+    CHECK(7.3 == Approx(*si_type2_1('f', 5)).margin(1e-12));
     conn4.disconnect();
 
-    EXPECT_DOUBLE_EQ(8.3, *si_type2_1('k', 8));
+    CHECK(8.3 == Approx(*si_type2_1('k', 8)).margin(1e-12));
     conn1.disconnect();
 
-    EXPECT_DOUBLE_EQ(2.8, *si_type2_1('k', 8));
+    CHECK(2.8 == Approx(*si_type2_1('k', 8)).margin(1e-12));
 }
 
-TEST_F(SignalImplTest, ConnectExtendedPosition)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::connect_extended() by position",
+                 "[Signal_impl]")
 {
     // char(int, double)
     Connection conn1 =
         si_type4.connect_extended(boost_extended_slot, Position::at_front);
-    EXPECT_FALSE(conn1 == Connection());
-    EXPECT_EQ(1, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(6, 3.42)));
-    EXPECT_EQ('h', *si_type4(6, 3.42));
+    CHECK_FALSE(conn1 == Connection());
+    CHECK(1 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(6, 3.42)));
+    CHECK('h' == *si_type4(6, 3.42));
 
     Connection conn2 =
         si_type4.connect_extended(std_extended_slot, Position::at_back);
-    EXPECT_EQ(2, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(8, 0.43)));
-    EXPECT_EQ('k', *si_type4(8, 0.43));
+    CHECK(2 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(8, 0.43)));
+    CHECK('k' == *si_type4(8, 0.43));
 
     conn1.disconnect();
 
-    EXPECT_EQ(1, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(8, 0.43)));
-    EXPECT_EQ('k', *si_type4(8, 0.43));
+    CHECK(1 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(8, 0.43)));
+    CHECK('k' == *si_type4(8, 0.43));
 }
 
-TEST_F(SignalImplTest, ConnectExtendedGroupPosition)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::connect_extended() by group and position",
+                 "[Signal_impl]")
 {
     // char(int, double)
     Connection conn1 =
         si_type4.connect_extended(5, boost_extended_slot, Position::at_front);
-    EXPECT_FALSE(conn1 == Connection());
-    EXPECT_EQ(1, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(6, 3.42)));
-    EXPECT_EQ('h', *si_type4(6, 3.42));
+    CHECK_FALSE(conn1 == Connection());
+    CHECK(1 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(6, 3.42)));
+    CHECK('h' == *si_type4(6, 3.42));
 
     Connection conn2 =
         si_type4.connect_extended(3, std_extended_slot, Position::at_back);
-    EXPECT_EQ(2, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(8, 0.43)));
-    EXPECT_EQ('h', *si_type4(8, 0.43));
+    CHECK(2 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(8, 0.43)));
+    CHECK('h' == *si_type4(8, 0.43));
 
     conn1.disconnect();
 
-    EXPECT_EQ(1, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(8, 0.43)));
-    EXPECT_EQ('k', *si_type4(8, 0.43));
+    CHECK(1 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(8, 0.43)));
+    CHECK('k' == *si_type4(8, 0.43));
 }
 
-TEST_F(SignalImplTest, ConnectExtendedBoth)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::connect_extended() both overloads",
+                 "[Signal_impl]")
 {
     // char(int, double)
     Connection conn1 =
         si_type4.connect_extended(5, boost_extended_slot, Position::at_front);
-    EXPECT_FALSE(conn1 == Connection());
-    EXPECT_EQ(1, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(6, 3.42)));
-    EXPECT_EQ('h', *si_type4(6, 3.42));
+    CHECK_FALSE(conn1 == Connection());
+    CHECK(1 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(6, 3.42)));
+    CHECK('h' == *si_type4(6, 3.42));
 
     Connection conn2 = si_type4.connect_extended(
         [](const Connection&, int, double) { return 'l'; }, Position::at_front);
-    EXPECT_EQ(2, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(8, 0.43)));
-    EXPECT_EQ('h', *si_type4(8, 0.43));
+    CHECK(2 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(8, 0.43)));
+    CHECK('h' == *si_type4(8, 0.43));
 
     Connection conn3 = si_type4.connect_extended(
         [](const Connection&, int, double) { return 'p'; }, Position::at_back);
-    EXPECT_EQ(3, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(8, 0.43)));
-    EXPECT_EQ('p', *si_type4(8, 0.43));
+    CHECK(3 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(8, 0.43)));
+    CHECK('p' == *si_type4(8, 0.43));
 
     Connection conn4 =
         si_type4.connect_extended(3, std_extended_slot, Position::at_back);
-    EXPECT_EQ(4, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(8, 0.43)));
-    EXPECT_EQ('p', *si_type4(8, 0.43));
+    CHECK(4 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(8, 0.43)));
+    CHECK('p' == *si_type4(8, 0.43));
 
     conn3.disconnect();
-    EXPECT_EQ(3, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(8, 0.43)));
-    EXPECT_EQ('h', *si_type4(8, 0.43));
+    CHECK(3 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(8, 0.43)));
+    CHECK('h' == *si_type4(8, 0.43));
 
     conn1.disconnect();
-    EXPECT_EQ(2, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(8, 0.43)));
-    EXPECT_EQ('k', *si_type4(8, 0.43));
+    CHECK(2 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(8, 0.43)));
+    CHECK('k' == *si_type4(8, 0.43));
 
     conn4.disconnect();
-    EXPECT_EQ(1, si_type4.num_slots());
-    ASSERT_TRUE(bool(si_type4(8, 0.43)));
-    EXPECT_EQ('l', *si_type4(8, 0.43));
+    CHECK(1 == si_type4.num_slots());
+    REQUIRE(bool(si_type4(8, 0.43)));
+    CHECK('l' == *si_type4(8, 0.43));
 
     conn2.disconnect();
-    EXPECT_TRUE(si_type4.empty());
-    EXPECT_FALSE(bool(si_type4(8, 0.43)));
+    CHECK(si_type4.empty());
+    CHECK_FALSE(bool(si_type4(8, 0.43)));
 }
 
-TEST_F(SignalImplTest, DisconnectByGroup)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::disconnect() by group",
+                 "[Signal_impl]")
 {
     // double(char, int), less<char>
     si_type2_1.connect(
@@ -467,67 +490,75 @@ TEST_F(SignalImplTest, DisconnectByGroup)
     si_type2_1.connect(
         'z', [](char, int) { return 7.3; }, Position::at_front);
 
-    EXPECT_DOUBLE_EQ(7.3, *si_type2_1('f', 5));
+    CHECK(7.3 == Approx(*si_type2_1('f', 5)).margin(1e-12));
     si_type2_1.disconnect('z');
 
-    EXPECT_DOUBLE_EQ(1.3, *si_type2_1('f', 5));
+    CHECK(1.3 == Approx(*si_type2_1('f', 5)).margin(1e-12));
     si_type2_1.disconnect('a');
 
-    EXPECT_DOUBLE_EQ(2.8, *si_type2_1('k', 8));
+    CHECK(2.8 == Approx(*si_type2_1('k', 8)).margin(1e-12));
 }
 
-TEST_F(SignalImplTest, DisconnectAllSlots)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::disconnect_all_slots()",
+                 "[Signal_impl]")
 {
-    EXPECT_EQ(6, si_type3_2.num_slots());
+    CHECK(6 == si_type3_2.num_slots());
 
     si_type3_2.disconnect_all_slots();
 
-    EXPECT_EQ(0, si_type3_2.num_slots());
-    EXPECT_TRUE(si_type3_2.empty());
+    CHECK(0 == si_type3_2.num_slots());
+    CHECK(si_type3_2.empty());
 }
 
-TEST_F(SignalImplTest, Empty)
+TEST_CASE_METHOD(Signal_impl_fixture, "Signal_impl::empty()", "[Signal_impl]")
 {
-    EXPECT_TRUE(si_type1_1.empty());
+    CHECK(si_type1_1.empty());
 
     si_type1_1.disconnect_all_slots();
 
-    EXPECT_TRUE(si_type1_1.empty());
+    CHECK(si_type1_1.empty());
 
     si_type3_2.disconnect_all_slots();
-    EXPECT_TRUE(si_type3_2.empty());
+    CHECK(si_type3_2.empty());
 }
 
-TEST_F(SignalImplTest, NumSlots)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::num_slots()",
+                 "[Signal_impl]")
 {
-    EXPECT_EQ(0, si_type1_1.num_slots());
-    EXPECT_EQ(1, si_type1_2.num_slots());
-    EXPECT_EQ(3, si_type2_2.num_slots());
-    EXPECT_EQ(6, si_type3_2.num_slots());
+    CHECK(0 == si_type1_1.num_slots());
+    CHECK(1 == si_type1_2.num_slots());
+    CHECK(3 == si_type2_2.num_slots());
+    CHECK(6 == si_type3_2.num_slots());
 }
 
-TEST_F(SignalImplTest, OperatorParenthesisCall)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::operator()",
+                 "[Signal_impl]")
 {
     // call on empty signal that returns void
     si_type1_1(1);
 
     // call on empty signal that does not return void
-    EXPECT_FALSE(bool(si_type2_1('j', 5)));
+    CHECK_FALSE(bool(si_type2_1('j', 5)));
 
     // call on void return type signal that contains slots
     si_type1_2(8);
 
     // call on non-void return type signal and check return value
-    ASSERT_TRUE(bool(si_type2_2('r', 8)));
-    EXPECT_DOUBLE_EQ(9.1, *si_type2_2('r', 8));
+    REQUIRE(bool(si_type2_2('r', 8)));
+    CHECK(9.1 == Approx(*si_type2_2('r', 8)).margin(1e-12));
 
     // Signal_impl with extended slots
     si_type4.connect_extended(boost_extended_slot, Position::at_back);
-    ASSERT_TRUE(bool(si_type4(6, 3.2)));
-    EXPECT_EQ('h', *si_type4(6, 3.2));
+    REQUIRE(bool(si_type4(6, 3.2)));
+    CHECK('h' == *si_type4(6, 3.2));
 }
 
-TEST_F(SignalImplTest, ConstOperatorParenthesisCall)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::operator() const",
+                 "[Signal_impl]")
 {
     // call on empty signal that returns void
     const type_1 si_1 = si_type1_1;
@@ -535,7 +566,7 @@ TEST_F(SignalImplTest, ConstOperatorParenthesisCall)
 
     // call on empty signal that does not return void
     const type_2 si_2 = si_type2_1;
-    EXPECT_FALSE(bool(si_2('j', 5)));
+    CHECK_FALSE(bool(si_2('j', 5)));
 
     // call on void return type signal that contains slots
     const type_1 si_3 = si_type1_2;
@@ -543,35 +574,38 @@ TEST_F(SignalImplTest, ConstOperatorParenthesisCall)
 
     // call on non-void return type signal and check return value
     const type_2 si_4 = si_type2_2;
-    ASSERT_TRUE(bool(si_4('r', 8)));
-    EXPECT_DOUBLE_EQ(9.1, *si_4('r', 8));
+    REQUIRE(bool(si_4('r', 8)));
+    CHECK(9.1 == Approx(*si_4('r', 8)).margin(1e-12));
 
     // Signal_impl with extended slots
     si_type4.connect_extended(boost_extended_slot, Position::at_back);
     const type_4 si_5 = si_type4;
-    ASSERT_TRUE(bool(si_5(6, 3.2)));
-    EXPECT_EQ('h', *si_5(6, 3.2));
+    REQUIRE(bool(si_5(6, 3.2)));
+    CHECK('h' == *si_5(6, 3.2));
 }
 
-TEST_F(SignalImplTest, Combiner)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::combiner()",
+                 "[Signal_impl]")
 {
-    EXPECT_TRUE(typeid(si_type2_2.combiner()) ==
-                typeid(Optional_last_value<double>{}));
+    CHECK(typeid(si_type2_2.combiner()) ==
+          typeid(Optional_last_value<double>{}));
 
     auto comb = si_type3_1.combiner();
     std::vector<int> vec{1, 2, 3, 4, 5};
     auto i = comb(std::begin(vec), std::end(vec));
-    ASSERT_TRUE(bool(i));
-    EXPECT_EQ(5, *i);
+    REQUIRE(bool(i));
+    CHECK(5 == *i);
 }
 
-TEST_F(SignalImplTest, SetCombiner)
+TEST_CASE_METHOD(Signal_impl_fixture,
+                 "Signal_impl::set_combiner()",
+                 "[Signal_impl]")
 {
     si_type1_2.set_combiner(Optional_last_value<void>{});
-    EXPECT_TRUE(typeid(si_type1_2.combiner()) ==
-                typeid(Optional_last_value<void>{}));
+    CHECK(typeid(si_type1_2.combiner()) == typeid(Optional_last_value<void>{}));
 
     si_type2_2.set_combiner(Optional_last_value<double>{});
-    EXPECT_TRUE(typeid(si_type2_2.combiner()) ==
-                typeid(Optional_last_value<double>{}));
+    CHECK(typeid(si_type2_2.combiner()) ==
+          typeid(Optional_last_value<double>{}));
 }

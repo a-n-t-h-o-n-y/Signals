@@ -6,11 +6,11 @@
 #include <tuple>
 #include <utility>
 
-#include <signals/connection.hpp>
-#include <signals/detail/signal_impl.hpp>
-#include <signals/position.hpp>
-#include <signals/signal_fwd.hpp>
-#include <signals/slot_fwd.hpp>
+#include "connection.hpp"
+#include "detail/signal_impl.hpp"
+#include "position.hpp"
+#include "signal_fwd.hpp"
+#include "slot_fwd.hpp"
 
 namespace sig {
 

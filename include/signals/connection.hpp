@@ -3,7 +3,7 @@
 #include <memory>
 #include <utility>
 
-#include <signals/detail/connection_impl_base.hpp>
+#include "detail/connection_impl_base.hpp"
 
 namespace sig {
 
