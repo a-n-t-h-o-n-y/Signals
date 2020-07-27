@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['arg',['arg',['../classsig_1_1Signal_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01GroupCompare_00_01SlotFunction_00_01Mutex_01_4_1_1arg.html',1,'sig::Signal&lt; Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex &gt;::arg&lt; n &gt;'],['../classsig_1_1Slot_3_01Ret_07Args_8_8_8_08_00_01FunctionType_01_4_1_1arg.html',1,'sig::Slot&lt; Ret(Args...), FunctionType &gt;::arg&lt; n &gt;']]]
+  ['connection_58',['Connection',['../classsig_1_1Connection.html',1,'sig']]],
+  ['connection_5fimpl_59',['Connection_impl',['../classsig_1_1Connection__impl.html',1,'sig']]],
+  ['connection_5fimpl_3c_20r_28args_2e_2e_2e_29_3e_60',['Connection_impl&lt; R(Args...)&gt;',['../classsig_1_1Connection__impl_3_01R_07Args_8_8_8_08_4.html',1,'sig']]],
+  ['connection_5fimpl_5fbase_61',['Connection_impl_base',['../classsig_1_1Connection__impl__base.html',1,'sig']]]
 ];

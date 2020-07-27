@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['empty',['empty',['../classsig_1_1Signal_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01GroupCompare_00_01SlotFunction_00_01Mutex_01_4.html#a4bbbdd4ed4dbcb8b3f4f7ca60d41e68d',1,'sig::Signal&lt; Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex &gt;']]],
-  ['enable',['enable',['../classsig_1_1Signal_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01GroupCompare_00_01SlotFunction_00_01Mutex_01_4.html#af75ebfa078a62d5221abdae905cdcae0',1,'sig::Signal&lt; Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex &gt;']]],
-  ['enabled',['enabled',['../classsig_1_1Signal_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01GroupCompare_00_01SlotFunction_00_01Mutex_01_4.html#a8c087e571cd892f775046fa1d9a3093c',1,'sig::Signal&lt; Ret(Args...), Combiner, Group, GroupCompare, SlotFunction, Mutex &gt;']]],
-  ['expired',['expired',['../classsig_1_1Slot__base.html#af13610e2d7cbb411718215502366a276',1,'sig::Slot_base']]],
-  ['expired_5fslot',['Expired_slot',['../classsig_1_1Expired__slot.html',1,'sig::Expired_slot'],['../classsig_1_1Expired__slot.html#a8bc246238acaf1d10fedccc7033ee15d',1,'sig::Expired_slot::Expired_slot()']]],
-  ['expired_5fslot_2ehpp',['expired_slot.hpp',['../expired__slot_8hpp.html',1,'']]]
+  ['empty_17',['empty',['../classsig_1_1Signal_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01Group__compare_00_01Slot__function_00_01Mutex_01_4.html#ae7e8e114927b2b12ca4613601fe26d54',1,'sig::Signal&lt; Ret(Args...), Combiner, Group, Group_compare, Slot_function, Mutex &gt;']]],
+  ['enable_18',['enable',['../classsig_1_1Signal_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01Group__compare_00_01Slot__function_00_01Mutex_01_4.html#a9e52bf9b2bd51aa0e537c0c952a41bfd',1,'sig::Signal&lt; Ret(Args...), Combiner, Group, Group_compare, Slot_function, Mutex &gt;']]],
+  ['enabled_19',['enabled',['../classsig_1_1Signal_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01Group__compare_00_01Slot__function_00_01Mutex_01_4.html#a50779e4a79fc3ac0ceda03e068ab34ae',1,'sig::Signal&lt; Ret(Args...), Combiner, Group, Group_compare, Slot_function, Mutex &gt;']]],
+  ['expired_20',['expired',['../classsig_1_1Slot__base.html#aa010c199ff2d139fa64ad9af6c14177d',1,'sig::Slot_base']]],
+  ['expired_5fslot_21',['Expired_slot',['../structsig_1_1Expired__slot.html',1,'sig']]]
 ];
