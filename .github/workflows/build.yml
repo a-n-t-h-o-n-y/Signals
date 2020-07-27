@@ -13,10 +13,12 @@ jobs:
           submodules: recursive
       - name: boost
         run: sudo apt-get update && sudo apt-get install -yq libboost-dev
-      - run: |
+      - name: build
+        run: |
           mkdir build && cd build
           cmake .. && make -j2 signals_test
-          ./tests/signals_test
+      - name: run-tests
+        run: ./tests/signals_test
   clang-build:
     runs-on: ubuntu-20.04
     steps:
@@ -25,8 +27,10 @@ jobs:
           submodules: recursive
       - name: boost
         run: sudo apt-get update && sudo apt-get install -yq libboost-dev
-      - run: |
+      - name: build
+        run: |
           mkdir build && cd build
           export CXX=clang++ && export CC=clang
           cmake .. && make -j2 signals_test
-          ./tests/signals_test
+      - name: run-tests
+        run: ./tests/signals_test
