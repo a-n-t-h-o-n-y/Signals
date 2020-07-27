@@ -1,3 +1,5 @@
+![build badge](https://github.com/a-n-t-h-o-n-y/Signals/workflows/build/badge.svg)
+
 ## Overview
 An implementation of the Boost::Signals2 library.
 
