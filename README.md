@@ -113,10 +113,9 @@ Using CMake:
 ```
 git clone https://github.com/a-n-t-h-o-n-y/Signals.git
 mkdir Signals/build && cd Signals/build
-git submodule init      # Initialize Optional Library dependency
-git submodule update
+git submodule update --init --recursive   # For testing only
 cmake ..
-make testsignals        # Build tests(Optional)
+make signals_test       # Build tests(Optional)
 ctest                   # Run tests(Optional)
 sudo make install       # Install headers to system default include directory
 ```
