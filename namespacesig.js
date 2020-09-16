@@ -12,8 +12,6 @@ var namespacesig =
     [ "Shared_connection_block", "classsig_1_1Shared__connection__block.html", "classsig_1_1Shared__connection__block" ],
     [ "Signal", "classsig_1_1Signal.html", null ],
     [ "Signal< Ret(Args...), Combiner, Group, Group_compare, Slot_function, Mutex >", "classsig_1_1Signal_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01Group__compare_00_01Slot__function_00_01Mutex_01_4.html", "classsig_1_1Signal_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01Group__compare_00_01Slot__function_00_01Mutex_01_4" ],
-    [ "Signal_impl", "classsig_1_1Signal__impl.html", null ],
-    [ "Signal_impl< Ret(Args...), Combiner, Group, Group_compare, Slot_function, Mutex >", "classsig_1_1Signal__impl_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01Group__compare_00a18f206677d24d09da7822735fcf1893.html", "classsig_1_1Signal__impl_3_01Ret_07Args_8_8_8_08_00_01Combiner_00_01Group_00_01Group__compare_00a18f206677d24d09da7822735fcf1893" ],
     [ "Slot", "classsig_1_1Slot.html", null ],
     [ "Slot< R(Args...), FunctionType >", "classsig_1_1Slot_3_01R_07Args_8_8_8_08_00_01FunctionType_01_4.html", "classsig_1_1Slot_3_01R_07Args_8_8_8_08_00_01FunctionType_01_4" ],
     [ "Slot_base", "classsig_1_1Slot__base.html", "classsig_1_1Slot__base" ],

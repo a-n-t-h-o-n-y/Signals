@@ -9,15 +9,10 @@ var files_dup =
     [ "position.hpp", "position_8hpp_source.html", null ],
     [ "shared_connection_block.hpp", "shared__connection__block_8hpp_source.html", null ],
     [ "signal.hpp", "signal_8hpp_source.html", null ],
-    [ "signal_fwd.hpp", "signal__fwd_8hpp.html", [
-      [ "Signal", "classsig_1_1Signal.html", null ]
-    ] ],
-    [ "signal_impl.hpp", "signal__impl_8hpp_source.html", null ],
+    [ "signal_fwd.hpp", "signal__fwd_8hpp.html", null ],
     [ "signals.hpp", "signals_8hpp_source.html", null ],
     [ "slot.hpp", "slot_8hpp_source.html", null ],
     [ "slot_base.hpp", "slot__base_8hpp_source.html", null ],
-    [ "slot_fwd.hpp", "slot__fwd_8hpp.html", [
-      [ "Slot", "classsig_1_1Slot.html", null ]
-    ] ],
+    [ "slot_fwd.hpp", "slot__fwd_8hpp.html", null ],
     [ "slot_iterator.hpp", "slot__iterator_8hpp_source.html", null ]
 ];
