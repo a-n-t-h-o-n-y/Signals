@@ -6,7 +6,6 @@ add_executable(signals_test EXCLUDE_FROM_ALL
     optional_last_value.test.cpp
     shared_connection_block.test.cpp
     signal.test.cpp
-    signal_impl.test.cpp
     slot.test.cpp
     slot_base.test.cpp
 )

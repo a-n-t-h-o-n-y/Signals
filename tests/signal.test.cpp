@@ -123,8 +123,6 @@ TEST_CASE("Signal(Signal&&)", "[signal]")
     CHECK(bool(result));
     CHECK(*result == 'r');
 
-    CHECK(sig.lock_impl() == nullptr);
-
     to_track1.reset();
     // EXPECT_THROW(sig_move_to(4, 2.1), Expired_slot);
 }
@@ -152,8 +150,6 @@ TEST_CASE("Signal::operator=(Signal&&)", "[signal]")
 
     CHECK(bool(result));
     CHECK(*result == 'r');
-
-    CHECK(sig.lock_impl() == nullptr);
 
     to_track1.reset();
     // EXPECT_THROW(sig_move_to(4, 2.1), Expired_slot);
@@ -851,21 +847,11 @@ TEST_CASE("Signal::swap()", "[signal]")
     CHECK(6 == *result2);
 }
 
-TEST_CASE("Signal::lock_impl() as void", "[signal]")
+TEST_CASE("Signal::get_tracker()", "[signal]")
 {
     Signal<int(char)> sig;
     Slot<int(char)> slot_1 = [](char) { return 6; };
     sig.connect(slot_1);
 
-    CHECK(2 == sig.lock_impl().use_count());
-}
-
-TEST_CASE("Signal::lock_impl()", "[signal]")
-{
-    Signal<int(char)> sig;
-    Slot<int(char)> slot_1 = [](char) { return 6; };
-    sig.connect(slot_1);
-
-    CHECK(1 == sig.lock_impl()->num_slots());
-    CHECK(2 == sig.lock_impl().use_count());
+    CHECK(2 == sig.get_tracker().use_count());
 }

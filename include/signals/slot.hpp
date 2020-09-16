@@ -55,10 +55,9 @@ class Slot<R(Args...), FunctionType> : public Slot_base {
               typename W,
               typename X,
               typename Y>
-    explicit Slot(Signal<T, U, V, W, X, Y> const& sig)
-        : function_{*(sig.lock_impl())}
+    explicit Slot(Signal<T, U, V, W, X, Y> const& signal) : function_{signal}
     {
-        track(sig);
+        track(signal);
     }
 
    public:
@@ -104,7 +103,7 @@ class Slot<R(Args...), FunctionType> : public Slot_base {
               typename Y>
     auto track(Signal<T, U, V, W, X, Y> const& sig) -> Slot&
     {
-        tracked_ptrs_.push_back(sig.lock_impl_as_void());
+        tracked_ptrs_.push_back(sig.get_tracker());
         return *this;
     }
 

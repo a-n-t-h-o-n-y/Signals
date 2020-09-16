@@ -2,12 +2,17 @@
 #define SIGNALS_SIGNAL_HPP
 #include <cstddef>
 #include <functional>
+#include <map>
 #include <memory>
+#include <mutex>
+#include <optional>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 #include "connection.hpp"
-#include "detail/signal_impl.hpp"
+#include "detail/connection_impl.hpp"
+#include "detail/slot_iterator.hpp"
 #include "position.hpp"
 #include "signal_fwd.hpp"
 #include "slot_fwd.hpp"
@@ -40,6 +45,9 @@ class Signal<Ret(Args...),
              Group_compare,
              Slot_function,
              Mutex> {
+   private:
+    using Lock_t = std::scoped_lock<Mutex>;
+
    public:
     using Result_type = typename Combiner::Result_type;
     using Signature   = Ret(Args...);
@@ -48,13 +56,7 @@ class Signal<Ret(Args...),
         std::function<Ret(Connection const&, Args...)>;
     using Extended_slot =
         Slot<Ret(Connection const&, Args...), Extended_slot_function>;
-    using Arguments      = std::tuple<Args...>;
-    using Implementation = Signal_impl<Signature,
-                                       Combiner,
-                                       Group,
-                                       Group_compare,
-                                       Slot_function,
-                                       Mutex>;
+    using Arguments = std::tuple<Args...>;
 
     /// Number of arguments the Signal takes.
     static constexpr int arity = std::tuple_size_v<Arguments>;
@@ -69,14 +71,50 @@ class Signal<Ret(Args...),
      *  \param group_compare Comparison functor for Slot call order. */
     explicit Signal(Combiner const& combiner           = Combiner(),
                     Group_compare const& group_compare = Group_compare())
-        : pimpl_{std::make_shared<Implementation>(combiner, group_compare)}
+        : connections_{group_compare}, combiner_{std::move(combiner)}
     {}
 
-    Signal(Signal const&)     = delete;
-    Signal(Signal&&) noexcept = default;
-    Signal& operator=(Signal const&) = delete;
-    Signal& operator=(Signal&&) noexcept = default;
-    ~Signal()                            = default;
+    Signal(Signal const& other)
+    {
+        auto const lock = Lock_t{other.mtx_};
+        connections_    = other.connections_;
+        combiner_       = other.combiner_;
+    }
+
+    Signal(Signal&& other) noexcept
+    {
+        auto const lock = Lock_t{other.mtx_};
+        connections_    = std::move(other.connections_);
+        combiner_       = std::move(other.combiner_);
+        tracker_        = std::move(other.tracker_);
+    }
+
+    auto operator=(Signal const& other) -> Signal&
+    {
+        if (this != &other) {
+            auto lhs_lock = std::unique_lock{this->mtx_, std::defer_lock};
+            auto rhs_lock = std::unique_lock{other.mtx_, std::defer_lock};
+            std::lock(lhs_lock, rhs_lock);
+            connections_ = other.connections_;
+            combiner_    = other.combiner_;
+        }
+        return *this;
+    }
+
+    auto operator=(Signal&& other) -> Signal&
+    {
+        if (this != &other) {
+            auto lhs_lock = std::unique_lock{this->mtx_, std::defer_lock};
+            auto rhs_lock = std::unique_lock{other.mtx_, std::defer_lock};
+            std::lock(lhs_lock, rhs_lock);
+            connections_ = std::move(other.connections_);
+            combiner_    = std::move(other.combiner_);
+            tracker_     = std::move(other.tracker_);
+        }
+        return *this;
+    }
+
+    ~Signal() = default;
 
    public:
     /// Connect a Slot to *this either at the front or back of call queue.
@@ -89,7 +127,13 @@ class Signal<Ret(Args...),
     auto connect(Slot_type const& slot, Position position = Position::at_back)
         -> Connection
     {
-        return pimpl_->connect(slot, position);
+        auto c_impl     = std::make_shared<Connection_impl<Signature>>(slot);
+        auto const lock = Lock_t{mtx_};
+        if (position == Position::at_front)
+            connections_.front.emplace(std::begin(connections_.front), c_impl);
+        else
+            connections_.back.push_back(c_impl);
+        return Connection(c_impl);
     }
 
     /// Connect a Slot to *this in a particular call group.
@@ -105,7 +149,15 @@ class Signal<Ret(Args...),
                  Slot_type const& slot,
                  Position position = Position::at_back) -> Connection
     {
-        return pimpl_->connect(group, slot, position);
+        auto c_impl     = std::make_shared<Connection_impl<Signature>>(slot);
+        auto const lock = Lock_t{mtx_};
+        if (position == Position::at_front) {
+            auto& group_container = connections_.grouped[group];
+            group_container.emplace(std::begin(group_container), c_impl);
+        }
+        else
+            connections_.grouped[group].push_back(c_impl);
+        return Connection(c_impl);
     }
 
     /// Connect an extended Slot to *this by \p position.
@@ -121,7 +173,15 @@ class Signal<Ret(Args...),
     auto connect_extended(Extended_slot const& ext_slot,
                           Position position = Position::at_back) -> Connection
     {
-        return pimpl_->connect_extended(ext_slot, position);
+        auto c_impl = std::make_shared<Connection_impl<Signature>>();
+        auto c      = Connection(c_impl);
+        c_impl->emplace_extended(ext_slot, c);
+        auto const lock = Lock_t{mtx_};
+        if (position == Position::at_front)
+            connections_.front.emplace(std::begin(connections_.front), c_impl);
+        else
+            connections_.back.push_back(c_impl);
+        return c;
     }
 
     /// Connect an extended Slot to *this in a particular call group.
@@ -139,27 +199,98 @@ class Signal<Ret(Args...),
      *  Ret ext_slot(Connection const&, Args...)
      *  \param position The position in the group that the Slot is added to.
      *  \returns A Connection object referring to the Signal/Slot Connection. */
-    auto connect_extended(Group const& g,
-                          Extended_slot const& es,
-                          Position pos = Position::at_back) -> Connection
+    auto connect_extended(Group const& group,
+                          Extended_slot const& ext_slot,
+                          Position position = Position::at_back) -> Connection
     {
-        return pimpl_->connect_extended(g, es, pos);
+        auto c_impl = std::make_shared<Connection_impl<Signature>>();
+        auto c      = Connection(c_impl);
+        c_impl->emplace_extended(ext_slot, c);
+        auto const lock = Lock_t{mtx_};
+        if (position == Position::at_front) {
+            auto& group_container = connections_.grouped[group];
+            group_container.emplace(std::begin(group_container), c_impl);
+        }
+        else
+            connections_.grouped[group].push_back(c_impl);
+        return c;
     }
 
     /// Disconnect all Slots in a given group.
     /** \param group The group to disconnect. */
-    void disconnect(Group const& group) { pimpl_->disconnect(group); }
+    void disconnect(Group const& group)
+    {
+        auto const lock = Lock_t{mtx_};
+        for (auto& connection : connections_.grouped[group]) {
+            connection->disconnect();
+        }
+        connections_.grouped.erase(group);
+    }
 
     /// Disconnect all Slots attached to *this.
-    void disconnect_all_slots() { pimpl_->disconnect_all_slots(); }
+    void disconnect_all_slots()
+    {
+        auto const lock = Lock_t{mtx_};
+        for (auto& connection : connections_.front) {
+            connection->disconnect();
+        }
+        for (auto& group : connections_.grouped) {
+            for (auto& connection : group.second) {
+                connection->disconnect();
+            }
+        }
+        for (auto& connection : connections_.back) {
+            connection->disconnect();
+        }
+        connections_.front.clear();
+        connections_.grouped.clear();
+        connections_.back.clear();
+    }
 
     /// Query whether or not *this has any Slots connected to it.
     /** \returns True if *this has no Slots attached, false otherwise. */
-    auto empty() const -> bool { return pimpl_->empty(); }
+    auto empty() const -> bool
+    {
+        auto const lock = Lock_t{mtx_};
+        for (auto& connection : connections_.front) {
+            if (connection->connected())
+                return false;
+        }
+        for (auto& group : connections_.grouped) {
+            for (auto& connection : group.second) {
+                if (connection->connected())
+                    return false;
+            }
+        }
+        for (auto& connection : connections_.back) {
+            if (connection->connected())
+                return false;
+        }
+        return true;
+    }
 
     /// Access the number of Slots connected to *this.
     /** \returns The number of Slots currently connected to *this. */
-    auto num_slots() const -> std::size_t { return pimpl_->num_slots(); }
+    auto num_slots() const -> std::size_t
+    {
+        auto const lock = Lock_t{mtx_};
+        auto size       = 0uL;
+        for (auto& connection : connections_.front) {
+            if (connection->connected())
+                ++size;
+        }
+        for (auto& group : connections_.grouped) {
+            for (auto& connection : group.second) {
+                if (connection->connected())
+                    ++size;
+            }
+        }
+        for (auto& connection : connections_.back) {
+            if (connection->connected())
+                ++size;
+        }
+        return size;
+    }
 
     /// Call operator to call all connected Slots.
     /** All arguments to this call operator are passed onto the Slots. The Slots
@@ -170,7 +301,14 @@ class Signal<Ret(Args...),
     template <typename... Params>
     auto operator()(Params&&... args) -> Result_type
     {
-        return pimpl_->operator()(std::forward<Params>(args)...);
+        if (!this->enabled())
+            return Result_type();
+        auto slots = bind_args(std::forward<Params>(args)...);
+        auto lock  = std::unique_lock{mtx_};
+        auto comb  = combiner_;
+        lock.unlock();
+        return comb(Bound_slot_iterator{std::begin(slots)},
+                    Bound_slot_iterator{std::end(slots)});
     }
 
     /// Call operator to call all connected Slots.
@@ -183,46 +321,124 @@ class Signal<Ret(Args...),
     template <typename... Params>
     auto operator()(Params&&... args) const -> Result_type
     {
-        return pimpl_->operator()(std::forward<Params>(args)...);
+        if (!this->enabled())
+            return Result_type();
+        auto slots            = bind_args(std::forward<Params>(args)...);
+        auto lock             = std::unique_lock{mtx_};
+        auto const const_comb = combiner_;
+        lock.unlock();
+        return const_comb(Bound_slot_iterator{std::begin(slots)},
+                          Bound_slot_iterator{std::end(slots)});
     }
 
     /// Access to the Combiner object.
     /** \returns A copy of the Combiner object used by *this. */
-    auto combiner() const -> Combiner { return pimpl_->combiner(); }
+    auto combiner() const -> Combiner
+    {
+        auto const lock = Lock_t{mtx_};
+        return combiner_;
+    }
 
     /// Set the Combiner object to a new value.
     /** A Combiner is a functor that takes a range of input iterators, it
      *  dereferences each iterator in the range and returns some value as a
      *  Result_type.
      *  \params comb The Combiner object to set for *this. */
-    void set_combiner(Combiner const& comb) { pimpl_->set_combiner(comb); }
+    void set_combiner(Combiner const& comb)
+    {
+        auto const lock = Lock_t{mtx_};
+        combiner_       = comb;
+    }
 
-    /// Ensures the Signal impl will not disapear even if *this is destroyed.
-    auto lock_impl_as_void() const -> std::shared_ptr<void> { return pimpl_; }
-
-    /// Ensures the Signal imple will not disapear even if *this is destroyed.
-    /** Also gives access to impl functions. */
-    auto lock_impl() const -> std::shared_ptr<Implementation> { return pimpl_; }
+    /// Shared pointer that can track the lifetime of this Signal.
+    auto get_tracker() const -> std::shared_ptr<int>
+    {
+        if (!tracker_.has_value())
+            tracker_.emplace(std::make_shared<int>(0));
+        return *tracker_;
+    }
 
     /// Query whether or not the Signal is enabled.
     /** A disabled Signal does not call any connected Slots when the call
      *  operator is summoned.
      *  \returns True if *this is enabled, false otherwise. */
-    auto enabled() const -> bool { return pimpl_->enabled(); }
+    auto enabled() const -> bool
+    {
+        auto const lock = Lock_t{mtx_};
+        return enabled_;
+    }
 
     /// Enable the Signal.
-    /** Connected Slots will be called when call operator is summoned. Safe when
-     *  *this is already enabled. */
-    void enable() { pimpl_->enable(); }
+    /** Connected Slots will be called when call operator is summoned. */
+    void enable()
+    {
+        auto const lock = Lock_t{mtx_};
+        enabled_        = true;
+    }
 
     /// Disable the Signal.
-    /** Connected Slots will _not_ be called when call operator is summoned.
-     *  Safe when *this is already disabled. */
-    void disable() { pimpl_->disable(); }
+    /** Connected Slots will _not_ be called when call operator is summoned. */
+    void disable()
+    {
+        auto const lock = Lock_t{mtx_};
+        enabled_        = false;
+    }
 
    private:
-    // Slots can track a Signals with a shared_ptr
-    std::shared_ptr<Implementation> pimpl_;
+    using Bound_slot_container = std::vector<std::function<Ret()>>;
+    using Bound_slot_iterator =
+        Slot_iterator<typename Bound_slot_container::iterator>;
+
+    class Connection_container {
+       public:
+        using Position_container =
+            std::vector<std::shared_ptr<Connection_impl<Signature>>>;
+        using Group_container =
+            std::map<Group, Position_container, Group_compare>;
+
+       public:
+        Position_container front;
+        Group_container grouped;
+        Position_container back;
+
+       public:
+        Connection_container() = default;
+        Connection_container(Group_compare const& compare) : grouped{compare} {}
+    };
+
+   private:
+    bool enabled_ = true;
+    Connection_container connections_;
+    Combiner combiner_;
+    mutable std::optional<std::shared_ptr<int>> tracker_;
+    mutable Mutex mtx_;
+
+   private:
+    // Binds parameters to each Slot so Combiner does not need to know them.
+    template <typename... Params>
+    auto bind_args(Params&&... args) const -> Bound_slot_container
+    {
+        auto bound_slots = Bound_slot_container{};
+        // Helper Function
+        auto bind_slots = [&bound_slots, &args...](auto& conn_container) {
+            for (auto& connection : conn_container) {
+                if (connection->connected() && !connection->blocked() &&
+                    !connection->get_slot().expired()) {
+                    auto& slot = connection->get_slot();
+                    // you get lucky the args... are still in scope while needed
+                    bound_slots.push_back(
+                        [&slot, &args...] { return slot(args...); });
+                }
+            }
+        };
+        // Bind arguments to all three types of connected Slots.
+        auto const lock = Lock_t{mtx_};
+        bind_slots(connections_.front);
+        for (auto& group : connections_.grouped)
+            bind_slots(group.second);
+        bind_slots(connections_.back);
+        return bound_slots;
+    }
 };
 
 }  // namespace sig

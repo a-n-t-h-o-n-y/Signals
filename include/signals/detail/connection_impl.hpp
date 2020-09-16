@@ -22,6 +22,7 @@ class Connection_impl<R(Args...)> : public Connection_impl_base {
    public:
     using Extended_slot_t = Slot<R(Connection const&, Args...)>;
 
+   public:
     Connection_impl() : slot_{}, connected_{false} {}
 
     explicit Connection_impl(Slot<R(Args...)> s)

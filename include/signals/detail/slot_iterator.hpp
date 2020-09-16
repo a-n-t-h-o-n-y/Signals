@@ -9,7 +9,6 @@ namespace sig {
 // useful for iterating over a container of functions and calling each function
 // on a dereference operation. InputIterator is any container iterator that
 // holds a callable type and can be incremented, dereferenced and copied.
-// \sa Signal_impl
 template <typename InputIterator>
 class Slot_iterator {
    public:
