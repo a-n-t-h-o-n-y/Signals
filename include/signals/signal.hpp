@@ -10,6 +10,8 @@
 #include <utility>
 #include <vector>
 
+#include <iostream>  //temp
+
 #include "connection.hpp"
 #include "detail/connection_impl.hpp"
 #include "detail/slot_iterator.hpp"
@@ -407,11 +409,11 @@ class Signal<Ret(Args...),
     };
 
    private:
-    bool enabled_ = true;
     Connection_container connections_;
-    Combiner combiner_;
     mutable std::optional<std::shared_ptr<int>> tracker_;
     mutable Mutex mtx_;
+    bool enabled_ = true;
+    Combiner combiner_;
 
    private:
     // Binds parameters to each Slot so Combiner does not need to know them.
