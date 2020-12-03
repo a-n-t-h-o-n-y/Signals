@@ -2,5 +2,6 @@ build/*
 docs/html
 notes/
 .clangd/
+.cache/
 *.json
 tags

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5.1)
 
-add_subdirectory(catch-2)
+if (NOT TARGET Catch2)
+    add_subdirectory(catch-2)
+endif()
 
 # Catch2 Main
 add_library(catch_two EXCLUDE_FROM_ALL catch2.main.cpp)
